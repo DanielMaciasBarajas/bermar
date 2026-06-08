@@ -9,10 +9,7 @@ const intlMiddleware = createMiddleware({
 })
 
 export async function middleware(request: NextRequest) {
-  // Run next-intl first (sets locale cookie)
   const intlResponse = intlMiddleware(request)
-
-  // Set up Supabase auth check
   let supabaseResponse = intlResponse ?? NextResponse.next({ request })
 
   const supabase = createServerClient(
@@ -33,7 +30,6 @@ export async function middleware(request: NextRequest) {
   )
 
   const { data: { user } } = await supabase.auth.getUser()
-
   const isAuthPage = request.nextUrl.pathname.startsWith('/auth')
   const isPublicPage = request.nextUrl.pathname === '/'
 
