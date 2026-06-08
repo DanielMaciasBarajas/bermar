@@ -1,0 +1,50 @@
+const config = {
+  content: [
+  './src/**/*.{js,ts,jsx,tsx,mdx}',
+  './app/**/*.{js,ts,jsx,tsx,mdx}',
+],
+  safelist: [
+    'flex', 'flex-1', 'flex-col', 'flex-shrink-0', 'flex-wrap',
+    'grid', 'grid-cols-2', 'grid-cols-3', 'grid-cols-4', 'grid-cols-7',
+    'items-center', 'items-start', 'items-end',
+    'justify-between', 'justify-center', 'justify-end',
+    'gap-1', 'gap-2', 'gap-3', 'gap-4', 'gap-6',
+    'space-y-2', 'space-y-3', 'space-y-4',
+    'w-full', 'w-auto', 'h-full', 'min-w-0', 'max-w-sm', 'max-w-3xl', 'max-w-5xl',
+    'w-6', 'w-7', 'w-8', 'w-9', 'w-10', 'w-14',
+    'h-6', 'h-7', 'h-8', 'h-9', 'h-10', 'h-11', 'h-14', 'h-20',
+    'p-1', 'p-2', 'p-3', 'p-4', 'p-6', 'px-2', 'px-3', 'px-4', 'py-1', 'py-2', 'py-2.5',
+    'mt-1', 'mt-2', 'mt-3', 'mt-4', 'mb-1', 'mb-2', 'mb-3', 'mb-4', 'mb-6', 'ml-auto',
+    'text-xs', 'text-sm', 'text-base', 'text-lg', 'text-xl', 'text-2xl',
+    'font-medium', 'font-semibold', 'font-bold', 'italic',
+    'text-center', 'text-left', 'truncate', 'whitespace-nowrap', 'uppercase', 'tracking-wider',
+    'text-white', 'text-gray-400', 'text-gray-500', 'text-gray-600', 'text-gray-700', 'text-gray-800',
+    'bg-white', 'bg-gray-50', 'bg-gray-100',
+    'text-green-600', 'text-green-700', 'text-green-800',
+    'text-red-500', 'text-red-600', 'text-amber-700', 'text-amber-800',
+    'text-blue-600', 'text-blue-700', 'text-blue-800',
+    'bg-green-50', 'bg-green-100', 'bg-red-50', 'bg-red-100',
+    'bg-amber-50', 'bg-amber-100', 'bg-blue-50', 'bg-blue-100',
+    'bg-purple-100', 'bg-pink-100', 'bg-teal-100',
+    'border-green-200', 'border-red-200', 'border-amber-200', 'border-blue-200',
+    'text-purple-800', 'text-pink-800', 'text-teal-800',
+    'rounded', 'rounded-lg', 'rounded-xl', 'rounded-2xl', 'rounded-full',
+    'border', 'border-2', 'border-dashed', 'border-gray-200', 'border-gray-300',
+    'divide-y', 'divide-gray-100', 'shadow-sm', 'overflow-hidden', 'overflow-y-auto',
+    'cursor-pointer', 'transition-colors', 'transition-all', 'opacity-60',
+    'hover:bg-gray-50', 'hover:bg-green-50', 'hover:underline', 'disabled:opacity-60',
+    'relative', 'absolute', 'inset-0', 'z-10', 'z-20',
+    'hidden', 'block', 'inline-flex', 'inline-block', 'min-h-screen', 'aspect-square',
+  ],
+  theme: {
+    extend: {
+      fontFamily: {
+        sans: ['var(--font-sans)', 'system-ui', 'sans-serif'],
+        serif: ['var(--font-serif)', 'Georgia', 'serif'],
+      },
+    },
+  },
+  plugins: [],
+}
+
+export default config

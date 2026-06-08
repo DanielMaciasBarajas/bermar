@@ -1,0 +1,84 @@
+{
+  "nav": {
+    "dashboard": "Dashboard",
+    "booking": "Book & invite",
+    "events": "Events",
+    "proposals": "Proposals",
+    "marketplace": "Marketplace",
+    "documents": "Documents",
+    "projects": "Projects",
+    "directory": "Directory",
+    "maintenance": "Maintenance",
+    "settings": "Settings",
+    "admin": "Admin"
+  },
+  "dashboard": {
+    "good_morning": "Good morning",
+    "good_afternoon": "Good afternoon",
+    "good_evening": "Good evening",
+    "registered": "Registered",
+    "proposals": "Proposals",
+    "today": "Today",
+    "marketplace": "Marketplace",
+    "activity_feed": "Activity feed",
+    "premises_today": "Premises today",
+    "my_bookings": "My bookings",
+    "community_voice": "Community voice"
+  },
+  "booking": {
+    "select_premise": "Select premise",
+    "tap_to_book": "Tap to book",
+    "your_booking": "Your booking",
+    "taken": "Taken",
+    "gap_rule": "Gap (rule)",
+    "invite_open": "Open this booking to neighbours"
+  },
+  "proposals": {
+    "new_proposal": "+ New proposal",
+    "all_categories": "All categories",
+    "all_statuses": "All statuses",
+    "support": "Support",
+    "against": "Against",
+    "comment": "Comment",
+    "closes_in": "Closes in {days} days"
+  },
+  "marketplace": {
+    "post_listing": "+ Post listing",
+    "contact": "Contact",
+    "all_categories": "All categories"
+  },
+  "documents": {
+    "search": "Search documents...",
+    "all_categories": "All categories",
+    "newest_first": "Newest first",
+    "oldest_first": "Oldest first",
+    "title_az": "Title A–Z",
+    "by_category": "By category"
+  },
+  "maintenance": {
+    "submit_ticket": "Submit a maintenance ticket",
+    "category": "Category",
+    "location": "Location in building",
+    "description": "Description",
+    "urgency": "Urgency",
+    "submit": "Submit ticket →"
+  },
+  "settings": {
+    "who_lives_here": "Who lives here",
+    "interests": "Interests",
+    "privacy": "Privacy & notifications",
+    "save": "Save settings",
+    "danger_zone": "Danger zone",
+    "delete_account": "Delete account"
+  },
+  "common": {
+    "loading": "Loading...",
+    "saving": "Saving...",
+    "cancel": "Cancel",
+    "free": "Free",
+    "join": "Join",
+    "leave": "Leave",
+    "approve": "Approve",
+    "reject": "Reject"
+  }
+}

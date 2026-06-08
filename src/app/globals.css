@@ -1,0 +1,715 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── FONTS ── */
+
+:root {
+  --pine: #1a3d2b;
+  --pine-l: #2d5a3f;
+  --gold: #b8922a;
+  --gold-l: #f0e4b0;
+  --sand: #f4efe6;
+  --sand-d: #e8e0d0;
+  --br: #ddd8cc;
+  --tx: #1c1c1a;
+  --txm: #4a4a45;
+  --txl: #8a8780;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'DM Sans', system-ui, sans-serif;
+  background: var(--sand);
+  color: var(--tx);
+  -webkit-font-smoothing: antialiased;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+h1, h2, h3, h4 {
+  font-family: 'DM Serif Display', Georgia, serif;
+}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--sand-d); border-radius: 2px; }
+
+/* ── APP SHELL ── */
+.app-shell { display: flex; height: 100vh; overflow: hidden; }
+
+/* ── SIDEBAR ── */
+.sidebar {
+  width: 210px;
+  min-width: 210px;
+  background: var(--pine);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  overflow: hidden;
+  transition: width 0.2s ease;
+  position: relative;
+  z-index: 20;
+}
+.sidebar.collapsed { width: 52px; min-width: 52px; }
+.sidebar-top {
+  padding: 14px 12px 11px;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  flex-shrink: 0;
+}
+.sidebar-logo { display: flex; align-items: center; gap: 10px; overflow: hidden; }
+.sidebar-logo-icon {
+  width: 32px; height: 32px; border-radius: 8px;
+  background: rgba(255,255,255,0.1);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.sidebar-logo-text { overflow: hidden; }
+.sidebar-name {
+  font-family: 'DM Serif Display', serif;
+  font-size: 15px; color: #fff; line-height: 1;
+  white-space: nowrap;
+}
+.sidebar-sub { font-size: 9px; color: rgba(255,255,255,0.35); margin-top: 2px; }
+.sidebar-ph { font-size: 8px; color: rgba(255,255,255,0.18); font-style: italic; margin-top: 1px; }
+.apt-pill {
+  display: inline-flex; align-items: center; gap: 3px;
+  background: rgba(184,146,42,0.2); color: var(--gold-l);
+  font-size: 9px; padding: 2px 8px; border-radius: 20px;
+  margin-top: 7px; font-weight: 500; white-space: nowrap;
+}
+.sidebar-nav { flex: 1; padding: 6px; overflow-y: auto; overflow-x: hidden; }
+.nav-section-label {
+  font-size: 8px; color: rgba(255,255,255,0.22);
+  text-transform: uppercase; letter-spacing: 0.7px;
+  padding: 7px 6px 2px; white-space: nowrap;
+}
+.nav-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 8px; border-radius: 8px;
+  cursor: pointer; font-size: 11px;
+  color: rgba(255,255,255,0.52);
+  margin-bottom: 1px; white-space: nowrap;
+  overflow: hidden; text-decoration: none;
+  transition: background 0.1s, color 0.1s;
+}
+.nav-item:hover { background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.85); }
+.nav-item.active { background: rgba(184,146,42,0.17); color: var(--gold-l); font-weight: 500; }
+.nav-icon { font-size: 14px; flex-shrink: 0; width: 16px; text-align: center; }
+.nav-label { overflow: hidden; white-space: nowrap; flex: 1; }
+.nav-badge {
+  background: rgba(239,68,68,0.25); color: #fca5a5;
+  font-size: 9px; padding: 1px 5px; border-radius: 8px;
+  font-weight: 500; flex-shrink: 0;
+}
+.sidebar-footer {
+  padding: 10px 12px;
+  border-top: 1px solid rgba(255,255,255,0.07);
+  flex-shrink: 0;
+}
+.sidebar-user { display: flex; align-items: center; gap: 8px; overflow: hidden; }
+.user-avatar {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: rgba(184,146,42,0.25);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px; font-weight: 600; color: var(--gold-l);
+  flex-shrink: 0;
+}
+.user-name { font-size: 11px; font-weight: 500; color: #fff; }
+.user-role { font-size: 9px; color: rgba(255,255,255,0.38); }
+
+/* ── MAIN AREA ── */
+.main-area { flex: 1; display: flex; flex-direction: column; min-width: 0; overflow: hidden; }
+
+/* ── TOPBAR ── */
+.topbar {
+  height: 46px; flex-shrink: 0;
+  background: rgba(244,239,230,0.97);
+  border-bottom: 1px solid var(--br);
+  display: flex; align-items: center;
+  padding: 0 16px; gap: 10px;
+}
+.topbar-title {
+  flex: 1; font-family: 'DM Serif Display', serif;
+  font-size: 15px; color: var(--tx); font-style: italic;
+}
+.lang-chip {
+  padding: 2px 6px; border-radius: 10px;
+  font-size: 9px; background: var(--pine);
+  color: rgba(255,255,255,0.9); font-weight: 500;
+}
+.lang-more {
+  padding: 2px 6px; border-radius: 10px;
+  font-size: 9px; background: var(--sand-d);
+  color: var(--txm); cursor: pointer; border: none;
+  font-family: inherit;
+}
+.notif-btn {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--sand-d);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; border: none; position: relative;
+}
+.notif-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: #e24b4a; position: absolute;
+  top: 4px; right: 4px;
+  border: 1.5px solid var(--sand);
+}
+.signout-btn {
+  font-size: 11px; color: var(--txl);
+  background: none; border: none; cursor: pointer;
+  font-family: inherit; padding: 4px 8px;
+  border-radius: 6px; transition: background 0.1s;
+}
+.signout-btn:hover { background: var(--sand-d); color: var(--tx); }
+
+/* ── PAGE CONTENT ── */
+.page-content { flex: 1; overflow-y: auto; padding: 16px; }
+
+/* ── CARDS ── */
+.card {
+  background: rgba(255,255,255,0.8);
+  border: 1px solid var(--br);
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 8px;
+}
+.card-sm { padding: 8px 12px; }
+
+/* ── STAT CARDS ── */
+.stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 14px; }
+.stat-card {
+  background: rgba(255,255,255,0.7);
+  border: 1px solid var(--br);
+  border-radius: 12px;
+  padding: 10px 12px;
+  text-align: center;
+}
+.stat-label { font-size: 9px; color: var(--txl); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 4px; }
+.stat-value { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--tx); line-height: 1; }
+.stat-sub { font-size: 9px; color: var(--txl); margin-top: 2px; }
+
+/* ── BANNER ── */
+.banner {
+  width: 100%; height: 80px; border-radius: 12px;
+  overflow: hidden; margin-bottom: 14px;
+  position: relative; background: var(--pine);
+}
+.banner img { width: 100%; height: 100%; object-fit: cover; object-position: center 35%; }
+.banner-overlay {
+  position: absolute; inset: 0;
+  background: rgba(26,61,43,0.5);
+  display: flex; align-items: flex-end;
+  padding: 10px 14px;
+}
+.banner-title { font-family: 'DM Serif Display', serif; font-size: 16px; color: #fff; line-height: 1; }
+.banner-sub { font-size: 10px; color: rgba(255,255,255,0.72); margin-top: 2px; }
+.banner-edit {
+  position: absolute; top: 8px; right: 8px;
+  background: rgba(0,0,0,0.35); color: #fff;
+  font-size: 9px; padding: 3px 8px; border-radius: 6px;
+  cursor: pointer; border: none; font-family: inherit;
+}
+
+/* ── TWO COLUMN ── */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.three-col { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+
+/* ── SECTION TITLE ── */
+.section-title {
+  font-size: 9px; font-weight: 500; color: var(--tx);
+  text-transform: uppercase; letter-spacing: 0.5px;
+  margin-bottom: 8px; margin-top: 14px;
+}
+.section-title:first-child { margin-top: 0; }
+
+/* ── FEED ITEMS ── */
+.feed-item { display: flex; align-items: flex-start; gap: 8px; padding: 7px 0; border-bottom: 1px solid var(--br); }
+.feed-item:last-child { border: none; }
+.feed-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+.feed-text { font-size: 11px; color: var(--tx); line-height: 1.4; }
+.feed-meta { font-size: 9px; color: var(--txl); margin-top: 2px; }
+
+/* ── PREMISE ROWS ── */
+.premise-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 5px 0; border-bottom: 1px solid var(--br);
+  font-size: 11px; color: var(--tx);
+}
+.premise-row:last-child { border: none; }
+
+/* ── TAGS / BADGES ── */
+.tag {
+  display: inline-flex; align-items: center;
+  font-size: 9px; padding: 2px 7px;
+  border-radius: 20px; font-weight: 500;
+}
+.tag-green { background: #dcfce7; color: #166534; }
+.tag-red { background: #fee2e2; color: #991b1b; }
+.tag-amber { background: #fef3c7; color: #92400e; }
+.tag-blue { background: #dbeafe; color: #1e40af; }
+.tag-gray { background: var(--sand-d); color: var(--txm); }
+.tag-pine { background: rgba(26,61,43,0.1); color: var(--pine); }
+.tag-gold { background: var(--gold-l); color: #78590a; }
+.tag-purple { background: #f3e8ff; color: #7c3aed; }
+.tag-pink { background: #fce7f3; color: #be185d; }
+.tag-teal { background: #ccfbf1; color: #0f766e; }
+
+/* ── BUTTONS ── */
+.btn {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 6px 12px; border-radius: 10px; font-size: 12px;
+  cursor: pointer; border: 1px solid var(--br);
+  background: #fff; color: var(--tx);
+  font-family: inherit; font-weight: 500;
+  transition: background 0.1s;
+  text-decoration: none;
+}
+.btn:hover { background: var(--sand-d); }
+.btn-sm { padding: 4px 9px; font-size: 11px; }
+.btn-primary { background: var(--pine); color: #fff; border-color: var(--pine); }
+.btn-primary:hover { background: var(--pine-l); }
+.btn-danger { color: #991b1b; border-color: #fecaca; }
+.btn-danger:hover { background: #fee2e2; }
+.btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* ── FORMS ── */
+.form-label { font-size: 11px; font-weight: 500; color: var(--txm); display: block; margin-bottom: 4px; }
+.form-input, .form-select, .form-textarea {
+  width: 100%; padding: 8px 10px;
+  border: 1px solid var(--br); border-radius: 8px;
+  font-size: 12px; font-family: inherit;
+  background: #fff; color: var(--tx);
+  transition: border-color 0.15s;
+}
+.form-input:focus, .form-select:focus, .form-textarea:focus {
+  outline: none; border-color: var(--pine);
+  box-shadow: 0 0 0 2px rgba(26,61,43,0.1);
+}
+.form-textarea { resize: vertical; min-height: 70px; }
+
+/* ── COMMUNITY VOICE ── */
+.cv-card {
+  background: rgba(26,61,43,0.05);
+  border: 1px solid rgba(26,61,43,0.12);
+  border-radius: 10px; padding: 10px 13px;
+  display: flex; gap: 10px; align-items: flex-start;
+  margin-bottom: 6px;
+}
+.cv-icon {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--pine); flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px;
+}
+.cv-label { font-size: 8px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--pine); font-weight: 500; margin-bottom: 3px; }
+.cv-text { font-family: 'DM Serif Display', serif; font-size: 12px; color: var(--tx); line-height: 1.45; font-style: italic; }
+.cv-time { font-size: 9px; color: var(--txl); margin-top: 3px; }
+
+/* ── LANG NUDGE ── */
+.lang-nudge {
+  background: var(--gold-l); color: #78590a;
+  border: 1px solid #e9d5a0; border-radius: 8px;
+  padding: 7px 10px; font-size: 11px;
+  display: flex; gap: 6px; align-items: flex-start;
+  margin-bottom: 10px;
+}
+
+/* ── WARNING BANNERS ── */
+.warn-bar {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 14px; font-size: 11px; font-weight: 500;
+}
+.warn-bar.type-warning { background: #fee2e2; color: #991b1b; border-bottom: 1px solid #fecaca; }
+.warn-bar.type-announcement { background: #fef3c7; color: #92400e; border-bottom: 1px solid #fde68a; }
+.warn-bar.type-convocatoria { background: #dcfce7; color: #166534; border-bottom: 1px solid #bbf7d0; }
+
+/* ── DIRECTORY GRID ── */
+.dir-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 3px; }
+.dir-cell-empty {
+  aspect-ratio: 1; border-radius: 6px;
+  background: var(--sand-d); border: 1px solid var(--br);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+}
+.dir-cell-reg {
+  aspect-ratio: 1; border-radius: 6px;
+  background: rgba(26,61,43,0.09); border: 1px solid rgba(26,61,43,0.2);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  cursor: pointer; transition: all 0.15s; position: relative;
+}
+.dir-cell-reg:hover { border-color: var(--gold); background: rgba(184,146,42,0.08); }
+.dir-av {
+  width: 22px; height: 22px; border-radius: 50%;
+  background: var(--pine); display: flex; align-items: center; justify-content: center;
+  font-size: 7px; font-weight: 600; color: #fff; margin-bottom: 2px;
+}
+.dir-av-empty { width: 22px; height: 22px; border-radius: 50%; background: var(--br); margin-bottom: 2px; }
+.dir-apt { font-size: 7px; color: var(--pine); font-weight: 500; }
+
+/* ── PROGRESS BAR ── */
+.progress-bar { height: 6px; border-radius: 3px; background: var(--sand-d); overflow: hidden; margin: 6px 0; }
+.progress-fill { height: 100%; border-radius: 3px; background: var(--pine); }
+
+/* ── TABS ── */
+.tab-bar {
+  display: flex; gap: 2px; padding: 3px;
+  background: var(--sand-d); border-radius: 10px;
+  margin-bottom: 14px;
+}
+.tab-item {
+  flex: 1; text-align: center; padding: 5px 8px;
+  font-size: 11px; border-radius: 7px;
+  cursor: pointer; color: var(--txm);
+  font-weight: 500; transition: all 0.1s;
+  font-family: inherit; border: none; background: none;
+}
+.tab-item.active { background: #fff; color: var(--tx); }
+
+/* ── TOGGLE SWITCH ── */
+.toggle {
+  width: 34px; height: 18px; border-radius: 9px;
+  background: var(--br); cursor: pointer;
+  position: relative; flex-shrink: 0;
+  transition: background 0.14s; border: none;
+}
+.toggle.on { background: var(--pine); }
+.toggle-knob {
+  width: 13px; height: 13px; border-radius: 50%;
+  background: #fff; position: absolute;
+  top: 2.5px; left: 2.5px; transition: left 0.14s;
+}
+.toggle.on .toggle-knob { left: 18.5px; }
+
+/* ── PULSE DOT ── */
+@keyframes pulse-dot { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+.pulse-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: #22c55e; display: inline-block;
+  animation: pulse-dot 1.5s ease-in-out infinite;
+}
+
+/* ── REGISTRATION ── */
+.auth-page { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: var(--sand); padding: 16px; }
+.auth-card { background: #fff; border-radius: 20px; border: 1px solid var(--sand-d); padding: 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); width: 100%; max-width: 360px; }
+.progress-dots { display: flex; gap: 6px; margin-bottom: 24px; }
+.progress-dot { flex: 1; height: 4px; border-radius: 2px; transition: background 0.2s; }
+
+/* ── CHIP ── */
+.chip {
+  padding: 4px 10px; border-radius: 20px; font-size: 11px;
+  border: 1px solid var(--br); cursor: pointer; color: var(--txm);
+  background: #fff; font-family: inherit; transition: all 0.1s;
+}
+.chip.on { background: var(--pine); color: #fff; border-color: var(--pine); }
+
+/* ── EMERG CARD ── */
+.emerg-card {
+  background: rgba(255,255,255,0.85); border: 1px solid var(--br);
+  border-radius: 10px; padding: 10px 13px;
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 6px;
+}
+/* ============================================================
+   BERMAR — Marketplace Poster Print Styles
+   Append this to the bottom of globals.css
+   ============================================================ */
+
+/* Hide poster on screen */
+.bermar-poster {
+  display: none;
+}
+
+@media print {
+  /* Hide everything except the poster */
+  body > * {
+    display: none !important;
+  }
+
+  .bermar-poster {
+    display: block !important;
+    position: fixed;
+    inset: 0;
+    width: 210mm;
+    min-height: 297mm;
+    padding: 20mm 18mm;
+    background: #fff;
+    font-family: 'DM Sans', sans-serif;
+    color: #1c1c1a;
+    box-sizing: border-box;
+  }
+
+  .bermar-poster-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid #1a3d2b;
+  }
+
+  .bermar-poster-logo {
+    font-size: 32px;
+    line-height: 1;
+  }
+
+  .bermar-poster-community {
+    font-family: 'DM Serif Display', serif;
+    font-size: 28px;
+    color: #1a3d2b;
+    line-height: 1;
+  }
+
+  .bermar-poster-sub {
+    font-size: 12px;
+    color: #8a8780;
+    margin-top: 2px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  .bermar-poster-category {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 999px;
+    background: #f4efe6;
+    color: #4a4a45;
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 16px;
+  }
+
+  .bermar-poster-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 36px;
+    color: #1a3d2b;
+    line-height: 1.2;
+    margin: 0 0 20px 0;
+  }
+
+  .bermar-poster-photo {
+    width: 100%;
+    max-height: 120mm;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 20px;
+  }
+
+  .bermar-poster-price {
+    font-size: 24px;
+    font-weight: 600;
+    color: #b8922a;
+    margin-bottom: 16px;
+  }
+
+  .bermar-poster-body {
+    font-size: 14px;
+    line-height: 1.7;
+    color: #4a4a45;
+    white-space: pre-line;
+    margin-bottom: 32px;
+  }
+
+  .bermar-poster-footer {
+    position: absolute;
+    bottom: 20mm;
+    left: 18mm;
+    right: 18mm;
+    padding-top: 16px;
+    border-top: 1px solid #ddd8cc;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .bermar-poster-contact {
+    font-size: 14px;
+    font-weight: 500;
+    color: #1a3d2b;
+  }
+
+  .bermar-poster-url {
+    font-size: 11px;
+    color: #8a8780;
+    letter-spacing: 0.5px;
+  }
+}/* ============================================================
+   BERMAR — Marketplace Poster Print Styles
+   Append this to the bottom of globals.css
+   ============================================================ */
+
+/* Hide poster on screen */
+.bermar-poster {
+  display: none;
+}
+
+@media print {
+  /* Hide everything except the poster */
+  body > * {
+    display: none !important;
+  }
+
+  .bermar-poster {
+    display: block !important;
+    position: fixed;
+    inset: 0;
+    width: 210mm;
+    min-height: 297mm;
+    padding: 20mm 18mm;
+    background: #fff;
+    font-family: 'DM Sans', sans-serif;
+    color: #1c1c1a;
+    box-sizing: border-box;
+  }
+
+  .bermar-poster-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid #1a3d2b;
+  }
+
+  .bermar-poster-logo {
+    font-size: 32px;
+    line-height: 1;
+  }
+
+  .bermar-poster-community {
+    font-family: 'DM Serif Display', serif;
+    font-size: 28px;
+    color: #1a3d2b;
+    line-height: 1;
+  }
+
+  .bermar-poster-sub {
+    font-size: 12px;
+    color: #8a8780;
+    margin-top: 2px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  .bermar-poster-category {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 999px;
+    background: #f4efe6;
+    color: #4a4a45;
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 16px;
+  }
+
+  .bermar-poster-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 36px;
+    color: #1a3d2b;
+    line-height: 1.2;
+    margin: 0 0 20px 0;
+  }
+
+  .bermar-poster-photo {
+    width: 100%;
+    max-height: 120mm;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 20px;
+  }
+
+  .bermar-poster-price {
+    font-size: 24px;
+    font-weight: 600;
+    color: #b8922a;
+    margin-bottom: 16px;
+  }
+
+  .bermar-poster-body {
+    font-size: 14px;
+    line-height: 1.7;
+    color: #4a4a45;
+    white-space: pre-line;
+    margin-bottom: 32px;
+  }
+
+  .bermar-poster-footer {
+    position: absolute;
+    bottom: 20mm;
+    left: 18mm;
+    right: 18mm;
+    padding-top: 16px;
+    border-top: 1px solid #ddd8cc;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .bermar-poster-contact {
+    font-size: 14px;
+    font-weight: 500;
+    color: #1a3d2b;
+  }
+
+  .bermar-poster-url {
+    font-size: 11px;
+    color: #8a8780;
+    letter-spacing: 0.5px;
+  }
+}
+/* ============================================================
+   BERMAR — Mobile nav additions
+   Append to bottom of globals.css
+   ============================================================ */
+
+/* Hamburger button — visible on mobile only */
+.hamburger-btn {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  width: 32px;
+  height: 32px;
+  padding: 6px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  flex-shrink: 0;
+  border-radius: 8px;
+}
+
+.hamburger-btn span {
+  display: block;
+  height: 2px;
+  width: 100%;
+  background: var(--tx);
+  border-radius: 2px;
+  transition: all 0.2s;
+}
+
+/* Hide sidebar on mobile by default (handled via transform in component) */
+/* Show hamburger on mobile */
+@media (max-width: 767px) {
+  .hamburger-btn {
+    display: flex;
+  }
+
+  /* Sidebar sits as fixed overlay — no space reserved in layout */
+  .sidebar {
+    position: fixed !important;
+    height: 100dvh !important;
+  }
+}
+
+/* Desktop — hide hamburger */
+@media (min-width: 768px) {
+  .hamburger-btn {
+    display: none !important;
+  }
+}

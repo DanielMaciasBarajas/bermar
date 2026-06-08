@@ -1,0 +1,84 @@
+{
+  "nav": {
+    "dashboard": "Главная",
+    "booking": "Бронь и приглашения",
+    "events": "События",
+    "proposals": "Предложения",
+    "marketplace": "Объявления",
+    "documents": "Документы",
+    "projects": "Проекты",
+    "directory": "Справочник",
+    "maintenance": "Обслуживание",
+    "settings": "Настройки",
+    "admin": "Администрация"
+  },
+  "dashboard": {
+    "good_morning": "Доброе утро",
+    "good_afternoon": "Добрый день",
+    "good_evening": "Добрый вечер",
+    "registered": "Зарегистрировано",
+    "proposals": "Предложения",
+    "today": "Сегодня",
+    "marketplace": "Объявления",
+    "activity_feed": "Последние события",
+    "premises_today": "Объекты сегодня",
+    "my_bookings": "Мои брони",
+    "community_voice": "Голос сообщества"
+  },
+  "booking": {
+    "select_premise": "Выбрать объект",
+    "tap_to_book": "Нажмите для брони",
+    "your_booking": "Ваша бронь",
+    "taken": "Занято",
+    "gap_rule": "Интервал (правило)",
+    "invite_open": "Открыть бронь для соседей"
+  },
+  "proposals": {
+    "new_proposal": "+ Новое предложение",
+    "all_categories": "Все категории",
+    "all_statuses": "Все статусы",
+    "support": "За",
+    "against": "Против",
+    "comment": "Комментировать",
+    "closes_in": "Закрывается через {days} дн."
+  },
+  "marketplace": {
+    "post_listing": "+ Разместить объявление",
+    "contact": "Связаться",
+    "all_categories": "Все категории"
+  },
+  "documents": {
+    "search": "Поиск документов...",
+    "all_categories": "Все категории",
+    "newest_first": "Сначала новые",
+    "oldest_first": "Сначала старые",
+    "title_az": "Название А–Я",
+    "by_category": "По категории"
+  },
+  "maintenance": {
+    "submit_ticket": "Отправить заявку на обслуживание",
+    "category": "Категория",
+    "location": "Расположение в здании",
+    "description": "Описание",
+    "urgency": "Срочность",
+    "submit": "Отправить заявку →"
+  },
+  "settings": {
+    "who_lives_here": "Кто здесь живёт",
+    "interests": "Интересы",
+    "privacy": "Конфиденциальность и уведомления",
+    "save": "Сохранить настройки",
+    "danger_zone": "Опасная зона",
+    "delete_account": "Удалить аккаунт"
+  },
+  "common": {
+    "loading": "Загрузка...",
+    "saving": "Сохранение...",
+    "cancel": "Отмена",
+    "free": "Свободно",
+    "join": "Присоединиться",
+    "leave": "Выйти",
+    "approve": "Одобрить",
+    "reject": "Отклонить"
+  }
+}

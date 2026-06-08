@@ -1,0 +1,84 @@
+{
+  "nav": {
+    "dashboard": "Почетна",
+    "booking": "Резервација и позиви",
+    "events": "Догађаји",
+    "proposals": "Предлози",
+    "marketplace": "Оглашавање",
+    "documents": "Документи",
+    "projects": "Пројекти",
+    "directory": "Именик",
+    "maintenance": "Одржавање",
+    "settings": "Подешавања",
+    "admin": "Администрација"
+  },
+  "dashboard": {
+    "good_morning": "Добро јутро",
+    "good_afternoon": "Добар дан",
+    "good_evening": "Добро вече",
+    "registered": "Регистровани",
+    "proposals": "Предлози",
+    "today": "Данас",
+    "marketplace": "Оглашавање",
+    "activity_feed": "Недавна активност",
+    "premises_today": "Просторије данас",
+    "my_bookings": "Моје резервације",
+    "community_voice": "Глас заједнице"
+  },
+  "booking": {
+    "select_premise": "Изабери просторију",
+    "tap_to_book": "Додирни за резервацију",
+    "your_booking": "Твоја резервација",
+    "taken": "Заузето",
+    "gap_rule": "Размак (правило)",
+    "invite_open": "Отвори резервацију за комшије"
+  },
+  "proposals": {
+    "new_proposal": "+ Нови предлог",
+    "all_categories": "Све категорије",
+    "all_statuses": "Сви статуси",
+    "support": "За",
+    "against": "Против",
+    "comment": "Коментариши",
+    "closes_in": "Затвара се за {days} дана"
+  },
+  "marketplace": {
+    "post_listing": "+ Постави оглас",
+    "contact": "Контакт",
+    "all_categories": "Све категорије"
+  },
+  "documents": {
+    "search": "Претражи документе...",
+    "all_categories": "Све категорије",
+    "newest_first": "Најновији прво",
+    "oldest_first": "Најстарији прво",
+    "title_az": "Наслов А–Ж",
+    "by_category": "По категорији"
+  },
+  "maintenance": {
+    "submit_ticket": "Пошаљи захтев за одржавање",
+    "category": "Категорија",
+    "location": "Локација у згради",
+    "description": "Опис",
+    "urgency": "Хитност",
+    "submit": "Пошаљи захтев →"
+  },
+  "settings": {
+    "who_lives_here": "Ко овде живи",
+    "interests": "Интересовања",
+    "privacy": "Приватност и обавештења",
+    "save": "Сачувај подешавања",
+    "danger_zone": "Опасна зона",
+    "delete_account": "Обриши налог"
+  },
+  "common": {
+    "loading": "Учитавање...",
+    "saving": "Чување...",
+    "cancel": "Откажи",
+    "free": "Слободно",
+    "join": "Придружи се",
+    "leave": "Напусти",
+    "approve": "Одобри",
+    "reject": "Одбиј"
+  }
+}

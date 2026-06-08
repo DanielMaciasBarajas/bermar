@@ -1,0 +1,84 @@
+{
+  "nav": {
+    "dashboard": "Inicio",
+    "booking": "Reservar e invitar",
+    "events": "Eventos",
+    "proposals": "Propuestas",
+    "marketplace": "Mercado vecinal",
+    "documents": "Documentos",
+    "projects": "Proyectos",
+    "directory": "Directorio",
+    "maintenance": "Mantenimiento",
+    "settings": "Ajustes",
+    "admin": "Administración"
+  },
+  "dashboard": {
+    "good_morning": "Buenos días",
+    "good_afternoon": "Buenas tardes",
+    "good_evening": "Buenas noches",
+    "registered": "Registrados",
+    "proposals": "Propuestas",
+    "today": "Hoy",
+    "marketplace": "Mercado vecinal",
+    "activity_feed": "Actividad reciente",
+    "premises_today": "Instalaciones hoy",
+    "my_bookings": "Mis reservas",
+    "community_voice": "Voz comunitaria"
+  },
+  "booking": {
+    "select_premise": "Selecciona la instalación",
+    "tap_to_book": "Toca para reservar",
+    "your_booking": "Tu reserva",
+    "taken": "Ocupado",
+    "gap_rule": "Margen (norma)",
+    "invite_open": "Abre esta reserva a los vecinos"
+  },
+  "proposals": {
+    "new_proposal": "+ Nueva propuesta",
+    "all_categories": "Todas las categorías",
+    "all_statuses": "Todos los estados",
+    "support": "A favor",
+    "against": "En contra",
+    "comment": "Comentar",
+    "closes_in": "Cierra en {days} días"
+  },
+  "marketplace": {
+    "post_listing": "+ Publicar anuncio",
+    "contact": "Contactar",
+    "all_categories": "Todas las categorías"
+  },
+  "documents": {
+    "search": "Buscar documentos...",
+    "all_categories": "Todas las categorías",
+    "newest_first": "Más recientes primero",
+    "oldest_first": "Más antiguos primero",
+    "title_az": "Título A–Z",
+    "by_category": "Por categoría"
+  },
+  "maintenance": {
+    "submit_ticket": "Envía una incidencia de mantenimiento",
+    "category": "Categoría",
+    "location": "Ubicación en el edificio",
+    "description": "Descripción",
+    "urgency": "Urgencia",
+    "submit": "Enviar incidencia →"
+  },
+  "settings": {
+    "who_lives_here": "Quién vive aquí",
+    "interests": "Intereses",
+    "privacy": "Privacidad y notificaciones",
+    "save": "Guardar ajustes",
+    "danger_zone": "Zona de peligro",
+    "delete_account": "Eliminar cuenta"
+  },
+  "common": {
+    "loading": "Cargando...",
+    "saving": "Guardando...",
+    "cancel": "Cancelar",
+    "free": "Libre",
+    "join": "Unirse",
+    "leave": "Salir",
+    "approve": "Aprobar",
+    "reject": "Rechazar"
+  }
+}

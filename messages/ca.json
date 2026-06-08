@@ -1,0 +1,84 @@
+{
+  "nav": {
+    "dashboard": "Inici",
+    "booking": "Reservar i convidar",
+    "events": "Esdeveniments",
+    "proposals": "Propostes",
+    "marketplace": "Mercat veïnal",
+    "documents": "Documents",
+    "projects": "Projectes",
+    "directory": "Directori",
+    "maintenance": "Manteniment",
+    "settings": "Configuració",
+    "admin": "Administració"
+  },
+  "dashboard": {
+    "good_morning": "Bon dia",
+    "good_afternoon": "Bona tarda",
+    "good_evening": "Bona nit",
+    "registered": "Registrats",
+    "proposals": "Propostes",
+    "today": "Avui",
+    "marketplace": "Mercat veïnal",
+    "activity_feed": "Activitat recent",
+    "premises_today": "Instal·lacions avui",
+    "my_bookings": "Les meves reserves",
+    "community_voice": "Veu comunitària"
+  },
+  "booking": {
+    "select_premise": "Selecciona la instal·lació",
+    "tap_to_book": "Toca per reservar",
+    "your_booking": "La teva reserva",
+    "taken": "Ocupat",
+    "gap_rule": "Marge (norma)",
+    "invite_open": "Obre aquesta reserva als veïns"
+  },
+  "proposals": {
+    "new_proposal": "+ Nova proposta",
+    "all_categories": "Totes les categories",
+    "all_statuses": "Tots els estats",
+    "support": "A favor",
+    "against": "En contra",
+    "comment": "Comentar",
+    "closes_in": "Tanca en {days} dies"
+  },
+  "marketplace": {
+    "post_listing": "+ Publicar anunci",
+    "contact": "Contactar",
+    "all_categories": "Totes les categories"
+  },
+  "documents": {
+    "search": "Cerca documents...",
+    "all_categories": "Totes les categories",
+    "newest_first": "Més recents primer",
+    "oldest_first": "Més antics primer",
+    "title_az": "Títol A–Z",
+    "by_category": "Per categoria"
+  },
+  "maintenance": {
+    "submit_ticket": "Envia una incidència de manteniment",
+    "category": "Categoria",
+    "location": "Ubicació a l'edifici",
+    "description": "Descripció",
+    "urgency": "Urgència",
+    "submit": "Enviar incidència →"
+  },
+  "settings": {
+    "who_lives_here": "Qui viu aquí",
+    "interests": "Interessos",
+    "privacy": "Privacitat i notificacions",
+    "save": "Desar configuració",
+    "danger_zone": "Zona de perill",
+    "delete_account": "Eliminar compte"
+  },
+  "common": {
+    "loading": "Carregant...",
+    "saving": "Desant...",
+    "cancel": "Cancel·lar",
+    "free": "Lliure",
+    "join": "Unir-se",
+    "leave": "Sortir",
+    "approve": "Aprovar",
+    "reject": "Rebutjar"
+  }
+}

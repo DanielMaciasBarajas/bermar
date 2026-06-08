@@ -1,0 +1,84 @@
+{
+  "nav": {
+    "dashboard": "Accueil",
+    "booking": "Réserver et inviter",
+    "events": "Événements",
+    "proposals": "Propositions",
+    "marketplace": "Marché du quartier",
+    "documents": "Documents",
+    "projects": "Projets",
+    "directory": "Annuaire",
+    "maintenance": "Maintenance",
+    "settings": "Paramètres",
+    "admin": "Administration"
+  },
+  "dashboard": {
+    "good_morning": "Bonjour",
+    "good_afternoon": "Bon après-midi",
+    "good_evening": "Bonsoir",
+    "registered": "Inscrits",
+    "proposals": "Propositions",
+    "today": "Aujourd'hui",
+    "marketplace": "Marché du quartier",
+    "activity_feed": "Activité récente",
+    "premises_today": "Installations aujourd'hui",
+    "my_bookings": "Mes réservations",
+    "community_voice": "Voix communautaire"
+  },
+  "booking": {
+    "select_premise": "Choisir une installation",
+    "tap_to_book": "Appuyer pour réserver",
+    "your_booking": "Votre réservation",
+    "taken": "Occupé",
+    "gap_rule": "Délai (règle)",
+    "invite_open": "Ouvrir cette réservation aux voisins"
+  },
+  "proposals": {
+    "new_proposal": "+ Nouvelle proposition",
+    "all_categories": "Toutes les catégories",
+    "all_statuses": "Tous les statuts",
+    "support": "Pour",
+    "against": "Contre",
+    "comment": "Commenter",
+    "closes_in": "Ferme dans {days} jours"
+  },
+  "marketplace": {
+    "post_listing": "+ Publier une annonce",
+    "contact": "Contacter",
+    "all_categories": "Toutes les catégories"
+  },
+  "documents": {
+    "search": "Rechercher des documents...",
+    "all_categories": "Toutes les catégories",
+    "newest_first": "Plus récents d'abord",
+    "oldest_first": "Plus anciens d'abord",
+    "title_az": "Titre A–Z",
+    "by_category": "Par catégorie"
+  },
+  "maintenance": {
+    "submit_ticket": "Soumettre un ticket de maintenance",
+    "category": "Catégorie",
+    "location": "Emplacement dans le bâtiment",
+    "description": "Description",
+    "urgency": "Urgence",
+    "submit": "Envoyer le ticket →"
+  },
+  "settings": {
+    "who_lives_here": "Qui habite ici",
+    "interests": "Intérêts",
+    "privacy": "Confidentialité et notifications",
+    "save": "Enregistrer les paramètres",
+    "danger_zone": "Zone dangereuse",
+    "delete_account": "Supprimer le compte"
+  },
+  "common": {
+    "loading": "Chargement...",
+    "saving": "Enregistrement...",
+    "cancel": "Annuler",
+    "free": "Libre",
+    "join": "Rejoindre",
+    "leave": "Quitter",
+    "approve": "Approuver",
+    "reject": "Rejeter"
+  }
+}
