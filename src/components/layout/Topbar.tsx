@@ -27,14 +27,18 @@ const LANG_FLAGS: Record<string, string> = {
   HI: '🇮🇳',
 }
 
+const LANG_NAMES: Record<string, string> = {
+  CA: 'Català', ES: 'Español', EN: 'English', FR: 'Français',
+  RU: 'Русский', SR: 'Српски', PT: 'Português', IT: 'Italiano',
+  DE: 'Deutsch', NL: 'Nederlands', UK: 'Українська', HI: 'हिन्दी',
+}
+
 export default function Topbar({ community, profile, unreadNotifs, warnings, onMenuToggle }: Props) {
   const supabase = createClient()
   const t = useTranslations('common')
 
+  // Only show core languages in topbar
   const langs = [...(community?.languages_core || ['CA','ES','EN','FR','RU'])]
-  const extended = community?.languages_extended || []
-  const allLangs = [...langs, ...extended]
-
   const [activeLang, setActiveLang] = useState<string>(profile?.preferred_lang || langs[0] || 'CA')
 
   async function switchLang(lang: string) {
@@ -69,32 +73,32 @@ export default function Topbar({ community, profile, unreadNotifs, warnings, onM
 
         <span className="topbar-title">{community?.name || 'Bermar Park'}</span>
 
-        {/* All language chips with flags */}
-        <div style={{ display: 'flex', gap: '3px', alignItems: 'center', flexWrap: 'wrap' }}>
-          {allLangs.map((l: string) => {
+        {/* Language flags — core only */}
+        <div style={{ display: 'flex', gap: '2px', alignItems: 'center', flexShrink: 0 }}>
+          {langs.map((l: string) => {
             const isActive = activeLang === l
             return (
               <button
                 key={l}
                 onClick={() => switchLang(l)}
-                title={l}
+                title={LANG_NAMES[l] || l}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '3px',
-                  padding: '3px 7px',
-                  borderRadius: '999px',
-                  fontSize: '11px',
-                  fontWeight: isActive ? 600 : 400,
+                  justifyContent: 'center',
+                  width: '28px',
+                  height: '28px',
+                  borderRadius: '50%',
+                  fontSize: '16px',
                   cursor: 'pointer',
-                  border: isActive ? '1.5px solid var(--pine)' : '1px solid var(--br)',
+                  border: isActive ? '2px solid var(--pine)' : '2px solid transparent',
                   background: isActive ? 'rgba(26,61,43,0.08)' : 'transparent',
-                  color: isActive ? 'var(--pine)' : 'var(--txm)',
                   transition: 'all 0.15s',
+                  padding: 0,
+                  lineHeight: 1,
                 }}
               >
-                <span style={{ fontSize: '14px', lineHeight: 1 }}>{LANG_FLAGS[l] || '🌐'}</span>
-                <span>{l}</span>
+                {LANG_FLAGS[l] || '🌐'}
               </button>
             )
           })}
