@@ -113,7 +113,7 @@ export default function AdminClient({ profile, community, activityLog, pendingPr
       const aiRes = await fetch('/api/documents/summarise', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title: docTitle, category: docCategory })
+        body: JSON.stringify({ title: docTitle, category: docCategory, locale: docLang })
       })
       const aiData = await aiRes.json()
       aiDescription = aiData.summary || null

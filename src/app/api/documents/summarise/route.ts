@@ -1,7 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function POST(request: NextRequest) {
-  const { title, category } = await request.json()
+  const { title, category, locale } = await request.json()
+  const LANG_NAMES: Record<string, string> = {
+    CA: 'Catalan', ES: 'Spanish', EN: 'English', FR: 'French',
+    RU: 'Russian', SR: 'Serbian', PT: 'Portuguese', IT: 'Italian',
+    DE: 'German', NL: 'Dutch', UK: 'Ukrainian', HI: 'Hindi',
+  }
+  const langName = LANG_NAMES[(locale || 'ES').toUpperCase()] || 'English'
 
   try {
     const res = await fetch('https://api.anthropic.com/v1/messages', {
@@ -16,7 +22,7 @@ export async function POST(request: NextRequest) {
         max_tokens: 200,
         messages: [{
           role: 'user',
-          content: `You are summarising a community document for residents of Bermar Park, Gavà Mar, Barcelona. The document is titled "${title}" and is categorised as "${category}". Write exactly 3 sentences summarising what this document is likely about and why it matters to residents. Be concise and friendly. Respond only with the 3 sentences, no preamble.`
+          content: `You are summarising a community document for residents of Bermar Park, Gavà Mar, Barcelona. The document is titled "${title}" and is categorised as "${category}". Write exactly 3 sentences in ${langName} summarising what this document is likely about and why it matters to residents. Be concise and friendly. Respond only with the 3 sentences, no preamble.`
         }]
       })
     })
