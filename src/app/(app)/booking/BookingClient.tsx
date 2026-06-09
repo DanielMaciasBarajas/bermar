@@ -3,6 +3,7 @@
 import { useState, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { generateSlots, formatTime } from '@/lib/utils'
+import { useTranslations } from 'next-intl'
 import type { Premise, Booking, Profile } from '@/lib/supabase/types'
 
 interface Props {
@@ -14,13 +15,11 @@ interface Props {
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
 const DAYS = ['Mo','Tu','We','Th','Fr','Sa','Su']
 
-const CHESS_LABELS: Record<string, string> = {
-  CA: 'Escacs', ES: 'Ajedrez', EN: 'Chess', FR: 'Échecs',
-  RU: 'Шахматы', DE: 'Schach', IT: 'Scacchi',
-}
-
 export default function BookingClient({ premises, existingBookings, profile }: Props) {
   const supabase = createClient()
+  const t = useTranslations('booking')
+  const tc = useTranslations('common')
+
   const [selectedPremise, setSelectedPremise] = useState<Premise | null>(premises[0] || null)
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0])
   const [inviteOpen, setInviteOpen] = useState(false)
@@ -96,7 +95,6 @@ export default function BookingClient({ premises, existingBookings, profile }: P
   }
 
   function buildCalendarUrl(date: string, start: string, end: string, premiseName: string) {
-    // Google Calendar expects dates as YYYYMMDDTHHmmssZ
     const toGCal = (d: string, t: string) => {
       const [y, m, day] = d.split('-')
       const [h, min] = t.split(':')
@@ -131,7 +129,7 @@ export default function BookingClient({ premises, existingBookings, profile }: P
     })
     setSaving(false)
     if (!error) {
-      setSuccess(`Booked ${formatTime(start)}–${formatTime(end)} on ${selectedDate}!`)
+      setSuccess(`✓ ${formatTime(start)}–${formatTime(end)} · ${selectedDate}`)
       setCalendarUrl(buildCalendarUrl(selectedDate, start, end, selectedPremise.name))
       setTimeout(() => { setSuccess(''); setCalendarUrl('') }, 10000)
     }
@@ -141,13 +139,39 @@ export default function BookingClient({ premises, existingBookings, profile }: P
     await supabase.from('bookings').update({ status: 'cancelled' }).eq('id', bookingId)
   }
 
+  async function bookHalfday(period: string) {
+    if (!selectedPremise) return
+    setSaving(true)
+    await supabase.from('bookings').insert({
+      community_id: profile.community_id,
+      premise_id: selectedPremise.id,
+      profile_id: profile.id,
+      apt_number: profile.apt_number,
+      date: selectedDate,
+      halfday_period: period,
+      status: 'confirmed',
+      invite_open: false,
+      invite_scope: 'none',
+    })
+    setSaving(false)
+    const timeMap: Record<string, { start: string; end: string }> = {
+      morning:   { start: '08:00', end: '13:00' },
+      afternoon: { start: '13:00', end: '18:00' },
+      evening:   { start: '18:00', end: '23:00' },
+    }
+    const tm = timeMap[period] || { start: '08:00', end: '13:00' }
+    setSuccess(`✓ ${period} · ${selectedDate}`)
+    setCalendarUrl(buildCalendarUrl(selectedDate, tm.start, tm.end, selectedPremise.name))
+    setTimeout(() => { setSuccess(''); setCalendarUrl('') }, 10000)
+  }
+
   const isHalfday = selectedPremise?.booking_type === 'halfday'
   const isChallenge = selectedPremise?.booking_type === 'challenge'
 
   const halfdayPeriods = [
-    { id: 'morning', label: 'Morning', time: '08:00–13:00' },
+    { id: 'morning',   label: 'Morning',   time: '08:00–13:00' },
     { id: 'afternoon', label: 'Afternoon', time: '13:00–18:00' },
-    { id: 'evening', label: 'Evening', time: '18:00–23:00' },
+    { id: 'evening',   label: 'Evening',   time: '18:00–23:00' },
   ]
 
   return (
@@ -155,35 +179,22 @@ export default function BookingClient({ premises, existingBookings, profile }: P
 
       {/* Left: Premises */}
       <div>
-        <div className="section-title" style={{ marginBottom: '8px' }}>Select premise</div>
-
+        <div className="section-title" style={{ marginBottom: '8px' }}>{t('select_premise')}</div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginBottom: '12px' }}>
           {premises.map(p => (
             <button
               key={p.id}
               onClick={() => { setSelectedPremise(p); setInviteOpen(false) }}
-              className={selectedPremise?.id === p.id ? 'premise-row' : 'premise-row'}
               style={{
-                width: '100%',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                padding: '8px 12px',
-                borderRadius: '12px',
+                width: '100%', display: 'flex', alignItems: 'center', gap: '8px',
+                padding: '8px 12px', borderRadius: '12px', textAlign: 'left', cursor: 'pointer',
                 border: selectedPremise?.id === p.id ? '1.5px solid var(--pine)' : '1px solid var(--br)',
                 background: selectedPremise?.id === p.id ? 'rgba(26,61,43,0.06)' : 'rgba(255,255,255,0.8)',
-                textAlign: 'left',
-                cursor: 'pointer',
                 transition: 'all 0.15s',
               }}
             >
               <div style={{ flex: 1 }}>
-                <div style={{ fontSize: '12px', fontWeight: 500, color: 'var(--tx)' }}>
-                  {p.booking_type === 'challenge' && Object.keys(CHESS_LABELS).length > 0
-                    ? 'Chess / Escacs'
-                    : p.name
-                  }
-                </div>
+                <div style={{ fontSize: '12px', fontWeight: 500, color: 'var(--tx)' }}>{p.name}</div>
                 <div style={{ fontSize: '9px', color: 'var(--txl)', marginTop: '1px' }}>
                   {p.booking_type === 'slots' ? `${p.slot_duration_minutes}min slots · gap rule` :
                    p.booking_type === 'halfday' ? 'Morn / Afternoon / Evening' :
@@ -193,9 +204,8 @@ export default function BookingClient({ premises, existingBookings, profile }: P
             </button>
           ))}
         </div>
-
         <div className="warn-bar">
-          <strong>Gap rule:</strong> min. 1 free slot between your own bookings on the same premise. Bookings sync to Google Calendar.
+          <strong>{t('gap_rule')}:</strong> min. 1 free slot between your own bookings on the same premise.
         </div>
       </div>
 
@@ -221,25 +231,12 @@ export default function BookingClient({ premises, existingBookings, profile }: P
                     key={day}
                     onClick={() => setSelectedDate(dateStr)}
                     style={{
-                      aspectRatio: '1',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      borderRadius: '6px',
-                      fontSize: '11px',
-                      cursor: 'pointer',
+                      aspectRatio: '1', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      borderRadius: '6px', fontSize: '11px', cursor: 'pointer',
                       border: selectedDate === dateStr && status !== 'today' ? '2px solid var(--pine)' : '2px solid transparent',
                       fontWeight: status === 'today' || status === 'mine' ? 500 : 400,
-                      background:
-                        status === 'today' ? 'var(--pine)' :
-                        status === 'mine' ? '#dcfce7' :
-                        status === 'booked' ? '#fee2e2' :
-                        'transparent',
-                      color:
-                        status === 'today' ? '#fff' :
-                        status === 'mine' ? '#166534' :
-                        status === 'booked' ? '#991b1b' :
-                        'var(--txm)',
+                      background: status === 'today' ? 'var(--pine)' : status === 'mine' ? '#dcfce7' : status === 'booked' ? '#fee2e2' : 'transparent',
+                      color: status === 'today' ? '#fff' : status === 'mine' ? '#166534' : status === 'booked' ? '#991b1b' : 'var(--txm)',
                     }}
                   >
                     {day}
@@ -248,27 +245,10 @@ export default function BookingClient({ premises, existingBookings, profile }: P
               })}
             </div>
 
-            {/* Legend */}
-            <div style={{ display: 'flex', gap: '12px', marginBottom: '12px', fontSize: '9px', color: 'var(--txl)' }}>
-              {[
-                { color: '#dcfce7', label: 'Mine' },
-                { color: '#fee2e2', label: 'Taken' },
-                { color: 'var(--pine)', label: 'Today' },
-                { color: '#dbeafe', label: 'Invite open' },
-              ].map(l => (
-                <span key={l.label} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  <span style={{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '2px', background: l.color }} />
-                  {l.label}
-                </span>
-              ))}
-            </div>
-
             {/* Slots */}
             {!isHalfday && !isChallenge && (
               <>
-                <div className="section-title" style={{ marginBottom: '6px' }}>
-                  Slots — {selectedDate}
-                </div>
+                <div className="section-title" style={{ marginBottom: '6px' }}>Slots — {selectedDate}</div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                   {slots.map(slot => {
                     const status = getSlotStatus(slot.start, slot.end)
@@ -282,43 +262,23 @@ export default function BookingClient({ premises, existingBookings, profile }: P
                           onClick={() => status === 'free' && bookSlot(slot.start, slot.end)}
                           disabled={saving || status !== 'free'}
                           style={{
-                            flex: 1,
-                            height: '28px',
-                            borderRadius: '8px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            paddingLeft: '8px',
-                            fontSize: '11px',
-                            fontWeight: 500,
-                            border: 'none',
-                            cursor: status === 'free' ? 'pointer' : 'default',
+                            flex: 1, height: '28px', borderRadius: '8px', display: 'flex',
+                            alignItems: 'center', paddingLeft: '8px', fontSize: '11px', fontWeight: 500,
+                            border: 'none', cursor: status === 'free' ? 'pointer' : 'default',
                             fontStyle: status === 'gap' ? 'italic' : 'normal',
-                            background:
-                              status === 'free' ? '#dcfce7' :
-                              status === 'mine' ? 'rgba(26,61,43,0.1)' :
-                              status === 'invite' ? '#dbeafe' :
-                              status === 'taken' ? '#fee2e2' :
-                              status === 'gap' ? 'var(--sand-d)' :
-                              'transparent',
-                            color:
-                              status === 'free' ? '#166534' :
-                              status === 'mine' ? 'var(--pine)' :
-                              status === 'invite' ? '#1e40af' :
-                              status === 'taken' ? '#991b1b' :
-                              'var(--txl)',
+                            background: status === 'free' ? '#dcfce7' : status === 'mine' ? 'rgba(26,61,43,0.1)' : status === 'invite' ? '#dbeafe' : status === 'taken' ? '#fee2e2' : status === 'gap' ? 'var(--sand-d)' : 'transparent',
+                            color: status === 'free' ? '#166534' : status === 'mine' ? 'var(--pine)' : status === 'invite' ? '#1e40af' : status === 'taken' ? '#991b1b' : 'var(--txl)',
                           }}
                         >
-                          {status === 'free' ? 'Tap to book' :
-                           status === 'mine' ? 'Your booking' :
-                           status === 'taken' ? `@${booking?.apt_number} booked` :
+                          {status === 'free' ? t('tap_to_book') :
+                           status === 'mine' ? t('your_booking') :
+                           status === 'taken' ? `@${booking?.apt_number} · ${t('taken')}` :
                            status === 'invite' ? `@${booking?.apt_number} open invite` :
-                           'Gap (rule)'}
+                           t('gap_rule')}
                         </button>
                         {status === 'mine' && (
-                          <button
-                            onClick={() => booking && cancelBooking(booking.id)}
-                            style={{ fontSize: '10px', color: '#ef4444', background: 'none', border: 'none', cursor: 'pointer' }}
-                          >
+                          <button onClick={() => booking && cancelBooking(booking.id)}
+                            style={{ fontSize: '10px', color: '#ef4444', background: 'none', border: 'none', cursor: 'pointer' }}>
                             ✕
                           </button>
                         )}
@@ -335,22 +295,15 @@ export default function BookingClient({ premises, existingBookings, profile }: P
                 {halfdayPeriods.map(period => {
                   const taken = dayBookings.find(b => b.halfday_period === period.id)
                   return (
-                    <button
-                      key={period.id}
-                      onClick={() => !taken && bookHalfday(period.id)}
+                    <button key={period.id} onClick={() => !taken && bookHalfday(period.id)}
                       disabled={!!taken || saving}
                       style={{
-                        width: '100%',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        padding: '12px 16px',
-                        borderRadius: '12px',
+                        width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                        padding: '12px 16px', borderRadius: '12px', fontSize: '13px',
                         border: taken ? '1px solid #fecaca' : '1px solid #bbf7d0',
                         background: taken ? '#fef2f2' : '#f0fdf4',
                         color: taken ? '#b91c1c' : '#15803d',
                         cursor: taken ? 'default' : 'pointer',
-                        fontSize: '13px',
                       }}
                     >
                       <span style={{ fontWeight: 500 }}>{period.label}</span>
@@ -367,21 +320,10 @@ export default function BookingClient({ premises, existingBookings, profile }: P
               <div className="card" style={{ marginTop: '8px' }}>
                 <p style={{ fontSize: '13px', fontWeight: 500, color: 'var(--tx)', marginBottom: '12px' }}>Chess challenge</p>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  <input
-                    placeholder="Challenge @apt# (e.g. 3B) or leave blank for open"
-                    className="form-input"
-                  />
-                  <input
-                    placeholder="Suggested time (e.g. Sunday 11:00)"
-                    className="form-input"
-                  />
-                  <input
-                    placeholder="Location (e.g. BBQ table, common room)"
-                    className="form-input"
-                  />
-                  <button className="btn btn-primary" style={{ width: '100%' }}>
-                    Post challenge
-                  </button>
+                  <input placeholder="Challenge @apt# (e.g. 3B) or leave blank for open" className="form-input" />
+                  <input placeholder="Suggested time (e.g. Sunday 11:00)" className="form-input" />
+                  <input placeholder="Location (e.g. BBQ table, common room)" className="form-input" />
+                  <button className="btn btn-primary" style={{ width: '100%' }}>Post challenge</button>
                 </div>
               </div>
             )}
@@ -390,60 +332,23 @@ export default function BookingClient({ premises, existingBookings, profile }: P
             {!isChallenge && selectedPremise.max_invite_slots && (
               <div className="card" style={{ marginTop: '12px' }}>
                 <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
-                  <input
-                    type="checkbox"
-                    checked={inviteOpen}
-                    onChange={e => setInviteOpen(e.target.checked)}
-                    style={{ width: '14px', height: '14px', borderRadius: '4px', accentColor: 'var(--pine)' }}
-                  />
-                  <span style={{ fontSize: '12px', fontWeight: 500, color: 'var(--tx)' }}>Open this booking to neighbours</span>
+                  <input type="checkbox" checked={inviteOpen} onChange={e => setInviteOpen(e.target.checked)}
+                    style={{ width: '14px', height: '14px', borderRadius: '4px', accentColor: 'var(--pine)' }} />
+                  <span style={{ fontSize: '12px', fontWeight: 500, color: 'var(--tx)' }}>{t('invite_open')}</span>
                 </label>
                 {inviteOpen && (
                   <div style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
                     <div style={{ fontSize: '11px', color: 'var(--txm)' }}>
                       {selectedPremise.name} — max {selectedPremise.max_invite_slots} neighbour spots
                     </div>
-                    <div style={{ display: 'flex', gap: '8px', marginBottom: '4px' }}>
-                      <div style={{
-                        width: '28px', height: '28px', borderRadius: '8px',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        fontSize: '11px', fontWeight: 600, color: '#fff',
-                        background: 'var(--pine)',
-                      }}>
-                        {profile.apt_number.slice(0,2)}
-                      </div>
-                      {Array.from({ length: selectedPremise.max_invite_slots }).map((_, i) => (
-                        <div key={i} style={{
-                          width: '28px', height: '28px', borderRadius: '8px',
-                          display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          fontSize: '11px', fontWeight: 500,
-                          background: '#dbeafe', color: '#1e40af',
-                          border: '1px solid transparent',
-                        }}>
-                          +1
-                        </div>
-                      ))}
-                    </div>
-                    <p style={{ fontSize: '11px', color: 'var(--txl)' }}>First come, first served. No confirmation needed.</p>
-                    <div>
-                      <label className="form-label">Notify</label>
-                      <select
-                        value={inviteScope}
-                        onChange={e => setInviteScope(e.target.value as any)}
-                        className="form-select"
-                      >
-                        <option value="interest">All residents with matching interest</option>
-                        <option value="apt">Specific @apt# (private — no feed post)</option>
-                        <option value="all">@tots — everyone</option>
-                      </select>
-                    </div>
+                    <select value={inviteScope} onChange={e => setInviteScope(e.target.value as any)} className="form-select">
+                      <option value="interest">All residents with matching interest</option>
+                      <option value="apt">Specific @apt# (private)</option>
+                      <option value="all">@tots — everyone</option>
+                    </select>
                     {inviteScope === 'apt' && (
-                      <input
-                        value={inviteTargetApt}
-                        onChange={e => setInviteTargetApt(e.target.value.toUpperCase())}
-                        placeholder="Apartment number e.g. 3B"
-                        className="form-input"
-                      />
+                      <input value={inviteTargetApt} onChange={e => setInviteTargetApt(e.target.value.toUpperCase())}
+                        placeholder="Apartment number e.g. 3B" className="form-input" />
                     )}
                   </div>
                 )}
@@ -451,30 +356,11 @@ export default function BookingClient({ premises, existingBookings, profile }: P
             )}
 
             {success && (
-              <div style={{
-                marginTop: '12px',
-                background: '#f0fdf4',
-                color: '#166534',
-                border: '1px solid #bbf7d0',
-                borderRadius: '12px',
-                padding: '12px',
-                fontSize: '12px',
-                textAlign: 'center',
-              }}>
-                <div style={{ marginBottom: calendarUrl ? '10px' : 0 }}>✓ {success}</div>
+              <div style={{ marginTop: '12px', background: '#f0fdf4', color: '#166534', border: '1px solid #bbf7d0', borderRadius: '12px', padding: '12px', fontSize: '12px', textAlign: 'center' }}>
+                <div style={{ marginBottom: calendarUrl ? '10px' : 0 }}>{success}</div>
                 {calendarUrl && (
-                  <a
-                    href={calendarUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{
-                      display: 'inline-flex', alignItems: 'center', gap: '6px',
-                      padding: '6px 14px', borderRadius: '8px',
-                      background: '#fff', border: '1px solid #bbf7d0',
-                      color: '#166534', fontSize: '11px', fontWeight: 500,
-                      textDecoration: 'none',
-                    }}
-                  >
+                  <a href={calendarUrl} target="_blank" rel="noopener noreferrer"
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 14px', borderRadius: '8px', background: '#fff', border: '1px solid #bbf7d0', color: '#166534', fontSize: '11px', fontWeight: 500, textDecoration: 'none' }}>
                     📅 Add to Google Calendar
                   </a>
                 )}
@@ -485,30 +371,4 @@ export default function BookingClient({ premises, existingBookings, profile }: P
       </div>
     </div>
   )
-
-  async function bookHalfday(period: string) {
-    if (!selectedPremise) return
-    setSaving(true)
-    await supabase.from('bookings').insert({
-      community_id: profile.community_id,
-      premise_id: selectedPremise.id,
-      profile_id: profile.id,
-      apt_number: profile.apt_number,
-      date: selectedDate,
-      halfday_period: period,
-      status: 'confirmed',
-      invite_open: false,
-      invite_scope: 'none',
-    })
-    setSaving(false)
-    const timeMap: Record<string, { start: string; end: string }> = {
-      morning:   { start: '08:00', end: '13:00' },
-      afternoon: { start: '13:00', end: '18:00' },
-      evening:   { start: '18:00', end: '23:00' },
-    }
-    const t = timeMap[period] || { start: '08:00', end: '13:00' }
-    setSuccess(`Booked ${period} on ${selectedDate}!`)
-    setCalendarUrl(buildCalendarUrl(selectedDate, t.start, t.end, selectedPremise.name))
-    setTimeout(() => { setSuccess(''); setCalendarUrl('') }, 10000)
-  }
 }

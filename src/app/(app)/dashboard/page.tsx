@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { formatDate } from '@/lib/utils'
+import { getTranslations } from 'next-intl/server'
 import DashboardFeed from './DashboardFeed'
 
 export default async function DashboardPage() {
@@ -12,6 +13,11 @@ export default async function DashboardPage() {
   if (!profile) redirect('/auth/register')
 
   const communityId = profile.community_id
+  const t = await getTranslations('dashboard')
+  const tc = await getTranslations('common')
+  const locale = (profile.preferred_lang || 'CA').toLowerCase()
+  const hour = new Date().getHours()
+  const greeting = hour < 12 ? t('good_morning') : hour < 19 ? t('good_afternoon') : t('good_evening')
 
   const [
     { count: registeredCount },
@@ -41,7 +47,6 @@ export default async function DashboardPage() {
     supabase.from('maintenance_tickets').select('*').eq('community_id', communityId).order('created_at', { ascending: false }).limit(5),
   ])
 
-  // Build initial feed — merge and sort all recent activity
   const feedItems = [
     ...(recentBookings || []).map((r: any) => ({
       id: r.id, type: 'booking' as const, icon: '📅',
@@ -69,63 +74,54 @@ export default async function DashboardPage() {
     birthday: '🎂', new_neighbour: '🏠', milestone: '🎯',
     proposal_milestone: '📢', marketplace_quirk: '🔄', event_completed: '🎾',
   }
-  const triggerLabels: Record<string, string> = {
-    birthday: 'Birthday', new_neighbour: 'New neighbour', milestone: 'Milestone',
-    proposal_milestone: 'Proposal', marketplace_quirk: 'Marketplace', event_completed: 'Completed',
-  }
 
   return (
     <div style={{ maxWidth: '960px', margin: '0 auto' }}>
-
-      {/* Banner */}
       <div className="banner" style={{ marginBottom: '14px' }}>
         {community?.banner_url && <img src={community.banner_url} alt="Bermar Park" />}
         <div className="banner-overlay">
           <div>
-            <div className="banner-title">Good morning, {community?.name || 'Bermar Park'}</div>
+            <div className="banner-title">{greeting}, {community?.name || 'Bermar Park'}</div>
             <div className="banner-sub" style={{ textTransform: 'capitalize' }}>
-              {new Date().toLocaleDateString('ca-ES', { weekday: 'long', day: 'numeric', month: 'long' })} · Gavà Mar
+              {new Date().toLocaleDateString(`${locale}-ES`, { weekday: 'long', day: 'numeric', month: 'long' })} · Gavà Mar
             </div>
           </div>
         </div>
       </div>
 
-      {/* Stat cards */}
       <div className="stat-grid">
         <div className="stat-card">
-          <div className="stat-label">Registered</div>
+          <div className="stat-label">{t('registered')}</div>
           <div className="stat-value">{registeredCount || 0}</div>
           <div className="stat-sub">of {community?.total_apts_tbc || 73} TBC</div>
         </div>
         <div className="stat-card">
-          <div className="stat-label">Proposals</div>
+          <div className="stat-label">{t('proposals')}</div>
           <div className="stat-value">{openProposals || 0}</div>
           <div className="stat-sub">open / voting</div>
         </div>
         <div className="stat-card">
-          <div className="stat-label">Today</div>
+          <div className="stat-label">{t('today')}</div>
           <div className="stat-value">{todayBookings || 0}</div>
           <div className="stat-sub">bookings</div>
         </div>
         <div className="stat-card">
-          <div className="stat-label">Marketplace</div>
+          <div className="stat-label">{t('marketplace')}</div>
           <div className="stat-value">{activeListings || 0}</div>
           <div className="stat-sub">active listings</div>
         </div>
       </div>
 
-      {/* Community Voice */}
       {voicePosts && voicePosts.length > 0 && (
         <div style={{ marginBottom: '16px' }}>
-          <div className="section-title">Community voice</div>
+          <div className="section-title">{t('community_voice')}</div>
           {voicePosts.map((post: any) => {
             const body = typeof post.body === 'object' ? post.body : {}
-            const text = body.EN || body.CA || body.ES || Object.values(body)[0] || ''
+            const text = body[profile.preferred_lang] || body.EN || body.CA || body.ES || Object.values(body)[0] || ''
             return (
               <div key={post.id} className="cv-card">
                 <div className="cv-icon">{triggerIcons[post.trigger_type] || '💬'}</div>
                 <div>
-                  <div className="cv-label">{triggerLabels[post.trigger_type] || 'Community'}</div>
                   <div className="cv-text">{text}</div>
                   <div className="cv-time">{formatDate(post.created_at)}</div>
                 </div>
@@ -135,25 +131,23 @@ export default async function DashboardPage() {
         </div>
       )}
 
-      {/* Two column */}
       <div className="two-col">
         <div>
-          <DashboardFeed communityId={communityId} initialItems={feedItems} />
+          <DashboardFeed communityId={communityId} initialItems={feedItems} activityLabel={t('activity_feed')} />
         </div>
         <div>
-          <div className="section-title">Premises today</div>
+          <div className="section-title">{t('premises_today')}</div>
           <div className="card card-sm" style={{ marginBottom: '12px' }}>
             {premises?.map((p: any) => (
               <div key={p.id} className="premise-row">
                 <span>{p.name}</span>
-                <span className="tag tag-green">Free</span>
+                <span className="tag tag-green">{tc('free')}</span>
               </div>
             ))}
           </div>
-
           {myBookings && myBookings.length > 0 && (
             <>
-              <div className="section-title">My bookings</div>
+              <div className="section-title">{t('my_bookings')}</div>
               <div className="card card-sm">
                 {myBookings.map((b: any) => (
                   <div key={b.id} className="feed-item">
