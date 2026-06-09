@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Sidebar from './Sidebar'
 import Topbar from './Topbar'
+import NotificationsPanel from './NotificationsPanel'
 
 interface Props {
   profile: any
@@ -14,6 +15,8 @@ interface Props {
 
 export default function MobileLayoutShell({ profile, community, unreadNotifs, warnings, children }: Props) {
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [notifOpen, setNotifOpen] = useState(false)
+  const [unread, setUnread] = useState(unreadNotifs)
 
   return (
     <div style={{ display: 'flex', height: '100dvh', overflow: 'hidden', background: 'var(--sand)', position: 'relative' }}>
@@ -27,14 +30,23 @@ export default function MobileLayoutShell({ profile, community, unreadNotifs, wa
         <Topbar
           community={community}
           profile={profile}
-          unreadNotifs={unreadNotifs}
+          unreadNotifs={unread}
           warnings={warnings}
           onMenuToggle={() => setMobileOpen(o => !o)}
+          onNotifClick={() => setNotifOpen(true)}
         />
         <main style={{ flex: 1, overflowY: 'auto', padding: '16px' }}>
           {children}
         </main>
       </div>
+
+      {notifOpen && (
+        <NotificationsPanel
+          profileId={profile.id}
+          onClose={() => setNotifOpen(false)}
+          onRead={() => setUnread(0)}
+        />
+      )}
     </div>
   )
 }

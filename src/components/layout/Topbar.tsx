@@ -10,20 +10,12 @@ interface Props {
   unreadNotifs: number
   warnings: any[]
   onMenuToggle: () => void
+  onNotifClick: () => void
 }
 
 const LANG_FLAGS: Record<string, string> = {
-  ES: '🇪🇸',
-  EN: '🇬🇧',
-  FR: '🇫🇷',
-  RU: '🇷🇺',
-  SR: '🇷🇸',
-  PT: '🇵🇹',
-  IT: '🇮🇹',
-  DE: '🇩🇪',
-  NL: '🇳🇱',
-  UK: '🇺🇦',
-  HI: '🇮🇳',
+  ES: '🇪🇸', EN: '🇬🇧', FR: '🇫🇷', RU: '🇷🇺', SR: '🇷🇸',
+  PT: '🇵🇹', IT: '🇮🇹', DE: '🇩🇪', NL: '🇳🇱', UK: '🇺🇦', HI: '🇮🇳',
 }
 
 const LANG_NAMES: Record<string, string> = {
@@ -32,7 +24,6 @@ const LANG_NAMES: Record<string, string> = {
   DE: 'Deutsch', NL: 'Nederlands', UK: 'Українська', HI: 'हिन्दी',
 }
 
-// Catalan flag as inline SVG (senyera — 4 red stripes on gold)
 function CatalanFlag({ size = 18 }: { size?: number }) {
   return (
     <svg width={size} height={Math.round(size * 0.67)} viewBox="0 0 3 2" style={{ borderRadius: '2px', display: 'block' }}>
@@ -45,40 +36,27 @@ function CatalanFlag({ size = 18 }: { size?: number }) {
   )
 }
 
-export default function Topbar({ community, profile, unreadNotifs, warnings, onMenuToggle }: Props) {
+export default function Topbar({ community, profile, unreadNotifs, warnings, onMenuToggle, onNotifClick }: Props) {
   const supabase = createClient()
   const t = useTranslations('common')
 
-  const coreLangs = [...(community?.languages_core || ['CA','ES','EN','FR','RU'])]
-  const extLangs = community?.languages_extended || []
-  // Show core + any extended langs that are active (e.g. SR)
-  const allLangs = coreLangs
-
-  const [activeLang, setActiveLang] = useState<string>(profile?.preferred_lang || coreLangs[0] || 'CA')
+  const langs = [...(community?.languages_core || ['CA','ES','EN','FR','RU'])]
+  const [activeLang, setActiveLang] = useState<string>(profile?.preferred_lang || langs[0] || 'CA')
 
   async function switchLang(lang: string) {
     setActiveLang(lang)
-    await supabase
-      .from('profiles')
-      .update({ preferred_lang: lang })
-      .eq('id', profile?.id)
+    await supabase.from('profiles').update({ preferred_lang: lang }).eq('id', profile?.id)
     document.cookie = `NEXT_LOCALE=${lang.toLowerCase()}; path=/; max-age=31536000; SameSite=Lax`
     window.location.reload()
   }
 
-  async function signOut() {
-    await supabase.auth.signOut()
-    window.location.href = '/auth/login'
-  }
 
   return (
     <div>
       {warnings.map((w: any) => (
         <div key={w.id} className="warn-bar type-warning">
           ⚠ <span><strong>{w.title}</strong>{w.body ? ` — ${w.body}` : ''}</span>
-          <button style={{ marginLeft: 'auto', background: 'none', border: 'none', cursor: 'pointer', fontSize: '11px', opacity: 0.7 }}>
-            {t('cancel')}
-          </button>
+          <button style={{ marginLeft: 'auto', background: 'none', border: 'none', cursor: 'pointer', fontSize: '11px', opacity: 0.7 }}>{t('cancel')}</button>
         </div>
       ))}
       <div className="topbar">
@@ -88,44 +66,31 @@ export default function Topbar({ community, profile, unreadNotifs, warnings, onM
 
         <span className="topbar-title">{community?.name || 'Bermar Park'}</span>
 
-        {/* Language flags */}
-        <div style={{ display: 'flex', gap: '2px', alignItems: 'center', flexShrink: 0, flexWrap: 'wrap' }}>
-          {allLangs.map((l: string) => {
+        {/* Language flags — core only */}
+        <div style={{ display: 'flex', gap: '2px', alignItems: 'center', flexShrink: 0 }}>
+          {langs.map((l: string) => {
             const isActive = activeLang === l
             return (
-              <button
-                key={l}
-                onClick={() => switchLang(l)}
-                title={LANG_NAMES[l] || l}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  width: '28px',
-                  height: '28px',
-                  borderRadius: '50%',
-                  fontSize: '16px',
-                  cursor: 'pointer',
-                  border: isActive ? '2px solid var(--pine)' : '2px solid transparent',
-                  background: isActive ? 'rgba(26,61,43,0.08)' : 'transparent',
-                  transition: 'all 0.15s',
-                  padding: 0,
-                  lineHeight: 1,
-                }}
-              >
-                {l === 'CA'
-                  ? <CatalanFlag size={18} />
-                  : (LANG_FLAGS[l] || '🌐')}
+              <button key={l} onClick={() => switchLang(l)} title={LANG_NAMES[l] || l} style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                width: '28px', height: '28px', borderRadius: '50%', fontSize: '16px',
+                cursor: 'pointer', padding: 0, lineHeight: 1,
+                border: isActive ? '2px solid var(--pine)' : '2px solid transparent',
+                background: isActive ? 'rgba(26,61,43,0.08)' : 'transparent',
+                transition: 'all 0.15s',
+              }}>
+                {l === 'CA' ? <CatalanFlag size={18} /> : (LANG_FLAGS[l] || '🌐')}
               </button>
             )
           })}
         </div>
 
-        <button className="notif-btn">
+        {/* Bell */}
+        <button className="notif-btn" onClick={onNotifClick} style={{ position: 'relative' }}>
           🔔
           {unreadNotifs > 0 && <span className="notif-dot" />}
         </button>
-        <button className="signout-btn" onClick={signOut}>Sign out</button>
+
       </div>
     </div>
   )

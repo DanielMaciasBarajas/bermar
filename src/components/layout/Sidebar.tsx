@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useTranslations } from 'next-intl'
+import { createClient } from '@/lib/supabase/client'
 
 const NAV = [
   { section: 'community', items: [
@@ -185,6 +186,27 @@ export default function Sidebar({ profile, community, mobileOpen, onMobileClose 
               </div>
             )}
           </div>
+          {showLabels && (
+            <button
+              onClick={async () => {
+                const supabase = createClient()
+                await supabase.auth.signOut()
+                window.location.href = '/auth/login'
+              }}
+              style={{
+                marginTop: '8px', width: '100%', padding: '8px',
+                borderRadius: '10px', border: '1px solid rgba(255,255,255,0.12)',
+                background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.6)',
+                fontSize: '11px', cursor: 'pointer', textAlign: 'left',
+                display: 'flex', alignItems: 'center', gap: '8px',
+                transition: 'background 0.15s',
+              }}
+              onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.12)')}
+              onMouseLeave={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.06)')}
+            >
+              <span>↪</span> Sign out
+            </button>
+          )}
         </div>
       </div>
     </>
