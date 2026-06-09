@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 
 interface Props {
@@ -14,7 +13,6 @@ interface Props {
 }
 
 export default function Topbar({ community, profile, unreadNotifs, warnings, onMenuToggle }: Props) {
-  const router = useRouter()
   const supabase = createClient()
   const t = useTranslations('common')
 
@@ -27,20 +25,17 @@ export default function Topbar({ community, profile, unreadNotifs, warnings, onM
   async function switchLang(lang: string) {
     setActiveLang(lang)
     setShowExtended(false)
-    // Save to profile
     await supabase
       .from('profiles')
       .update({ preferred_lang: lang })
       .eq('id', profile?.id)
     document.cookie = `NEXT_LOCALE=${lang.toLowerCase()}; path=/; max-age=31536000; SameSite=Lax`
-    // Refresh server components so multilingual content re-renders
-    router.refresh()
+    window.location.reload()
   }
 
   async function signOut() {
     await supabase.auth.signOut()
-    router.push('/auth/login')
-    router.refresh()
+    window.location.href = '/auth/login'
   }
 
   return (
@@ -54,14 +49,12 @@ export default function Topbar({ community, profile, unreadNotifs, warnings, onM
         </div>
       ))}
       <div className="topbar">
-        {/* Hamburger — mobile only */}
         <button onClick={onMenuToggle} className="hamburger-btn" aria-label="Open menu">
           <span /><span /><span />
         </button>
 
         <span className="topbar-title">{community?.name || 'Bermar Park'}</span>
 
-        {/* Language chips */}
         <div style={{ display: 'flex', gap: '4px', alignItems: 'center', position: 'relative' }}>
           {langs.map((l: string) => (
             <button
@@ -80,7 +73,6 @@ export default function Topbar({ community, profile, unreadNotifs, warnings, onM
             </button>
           ))}
 
-          {/* Extended languages dropdown */}
           {extended.length > 0 && (
             <div style={{ position: 'relative' }}>
               <button
