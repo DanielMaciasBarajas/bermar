@@ -13,7 +13,6 @@ interface Props {
 }
 
 const LANG_FLAGS: Record<string, string> = {
-  CA: '🏴󠁥󠁳󠁣󠁴󠁿',
   ES: '🇪🇸',
   EN: '🇬🇧',
   FR: '🇫🇷',
@@ -33,13 +32,29 @@ const LANG_NAMES: Record<string, string> = {
   DE: 'Deutsch', NL: 'Nederlands', UK: 'Українська', HI: 'हिन्दी',
 }
 
+// Catalan flag as inline SVG (senyera — 4 red stripes on gold)
+function CatalanFlag({ size = 18 }: { size?: number }) {
+  return (
+    <svg width={size} height={Math.round(size * 0.67)} viewBox="0 0 3 2" style={{ borderRadius: '2px', display: 'block' }}>
+      <rect width="3" height="2" fill="#FCDD09"/>
+      <rect y="0" width="3" height="0.286" fill="#DA121A"/>
+      <rect y="0.572" width="3" height="0.286" fill="#DA121A"/>
+      <rect y="1.144" width="3" height="0.286" fill="#DA121A"/>
+      <rect y="1.716" width="3" height="0.284" fill="#DA121A"/>
+    </svg>
+  )
+}
+
 export default function Topbar({ community, profile, unreadNotifs, warnings, onMenuToggle }: Props) {
   const supabase = createClient()
   const t = useTranslations('common')
 
-  // Only show core languages in topbar
-  const langs = [...(community?.languages_core || ['CA','ES','EN','FR','RU'])]
-  const [activeLang, setActiveLang] = useState<string>(profile?.preferred_lang || langs[0] || 'CA')
+  const coreLangs = [...(community?.languages_core || ['CA','ES','EN','FR','RU'])]
+  const extLangs = community?.languages_extended || []
+  // Show core + any extended langs that are active (e.g. SR)
+  const allLangs = [...coreLangs, ...extLangs]
+
+  const [activeLang, setActiveLang] = useState<string>(profile?.preferred_lang || coreLangs[0] || 'CA')
 
   async function switchLang(lang: string) {
     setActiveLang(lang)
@@ -73,9 +88,9 @@ export default function Topbar({ community, profile, unreadNotifs, warnings, onM
 
         <span className="topbar-title">{community?.name || 'Bermar Park'}</span>
 
-        {/* Language flags — core only */}
-        <div style={{ display: 'flex', gap: '2px', alignItems: 'center', flexShrink: 0 }}>
-          {langs.map((l: string) => {
+        {/* Language flags */}
+        <div style={{ display: 'flex', gap: '2px', alignItems: 'center', flexShrink: 0, flexWrap: 'wrap' }}>
+          {allLangs.map((l: string) => {
             const isActive = activeLang === l
             return (
               <button
@@ -98,7 +113,9 @@ export default function Topbar({ community, profile, unreadNotifs, warnings, onM
                   lineHeight: 1,
                 }}
               >
-                {LANG_FLAGS[l] || '🌐'}
+                {l === 'CA'
+                  ? <CatalanFlag size={18} />
+                  : (LANG_FLAGS[l] || '🌐')}
               </button>
             )
           })}
