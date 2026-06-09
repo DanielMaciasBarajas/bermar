@@ -107,23 +107,16 @@ export default function AdminClient({ profile, community, activityLog, pendingPr
 
     const { data: { publicUrl } } = supabase.storage.from('documents').getPublicUrl(path)
 
-    // AI summary
+    // AI summary via server route
     let aiDescription: string | null = null
     try {
-      const aiRes = await fetch('https://api.anthropic.com/v1/messages', {
+      const aiRes = await fetch('/api/documents/summarise', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 200,
-          messages: [{
-            role: 'user',
-            content: `You are summarising a community document for residents of Bermar Park, Gavà Mar, Barcelona. The document is titled "${docTitle}" and is categorised as "${docCategory}". Write exactly 3 sentences summarising what this document is likely about and why it matters to residents. Be concise and friendly. Respond only with the 3 sentences, no preamble.`
-          }]
-        })
+        body: JSON.stringify({ title: docTitle, category: docCategory })
       })
       const aiData = await aiRes.json()
-      aiDescription = aiData.content?.[0]?.text || null
+      aiDescription = aiData.summary || null
     } catch (e) {
       console.warn('AI summary failed:', e)
     }
