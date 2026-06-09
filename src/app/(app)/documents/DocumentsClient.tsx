@@ -6,7 +6,7 @@ import { useTranslations } from 'next-intl'
 import type { Profile } from '@/lib/supabase/types'
 
 interface DocumentFile { id: string; language: string; file_url: string; file_name: string | null; uploaded_at: string }
-interface DocumentData { id: string; title: string; category: string; created_at: string; files: DocumentFile[] }
+interface DocumentData { id: string; title: string; category: string; created_at: string; description?: string | null; files: DocumentFile[] }
 
 const CATEGORY_LABELS: Record<string, string> = {
   statutes: 'Statutes & rules', minutes: 'Meeting minutes', contracts: 'Contracts',
@@ -75,6 +75,9 @@ export default function DocumentsClient({ documents, allLangs, profile }: Props)
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ fontSize: '13px', fontWeight: 500, color: 'var(--tx)', marginBottom: '2px' }}>{doc.title}</div>
+              {doc.description && (
+                <div style={{ fontSize: '11px', color: 'var(--txm)', marginBottom: '6px', lineHeight: 1.5, fontStyle: 'italic' }}>{doc.description}</div>
+              )}
               <div style={{ fontSize: '11px', color: 'var(--txm)', marginBottom: '8px' }}>{CATEGORY_LABELS[doc.category] || doc.category} · {formatDate(doc.created_at)}</div>
               {doc.files.length > 0 && (
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>

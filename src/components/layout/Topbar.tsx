@@ -52,7 +52,7 @@ export default function Topbar({ community, profile, unreadNotifs, warnings, onM
   const coreLangs = [...(community?.languages_core || ['CA','ES','EN','FR','RU'])]
   const extLangs = community?.languages_extended || []
   // Show core + any extended langs that are active (e.g. SR)
-  const allLangs = [...coreLangs, ...extLangs]
+  const allLangs = coreLangs
 
   const [activeLang, setActiveLang] = useState<string>(profile?.preferred_lang || coreLangs[0] || 'CA')
 
