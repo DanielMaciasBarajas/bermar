@@ -2,6 +2,11 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 export async function middleware(request: NextRequest) {
+  // Read locale from cookie
+  const localeCookie = request.cookies.get('NEXT_LOCALE')?.value
+  const validLocales = ['ca', 'es', 'en', 'fr', 'ru', 'sr']
+  const locale = validLocales.includes(localeCookie || '') ? localeCookie! : 'ca'
+
   let supabaseResponse = NextResponse.next({ request })
 
   const supabase = createServerClient(
@@ -37,11 +42,9 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  // Set locale cookie for next-intl if not already set
-  const localeCookie = request.cookies.get('NEXT_LOCALE')
-  if (!localeCookie) {
-    supabaseResponse.cookies.set('NEXT_LOCALE', 'ca', { path: '/', maxAge: 31536000 })
-  }
+  // Pass locale via header so next-intl can read it
+  supabaseResponse.headers.set('x-locale', locale)
+  supabaseResponse.cookies.set('NEXT_LOCALE', locale, { path: '/', maxAge: 31536000, sameSite: 'lax' })
 
   return supabaseResponse
 }
