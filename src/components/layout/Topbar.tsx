@@ -12,19 +12,33 @@ interface Props {
   onMenuToggle: () => void
 }
 
+const LANG_FLAGS: Record<string, string> = {
+  CA: '🏴󠁥󠁳󠁣󠁴󠁿',
+  ES: '🇪🇸',
+  EN: '🇬🇧',
+  FR: '🇫🇷',
+  RU: '🇷🇺',
+  SR: '🇷🇸',
+  PT: '🇵🇹',
+  IT: '🇮🇹',
+  DE: '🇩🇪',
+  NL: '🇳🇱',
+  UK: '🇺🇦',
+  HI: '🇮🇳',
+}
+
 export default function Topbar({ community, profile, unreadNotifs, warnings, onMenuToggle }: Props) {
   const supabase = createClient()
   const t = useTranslations('common')
 
   const langs = [...(community?.languages_core || ['CA','ES','EN','FR','RU'])]
   const extended = community?.languages_extended || []
+  const allLangs = [...langs, ...extended]
 
   const [activeLang, setActiveLang] = useState<string>(profile?.preferred_lang || langs[0] || 'CA')
-  const [showExtended, setShowExtended] = useState(false)
 
   async function switchLang(lang: string) {
     setActiveLang(lang)
-    setShowExtended(false)
     await supabase
       .from('profiles')
       .update({ preferred_lang: lang })
@@ -55,64 +69,35 @@ export default function Topbar({ community, profile, unreadNotifs, warnings, onM
 
         <span className="topbar-title">{community?.name || 'Bermar Park'}</span>
 
-        <div style={{ display: 'flex', gap: '4px', alignItems: 'center', position: 'relative' }}>
-          {langs.map((l: string) => (
-            <button
-              key={l}
-              onClick={() => switchLang(l)}
-              className="lang-chip"
-              style={{
-                background: activeLang === l ? 'var(--pine)' : undefined,
-                color: activeLang === l ? '#fff' : undefined,
-                border: activeLang === l ? '1px solid var(--pine)' : undefined,
-                fontWeight: activeLang === l ? 600 : undefined,
-                cursor: 'pointer',
-              }}
-            >
-              {l}
-            </button>
-          ))}
-
-          {extended.length > 0 && (
-            <div style={{ position: 'relative' }}>
+        {/* All language chips with flags */}
+        <div style={{ display: 'flex', gap: '3px', alignItems: 'center', flexWrap: 'wrap' }}>
+          {allLangs.map((l: string) => {
+            const isActive = activeLang === l
+            return (
               <button
-                className="lang-more"
-                onClick={() => setShowExtended(o => !o)}
+                key={l}
+                onClick={() => switchLang(l)}
+                title={l}
                 style={{
-                  background: extended.includes(activeLang) ? 'var(--pine)' : undefined,
-                  color: extended.includes(activeLang) ? '#fff' : undefined,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '3px',
+                  padding: '3px 7px',
+                  borderRadius: '999px',
+                  fontSize: '11px',
+                  fontWeight: isActive ? 600 : 400,
+                  cursor: 'pointer',
+                  border: isActive ? '1.5px solid var(--pine)' : '1px solid var(--br)',
+                  background: isActive ? 'rgba(26,61,43,0.08)' : 'transparent',
+                  color: isActive ? 'var(--pine)' : 'var(--txm)',
+                  transition: 'all 0.15s',
                 }}
               >
-                {extended.includes(activeLang) ? activeLang : `+${extended.length}`}
+                <span style={{ fontSize: '14px', lineHeight: 1 }}>{LANG_FLAGS[l] || '🌐'}</span>
+                <span>{l}</span>
               </button>
-              {showExtended && (
-                <div style={{
-                  position: 'absolute', top: '100%', right: 0, marginTop: '4px',
-                  background: '#fff', borderRadius: '12px', border: '1px solid var(--br)',
-                  boxShadow: '0 4px 16px rgba(0,0,0,0.1)', padding: '6px',
-                  display: 'flex', flexDirection: 'column', gap: '2px', zIndex: 100,
-                  minWidth: '80px',
-                }}>
-                  {extended.map((l: string) => (
-                    <button
-                      key={l}
-                      onClick={() => switchLang(l)}
-                      style={{
-                        padding: '6px 10px', borderRadius: '8px', fontSize: '11px',
-                        fontWeight: activeLang === l ? 600 : 400,
-                        background: activeLang === l ? '#dcfce7' : 'transparent',
-                        color: activeLang === l ? '#166534' : 'var(--tx)',
-                        border: 'none', cursor: 'pointer', textAlign: 'left',
-                        transition: 'background 0.1s',
-                      }}
-                    >
-                      {l}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
+            )
+          })}
         </div>
 
         <button className="notif-btn">
