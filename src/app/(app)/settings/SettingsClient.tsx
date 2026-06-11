@@ -27,6 +27,55 @@ export default function SettingsClient({ profile, apartment, email }: Props) {
   const [deleteConfirm, setDeleteConfirm] = useState(false)
   const [deleteInput, setDeleteInput] = useState('')
   const [deleting, setDeleting] = useState(false)
+  const [exporting, setExporting] = useState(false)
+
+  async function exportData() {
+    setExporting(true)
+    const [
+      { data: profileData },
+      { data: bookings },
+      { data: proposals },
+      { data: votes },
+      { data: listings },
+      { data: tickets },
+      { data: occupantsData },
+      { data: interestsData },
+    ] = await Promise.all([
+      supabase.from('profiles').select('*').eq('id', profile.id).single(),
+      supabase.from('bookings').select('*').eq('profile_id', profile.id),
+      supabase.from('proposals').select('*').eq('profile_id', profile.id),
+      supabase.from('proposal_votes').select('*').eq('profile_id', profile.id),
+      supabase.from('marketplace_listings').select('*').eq('profile_id', profile.id),
+      supabase.from('maintenance_tickets').select('*').eq('profile_id', profile.id),
+      supabase.from('occupants').select('*').eq('profile_id', profile.id),
+      supabase.from('interests').select('*').eq('profile_id', profile.id),
+    ])
+
+    // Strip sensitive internal fields before export
+    const { community_id, ...safeProfile } = profileData as any
+
+    const payload = {
+      exported_at: new Date().toISOString(),
+      gdpr_note: 'This file contains all personal data held by Bermar Park for your apartment. You may request deletion at any time via Settings → Danger Zone.',
+      profile: safeProfile,
+      occupants: occupantsData || [],
+      interests: (interestsData || []).map((i: any) => i.interest),
+      bookings: bookings || [],
+      proposals: proposals || [],
+      votes: votes || [],
+      marketplace_listings: listings || [],
+      maintenance_tickets: tickets || [],
+    }
+
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `bermar-data-apt${profile.apt_number}-${new Date().toISOString().split('T')[0]}.json`
+    a.click()
+    URL.revokeObjectURL(url)
+    setExporting(false)
+  }
 
   const chipBase: React.CSSProperties = { padding: '4px 10px', borderRadius: '999px', fontSize: '11px', border: '1px solid', cursor: 'pointer', transition: 'all 0.15s' }
 
@@ -129,7 +178,20 @@ export default function SettingsClient({ profile, apartment, email }: Props) {
       </button>
 
       <div className="section-title" style={{ marginBottom: '8px', color: '#dc2626' }}>{t('danger_zone')}</div>
-      <div className="card" style={{ border: '1px solid #fecaca' }}>
+      <div className="card" style={{ border: '1px solid #fecaca', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+
+        {/* GDPR data export */}
+        <div>
+          <div style={{ fontSize: '13px', fontWeight: 500, color: 'var(--tx)', marginBottom: '4px' }}>Download my data</div>
+          <div style={{ fontSize: '11px', color: 'var(--txm)', marginBottom: '10px', lineHeight: 1.5 }}>
+            Export all data Bermar holds about your apartment — profile, bookings, votes, proposals, listings and maintenance tickets — as a JSON file. Your right under GDPR Art. 20.
+          </div>
+          <button onClick={exportData} disabled={exporting} style={{ padding: '8px 16px', borderRadius: '10px', fontSize: '12px', fontWeight: 500, background: 'transparent', border: '1px solid var(--br)', color: 'var(--tx)', cursor: 'pointer', opacity: exporting ? 0.6 : 1 }}>
+            {exporting ? '⏳ Preparing export...' : '⬇ Download my data'}
+          </button>
+        </div>
+
+        <div style={{ borderTop: '1px solid #fecaca' }} />
         <div style={{ fontSize: '13px', fontWeight: 500, color: '#dc2626', marginBottom: '4px' }}>{t('delete_account')}</div>
         <div style={{ fontSize: '11px', color: 'var(--txm)', marginBottom: '12px', lineHeight: 1.5 }}>
           This permanently deletes all data associated with Apt {profile.apt_number} — bookings, votes, proposals, and your profile. The apartment remains in the building directory but will show as unregistered. This cannot be undone.
@@ -150,6 +212,7 @@ export default function SettingsClient({ profile, apartment, email }: Props) {
             </div>
           </div>
         )}
+
       </div>
     </div>
   )
