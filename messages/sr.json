@@ -69,7 +69,11 @@
     "privacy": "Приватност и обавештења",
     "save": "Сачувај подешавања",
     "danger_zone": "Опасна зона",
-    "delete_account": "Обриши налог"
+    "delete_account": "Обриши налог",
+    "download_data": "Преузми моје податке",
+    "download_data_desc": "Извези све личне податке које Bermar чува о твом стану као JSON фајл. Твоје право по GDPR чл. 20.",
+    "download_data_btn": "⬇ Преузми моје податке",
+    "download_data_preparing": "⏳ Припрема извоза..."
   },
   "common": {
     "loading": "Учитавање...",

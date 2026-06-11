@@ -69,7 +69,11 @@
     "privacy": "Конфиденциальность и уведомления",
     "save": "Сохранить настройки",
     "danger_zone": "Опасная зона",
-    "delete_account": "Удалить аккаунт"
+    "delete_account": "Удалить аккаунт",
+    "download_data": "Скачать мои данные",
+    "download_data_desc": "Экспортируйте все личные данные Bermar о вашей квартире в файл JSON. Ваше право по GDPR Ст. 20.",
+    "download_data_btn": "⬇ Скачать мои данные",
+    "download_data_preparing": "⏳ Подготовка экспорта..."
   },
   "common": {
     "loading": "Загрузка...",

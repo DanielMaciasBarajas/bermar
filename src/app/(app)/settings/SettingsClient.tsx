@@ -182,12 +182,12 @@ export default function SettingsClient({ profile, apartment, email }: Props) {
 
         {/* GDPR data export */}
         <div>
-          <div style={{ fontSize: '13px', fontWeight: 500, color: 'var(--tx)', marginBottom: '4px' }}>Download my data</div>
+          <div style={{ fontSize: '13px', fontWeight: 500, color: 'var(--tx)', marginBottom: '4px' }}>{t('download_data')}</div>
           <div style={{ fontSize: '11px', color: 'var(--txm)', marginBottom: '10px', lineHeight: 1.5 }}>
-            Export all data Bermar holds about your apartment — profile, bookings, votes, proposals, listings and maintenance tickets — as a JSON file. Your right under GDPR Art. 20.
+            {t('download_data_desc')}
           </div>
           <button onClick={exportData} disabled={exporting} style={{ padding: '8px 16px', borderRadius: '10px', fontSize: '12px', fontWeight: 500, background: 'transparent', border: '1px solid var(--br)', color: 'var(--tx)', cursor: 'pointer', opacity: exporting ? 0.6 : 1 }}>
-            {exporting ? '⏳ Preparing export...' : '⬇ Download my data'}
+            {exporting ? t('download_data_preparing') : t('download_data_btn')}
           </button>
         </div>
 

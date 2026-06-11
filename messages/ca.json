@@ -69,7 +69,11 @@
     "privacy": "Privacitat i notificacions",
     "save": "Desar configuració",
     "danger_zone": "Zona de perill",
-    "delete_account": "Eliminar compte"
+    "delete_account": "Eliminar compte",
+    "download_data": "Descarrega les meves dades",
+    "download_data_desc": "Exporta totes les dades personals que Bermar té del teu apartament com a fitxer JSON. El teu dret segons el RGPD Art. 20.",
+    "download_data_btn": "⬇ Descarrega les meves dades",
+    "download_data_preparing": "⏳ Preparant exportació..."
   },
   "common": {
     "loading": "Carregant...",
