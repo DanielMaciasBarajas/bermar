@@ -62,6 +62,36 @@ export default function AdminClient({ profile, community, activityLog, pendingPr
   const [birthdayEnabled, setBirthdayEnabled] = useState(community?.birthday_wishes_enabled ?? true)
   const [extLangs, setExtLangs] = useState<string[]>(community?.languages_extended || [])
 
+  const [logoFile, setLogoFile] = useState<File | null>(null)
+  const [logoPreview, setLogoPreview] = useState<string | null>(community?.logo_url || null)
+  const [logoUploading, setLogoUploading] = useState(false)
+  const [logoSuccess, setLogoSuccess] = useState('')
+
+  function pickLogo(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setLogoFile(file)
+    setLogoPreview(URL.createObjectURL(file))
+    setLogoSuccess('')
+  }
+
+  async function uploadLogo() {
+    if (!logoFile) return
+    setLogoUploading(true)
+    setLogoSuccess('')
+    const ext = logoFile.name.split('.').pop()
+    const path = `${profile.community_id}/logo.${ext}`
+    const { error } = await supabase.storage
+      .from('community-assets')
+      .upload(path, logoFile, { upsert: true, contentType: logoFile.type })
+    if (error) { setLogoUploading(false); return }
+    const { data: { publicUrl } } = supabase.storage.from('community-assets').getPublicUrl(path)
+    await supabase.from('communities').update({ logo_url: publicUrl }).eq('id', profile.community_id)
+    setLogoFile(null)
+    setLogoSuccess('Logo saved ✓ — favicon and home screen icon updated.')
+    setLogoUploading(false)
+  }
+
   async function approveProfile(profileId: string) {
     await supabase.from('profiles').update({ approved: true, approved_at: new Date().toISOString(), approved_by: profile.id }).eq('id', profileId)
   }
@@ -348,6 +378,29 @@ export default function AdminClient({ profile, community, activityLog, pendingPr
       {activeTab === 'config' && (
         <div className="two-col" style={{ gap: '24px' }}>
           <div>
+            <div className="section-title" style={{ marginBottom: '12px' }}>Community logo</div>
+            <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '24px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                <div style={{ width: '72px', height: '72px', borderRadius: '16px', border: '1px solid var(--br)', background: 'var(--sand-d)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', flexShrink: 0 }}>
+                  {logoPreview
+                    ? <img src={logoPreview} alt="logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                    : <span style={{ fontSize: '28px' }}>🏘</span>
+                  }
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: '11px', color: 'var(--txm)', marginBottom: '8px', lineHeight: 1.5 }}>
+                    Used as favicon and PWA home screen icon.<br />
+                    Square PNG or SVG, min 512×512px recommended.
+                  </div>
+                  <input type="file" accept="image/png,image/svg+xml,image/jpeg,image/webp" onChange={pickLogo} style={{ fontSize: '11px', color: 'var(--tx)' }} />
+                </div>
+              </div>
+              {logoSuccess && <div style={{ fontSize: '11px', color: '#166534', background: '#f0fdf4', padding: '8px 12px', borderRadius: '8px' }}>✓ {logoSuccess}</div>}
+              <button onClick={uploadLogo} disabled={!logoFile || logoUploading} className="btn btn-primary" style={{ width: '100%', opacity: !logoFile || logoUploading ? 0.6 : 1 }}>
+                {logoUploading ? '⏳ Uploading...' : '⬆ Save logo'}
+              </button>
+            </div>
+
             <div className="section-title" style={{ marginBottom: '12px' }}>Core languages — always active</div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '8px', marginBottom: '20px' }}>
               {CORE_LANGS.map(lang => <div key={lang} style={{ padding: '8px', borderRadius: '12px', textAlign: 'center', fontSize: '12px', fontWeight: 600, color: '#fff', background: 'var(--pine)' }}>{lang}</div>)}

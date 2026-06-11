@@ -1,0 +1,31 @@
+<!-- ═══════════════════════════════════════════
+     BERMAR PARK – Favicon & PWA — paste in <head>
+     ═══════════════════════════════════════════ -->
+
+<!-- Favicon -->
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" href="/favicon-32x32.png" type="image/png" sizes="32x32">
+<link rel="icon" href="/favicon-16x16.png" type="image/png" sizes="16x16">
+
+<!-- Apple -->
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+
+<!-- PWA manifest -->
+<link rel="manifest" href="/manifest.webmanifest">
+
+<!-- Theme color (Chrome/Android address bar) -->
+<meta name="theme-color" content="#2d6b65">
+
+<!-- Open Graph / Social share -->
+<meta property="og:image" content="/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+
+<!-- Service Worker registration -->
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js');
+    });
+  }
+</script>
