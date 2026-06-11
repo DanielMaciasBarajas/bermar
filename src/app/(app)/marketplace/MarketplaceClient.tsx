@@ -45,6 +45,18 @@ export default function MarketplaceClient({ listings, profile, shortTermAllowed,
 
   function triggerPrint(listing: MarketplaceListing) { setPrintListing(listing); setTimeout(() => window.print(), 150) }
 
+  async function deleteListing(id: string) {
+    if (!confirm('Delete this listing?')) return
+    await supabase.from('marketplace_listings').delete().eq('id', id)
+    window.location.reload()
+  }
+
+  async function toggleStatus(listing: MarketplaceListing) {
+    const next = listing.status === 'active' ? 'closed' : 'active'
+    await supabase.from('marketplace_listings').update({ status: next }).eq('id', listing.id)
+    window.location.reload()
+  }
+
   const categories = Object.entries(MARKETPLACE_CATEGORY_LABELS)
   const filtered = listings.filter(l => categoryFilter === 'all' || l.category === categoryFilter)
 
@@ -152,6 +164,9 @@ export default function MarketplaceClient({ listings, profile, shortTermAllowed,
         {filtered.map(listing => (
           <div key={listing.id} className="card-sm">
             <span className={CATEGORY_TAG[listing.category] || 'tag tag-gray'} style={{ display: 'inline-block', marginBottom: '8px' }}>{MARKETPLACE_CATEGORY_LABELS[listing.category]}</span>
+            {listing.status === 'closed' && (
+              <span style={{ display: 'inline-block', marginLeft: '6px', fontSize: '10px', fontWeight: 600, color: '#fff', background: '#6b7280', borderRadius: '999px', padding: '2px 8px', verticalAlign: 'middle' }}>CLOSED</span>
+            )}
             {listing.photo_url
               ? <img src={listing.photo_url} alt={listing.title} style={{ width: '100%', height: '112px', objectFit: 'cover', borderRadius: '8px', marginBottom: '8px' }} />
               : <div style={{ width: '100%', height: '48px', borderRadius: '8px', marginBottom: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--txl)', border: '1px dashed var(--br)', background: 'var(--sand-d)' }}>📷</div>
@@ -165,6 +180,22 @@ export default function MarketplaceClient({ listings, profile, shortTermAllowed,
               <button className="btn btn-sm" style={{ flex: 1 }}>{t('contact')} @{listing.apt_number}</button>
               <button className="btn btn-sm" title="Generate PDF poster" style={{ padding: '4px 8px' }} onClick={() => triggerPrint(listing)}>📄</button>
             </div>
+            {listing.profile_id === profile.id && (
+              <div style={{ display: 'flex', gap: '6px', marginTop: '6px' }}>
+                <button
+                  className="btn btn-sm"
+                  style={{ flex: 1, fontSize: '10px', color: listing.status === 'active' ? '#92400e' : '#166534', borderColor: listing.status === 'active' ? '#fcd34d' : '#86efac' }}
+                  onClick={() => toggleStatus(listing)}
+                >
+                  {listing.status === 'active' ? '✓ Mark closed' : '↺ Reopen'}
+                </button>
+                <button
+                  className="btn btn-sm"
+                  style={{ padding: '4px 8px', fontSize: '10px', color: '#dc2626', borderColor: '#fca5a5' }}
+                  onClick={() => deleteListing(listing.id)}
+                >🗑</button>
+              </div>
+            )}
           </div>
         ))}
 
