@@ -1,5 +1,6 @@
 // src/app/layout.tsx
 import type { Metadata } from 'next'
+import './globals.css'
 import { createClient } from '@/lib/supabase/server'
 import { NextIntlClientProvider } from 'next-intl'
 import { getMessages } from 'next-intl/server'
