@@ -58,13 +58,16 @@ export default function MarketplaceClient({ listings, profile, shortTermAllowed,
       const { error: uploadError } = await supabase.storage
         .from('marketplace')
         .upload(path, photoFile, { upsert: false, contentType: photoFile.type })
-      if (!uploadError) {
+      if (uploadError) {
+        console.error('Photo upload error:', uploadError)
+        // continue without photo — don't block the listing
+      } else {
         const { data: urlData } = supabase.storage.from('marketplace').getPublicUrl(path)
         photo_url = urlData.publicUrl
       }
     }
 
-    await supabase.from('marketplace_listings').insert({
+    const { error: insertError } = await supabase.from('marketplace_listings').insert({
       community_id: profile.community_id, profile_id: profile.id, apt_number: profile.apt_number,
       category: form.category, title: form.title, body: form.body,
       price_eur: form.price_eur ? parseInt(form.price_eur) : null,
@@ -72,10 +75,19 @@ export default function MarketplaceClient({ listings, profile, shortTermAllowed,
       language_from: form.language_from || null, language_to: form.language_to || null,
       status: 'active', photo_url,
     })
+
+    if (insertError) {
+      console.error('Insert error:', insertError)
+      alert('Error posting listing: ' + insertError.message)
+      setSaving(false)
+      return
+    }
+
     setShowNewForm(false)
     setPhotoFile(null)
     setPhotoPreview(null)
     setSaving(false)
+    window.location.reload()
   }
 
   return (
