@@ -12,13 +12,11 @@ interface Props {
   profile: Profile
 }
 
-const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
-const DAYS = ['Mo','Tu','We','Th','Fr','Sa','Su']
-
 export default function BookingClient({ premises, existingBookings, profile }: Props) {
   const supabase = createClient()
   const t = useTranslations('booking')
   const tc = useTranslations('common')
+  const lang = (profile as any).preferred_lang || 'CA'
 
   const [selectedPremise, setSelectedPremise] = useState<Premise | null>(premises[0] || null)
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0])
@@ -32,6 +30,17 @@ export default function BookingClient({ premises, existingBookings, profile }: P
   const today = new Date()
   const currentMonth = today.getMonth()
   const currentYear = today.getFullYear()
+
+  const MONTHS: string[] = t.raw('months') as string[]
+  const DAYS: string[] = t.raw('days') as string[]
+
+  function getPremiseName(p: Premise): string {
+    const nt = (p as any).name_translations
+    if (nt && typeof nt === 'object') {
+      return nt[lang] || nt['CA'] || nt['ES'] || p.name
+    }
+    return p.name
+  }
 
   const calDays = useMemo(() => {
     const firstDay = new Date(currentYear, currentMonth, 1)
@@ -129,8 +138,9 @@ export default function BookingClient({ premises, existingBookings, profile }: P
     })
     setSaving(false)
     if (!error) {
+      const premiseName = getPremiseName(selectedPremise)
       setSuccess(`✓ ${formatTime(start)}–${formatTime(end)} · ${selectedDate}`)
-      setCalendarUrl(buildCalendarUrl(selectedDate, start, end, selectedPremise.name))
+      setCalendarUrl(buildCalendarUrl(selectedDate, start, end, premiseName))
       setTimeout(() => { setSuccess(''); setCalendarUrl('') }, 10000)
     }
   }
@@ -160,8 +170,9 @@ export default function BookingClient({ premises, existingBookings, profile }: P
       evening:   { start: '18:00', end: '23:00' },
     }
     const tm = timeMap[period] || { start: '08:00', end: '13:00' }
+    const premiseName = getPremiseName(selectedPremise)
     setSuccess(`✓ ${period} · ${selectedDate}`)
-    setCalendarUrl(buildCalendarUrl(selectedDate, tm.start, tm.end, selectedPremise.name))
+    setCalendarUrl(buildCalendarUrl(selectedDate, tm.start, tm.end, premiseName))
     setTimeout(() => { setSuccess(''); setCalendarUrl('') }, 10000)
   }
 
@@ -169,9 +180,9 @@ export default function BookingClient({ premises, existingBookings, profile }: P
   const isChallenge = selectedPremise?.booking_type === 'challenge'
 
   const halfdayPeriods = [
-    { id: 'morning',   label: 'Morning',   time: '08:00–13:00' },
-    { id: 'afternoon', label: 'Afternoon', time: '13:00–18:00' },
-    { id: 'evening',   label: 'Evening',   time: '18:00–23:00' },
+    { id: 'morning',   label: t('morning'),   time: '08:00–13:00' },
+    { id: 'afternoon', label: t('afternoon'), time: '13:00–18:00' },
+    { id: 'evening',   label: t('evening'),   time: '18:00–23:00' },
   ]
 
   return (
@@ -194,18 +205,20 @@ export default function BookingClient({ premises, existingBookings, profile }: P
               }}
             >
               <div style={{ flex: 1 }}>
-                <div style={{ fontSize: '12px', fontWeight: 500, color: 'var(--tx)' }}>{p.name}</div>
+                <div style={{ fontSize: '12px', fontWeight: 500, color: 'var(--tx)' }}>{getPremiseName(p)}</div>
                 <div style={{ fontSize: '9px', color: 'var(--txl)', marginTop: '1px' }}>
-                  {p.booking_type === 'slots' ? `${p.slot_duration_minutes}min slots · gap rule` :
-                   p.booking_type === 'halfday' ? 'Morn / Afternoon / Evening' :
-                   'Challenge · no court needed'}
+                  {p.booking_type === 'slots'
+                    ? t('premise_slots_sub', { min: p.slot_duration_minutes || 90 })
+                    : p.booking_type === 'halfday'
+                    ? t('premise_halfday_sub')
+                    : t('premise_challenge_sub')}
                 </div>
               </div>
             </button>
           ))}
         </div>
         <div className="warn-bar">
-          <strong>{t('gap_rule')}:</strong> min. 1 free slot between your own bookings on the same premise.
+          <strong>{t('gap_rule')}:</strong> {t('gap_rule_desc')}
         </div>
       </div>
 
@@ -214,7 +227,7 @@ export default function BookingClient({ premises, existingBookings, profile }: P
         {selectedPremise && (
           <>
             <div className="section-title" style={{ marginBottom: '8px' }}>
-              {selectedPremise.name} — {MONTHS[currentMonth]} {currentYear}
+              {getPremiseName(selectedPremise)} — {MONTHS[currentMonth]} {currentYear}
             </div>
 
             {/* Calendar */}
@@ -248,7 +261,7 @@ export default function BookingClient({ premises, existingBookings, profile }: P
             {/* Slots */}
             {!isHalfday && !isChallenge && (
               <>
-                <div className="section-title" style={{ marginBottom: '6px' }}>Slots — {selectedDate}</div>
+                <div className="section-title" style={{ marginBottom: '6px' }}>{t('slots_header', { date: selectedDate })}</div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                   {slots.map(slot => {
                     const status = getSlotStatus(slot.start, slot.end)
@@ -273,7 +286,7 @@ export default function BookingClient({ premises, existingBookings, profile }: P
                           {status === 'free' ? t('tap_to_book') :
                            status === 'mine' ? t('your_booking') :
                            status === 'taken' ? `@${booking?.apt_number} · ${t('taken')}` :
-                           status === 'invite' ? `@${booking?.apt_number} open invite` :
+                           status === 'invite' ? `@${booking?.apt_number} ${t('open_invite_tag')}` :
                            t('gap_rule')}
                         </button>
                         {status === 'mine' && (
@@ -308,7 +321,7 @@ export default function BookingClient({ premises, existingBookings, profile }: P
                     >
                       <span style={{ fontWeight: 500 }}>{period.label}</span>
                       <span style={{ fontSize: '11px', opacity: 0.7 }}>{period.time}</span>
-                      <span style={{ fontSize: '11px' }}>{taken ? `@${taken.apt_number}` : 'Available'}</span>
+                      <span style={{ fontSize: '11px' }}>{taken ? `@${taken.apt_number}` : t('available')}</span>
                     </button>
                   )
                 })}
@@ -318,12 +331,12 @@ export default function BookingClient({ premises, existingBookings, profile }: P
             {/* Chess challenge */}
             {isChallenge && (
               <div className="card" style={{ marginTop: '8px' }}>
-                <p style={{ fontSize: '13px', fontWeight: 500, color: 'var(--tx)', marginBottom: '12px' }}>Chess challenge</p>
+                <p style={{ fontSize: '13px', fontWeight: 500, color: 'var(--tx)', marginBottom: '12px' }}>{t('challenge_title')}</p>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  <input placeholder="Challenge @apt# (e.g. 3B) or leave blank for open" className="form-input" />
-                  <input placeholder="Suggested time (e.g. Sunday 11:00)" className="form-input" />
-                  <input placeholder="Location (e.g. BBQ table, common room)" className="form-input" />
-                  <button className="btn btn-primary" style={{ width: '100%' }}>Post challenge</button>
+                  <input placeholder={t('challenge_opponent')} className="form-input" />
+                  <input placeholder={t('challenge_time')} className="form-input" />
+                  <input placeholder={t('challenge_location')} className="form-input" />
+                  <button className="btn btn-primary" style={{ width: '100%' }}>{t('challenge_post')}</button>
                 </div>
               </div>
             )}
@@ -339,12 +352,12 @@ export default function BookingClient({ premises, existingBookings, profile }: P
                 {inviteOpen && (
                   <div style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
                     <div style={{ fontSize: '11px', color: 'var(--txm)' }}>
-                      {selectedPremise.name} — max {selectedPremise.max_invite_slots} neighbour spots
+                      {t('invite_spots', { name: getPremiseName(selectedPremise), n: selectedPremise.max_invite_slots })}
                     </div>
                     <select value={inviteScope} onChange={e => setInviteScope(e.target.value as any)} className="form-select">
-                      <option value="interest">All residents with matching interest</option>
-                      <option value="apt">Specific @apt# (private)</option>
-                      <option value="all">@tots — everyone</option>
+                      <option value="interest">{t('invite_scope_interest')}</option>
+                      <option value="apt">{t('invite_scope_apt')}</option>
+                      <option value="all">{t('invite_scope_all')}</option>
                     </select>
                     {inviteScope === 'apt' && (
                       <input value={inviteTargetApt} onChange={e => setInviteTargetApt(e.target.value.toUpperCase())}
@@ -361,7 +374,7 @@ export default function BookingClient({ premises, existingBookings, profile }: P
                 {calendarUrl && (
                   <a href={calendarUrl} target="_blank" rel="noopener noreferrer"
                     style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 14px', borderRadius: '8px', background: '#fff', border: '1px solid #bbf7d0', color: '#166534', fontSize: '11px', fontWeight: 500, textDecoration: 'none' }}>
-                    📅 Add to Google Calendar
+                    📅 {t('add_to_calendar')}
                   </a>
                 )}
               </div>
