@@ -84,6 +84,17 @@ export default function BookingClient({ premises, existingBookings, profile }: P
     return 'taken'
   }
 
+  function getGapCausingApt(start: string, end: string): string {
+    const slotStart = parseInt(start.replace(':', ''))
+    const slotEnd = parseInt(end.replace(':', ''))
+    for (const mb of myDayBookings) {
+      const mbEnd = parseInt((mb.slot_end || '').replace(':', ''))
+      const mbStart = parseInt((mb.slot_start || '').replace(':', ''))
+      if (mbEnd === slotStart || slotEnd === mbStart) return mb.apt_number
+    }
+    return profile.apt_number
+  }
+
   function getDateStatus(day: number) {
     const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2,'0')}-${String(day).padStart(2,'0')}`
     const todayStr = today.toISOString().split('T')[0]
@@ -191,7 +202,196 @@ export default function BookingClient({ premises, existingBookings, profile }: P
 
   return (
     <div style={{ maxWidth: '960px', margin: '0 auto' }}>
-      <div className="two-col">
+      {/* 3-col on desktop: premises | calendar | timetable+invite */}
+      <div style={{ display: 'grid', gridTemplateColumns: '200px 1fr 1fr', gap: '16px', alignItems: 'start' }}>
+
+        {/* COL 1: Premises list */}
+        <div>
+          <div className="section-title" style={{ marginBottom: '8px' }}>{t('select_premise')}</div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            {premises.map(p => (
+              <button key={p.id}
+                onClick={() => { setSelectedPremise(p); setInviteOpen(false) }}
+                style={{
+                  width: '100%', display: 'flex', alignItems: 'center', gap: '8px',
+                  padding: '8px 12px', borderRadius: '12px', textAlign: 'left', cursor: 'pointer',
+                  border: selectedPremise?.id === p.id ? '1.5px solid var(--pine)' : '1px solid var(--br)',
+                  background: selectedPremise?.id === p.id ? 'rgba(26,61,43,0.06)' : 'rgba(255,255,255,0.8)',
+                  transition: 'all 0.15s',
+                }}>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: '12px', fontWeight: 500, color: 'var(--tx)' }}>{getPremiseName(p)}</div>
+                  <div style={{ fontSize: '9px', color: 'var(--txl)', marginTop: '1px' }}>
+                    {p.booking_type === 'slots' ? t('premise_slots_sub', { min: p.slot_duration_minutes || 90 })
+                     : p.booking_type === 'halfday' ? t('premise_halfday_sub')
+                     : t('premise_challenge_sub')}
+                  </div>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* COL 2: Calendar */}
+        <div>
+          {selectedPremise && (
+            <>
+              <div className="section-title" style={{ marginBottom: '8px' }}>
+                {getPremiseName(selectedPremise)} — {MONTHS[currentMonth]} {currentYear}
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '2px', marginBottom: '8px' }}>
+                {DAYS.map(d => (
+                  <div key={d} style={{ textAlign: 'center', fontSize: '9px', color: 'var(--txl)', fontWeight: 500, paddingBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.3px' }}>{d}</div>
+                ))}
+                {calDays.map((day, i) => {
+                  if (!day) return <div key={`e${i}`} />
+                  const status = getDateStatus(day)
+                  const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2,'0')}-${String(day).padStart(2,'0')}`
+                  return (
+                    <button key={day} onClick={() => setSelectedDate(dateStr)}
+                      style={{
+                        aspectRatio: '1', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        borderRadius: '6px', fontSize: '11px', cursor: 'pointer',
+                        border: selectedDate === dateStr && status !== 'today' ? '2px solid var(--pine)' : '2px solid transparent',
+                        fontWeight: status === 'today' || status === 'mine' ? 500 : 400,
+                        background: status === 'today' ? 'var(--pine)' : status === 'mine' ? '#dcfce7' : status === 'booked' ? '#fee2e2' : 'transparent',
+                        color: status === 'today' ? '#fff' : status === 'mine' ? '#166534' : status === 'booked' ? '#991b1b' : 'var(--txm)',
+                      }}>
+                      {day}
+                    </button>
+                  )
+                })}
+              </div>
+            </>
+          )}
+        </div>
+
+        {/* COL 3: Timetable + invite */}
+        <div>
+          {selectedPremise && (
+            <>
+              {/* SLOTS */}
+              {!isHalfday && !isChallenge && (
+                <>
+                  <div style={{ display: 'grid', gridTemplateColumns: invitePanel ? '1fr 180px' : '1fr', gap: '12px', alignItems: 'start' }}>
+                    <div>
+                      <div className="section-title" style={{ marginBottom: '6px' }}>{t('slots_header', { date: selectedDate })}</div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                        {slots.map(slot => {
+                          const status = getSlotStatus(slot.start, slot.end)
+                          const booking = dayBookings.find(b => b.slot_start === slot.start)
+                          return (
+                            <div key={slot.start} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                              <span style={{ fontSize: '9px', color: 'var(--txl)', fontWeight: 500, width: '64px', flexShrink: 0 }}>
+                                {formatTime(slot.start)}–{formatTime(slot.end)}
+                              </span>
+                              <button
+                                onClick={() => status === 'free' && bookSlot(slot.start, slot.end)}
+                                disabled={saving || status !== 'free'}
+                                style={{
+                                  flex: 1, height: '28px', borderRadius: '8px', display: 'flex',
+                                  alignItems: 'center', paddingLeft: '8px', fontSize: '11px', fontWeight: 500,
+                                  border: 'none', cursor: status === 'free' ? 'pointer' : 'default',
+                                  fontStyle: status === 'gap' ? 'italic' : 'normal',
+                                  background: status === 'free' ? '#dcfce7' : status === 'mine' ? 'rgba(26,61,43,0.1)' : status === 'invite' ? '#dbeafe' : status === 'taken' ? '#fee2e2' : 'var(--sand-d)',
+                                  color: status === 'free' ? '#166534' : status === 'mine' ? 'var(--pine)' : status === 'invite' ? '#1e40af' : status === 'taken' ? '#991b1b' : 'var(--txl)',
+                                }}>
+                                {status === 'free' ? t('tap_to_book') :
+                                 status === 'mine' ? `${t('your_booking')} @${profile.apt_number}` :
+                                 status === 'taken' ? `@${booking?.apt_number} · ${t('taken')}` :
+                                 status === 'invite' ? `@${booking?.apt_number} ${t('open_invite_tag')}` :
+                                 `@${getGapCausingApt(slot.start, slot.end)} · ${t('gap_rule')}`}
+                              </button>
+                              {status === 'mine' && (
+                                <button onClick={() => booking && cancelBooking(booking.id)}
+                                  style={{ fontSize: '10px', color: '#ef4444', background: 'none', border: 'none', cursor: 'pointer' }}>✕</button>
+                              )}
+                            </div>
+                          )
+                        })}
+                      </div>
+                      <div className="warn-bar" style={{ marginTop: '10px' }}>
+                        ⚠️ {t('gap_rule')}: {t('gap_rule_desc')}
+                      </div>
+                    </div>
+                    {invitePanel && <div>{invitePanel}</div>}
+                  </div>
+                </>
+              )}
+
+              {/* HALFDAY */}
+              {isHalfday && (
+                <div>
+                  <div className="section-title" style={{ marginBottom: '6px' }}>{selectedDate}</div>
+                  <div style={{ fontSize: '11px', color: 'var(--txm)', marginBottom: '10px', lineHeight: 1.5 }}>
+                    {t('halfday_instruction')}
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '12px' }}>
+                    {halfdayPeriods.map(period => {
+                      const taken = dayBookings.find(b => b.halfday_period === period.id)
+                      const isMine = taken?.profile_id === profile.id
+                      return (
+                        <div key={period.id} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <button onClick={() => !taken && bookHalfday(period.id)}
+                            disabled={!!taken || saving}
+                            style={{
+                              flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                              padding: '12px 16px', borderRadius: '12px', fontSize: '13px',
+                              border: taken ? '1px solid #fecaca' : '1px solid #bbf7d0',
+                              background: taken ? '#fef2f2' : '#f0fdf4',
+                              color: taken ? '#b91c1c' : '#15803d',
+                              cursor: taken ? 'default' : 'pointer',
+                            }}>
+                            <span style={{ fontWeight: 500 }}>{period.label}</span>
+                            <span style={{ fontSize: '11px', opacity: 0.7 }}>{period.time}</span>
+                            <span style={{ fontSize: '11px' }}>{taken ? `@${taken.apt_number}` : t('available')}</span>
+                          </button>
+                          {isMine && (
+                            <button onClick={() => taken && cancelBooking(taken.id)}
+                              style={{ fontSize: '10px', color: '#ef4444', background: 'none', border: 'none', cursor: 'pointer' }}>✕</button>
+                          )}
+                        </div>
+                      )
+                    })}
+                  </div>
+                  <div style={{ fontSize: '12px', color: '#92400e', background: '#fffbeb', border: '1px solid #fde68a', borderRadius: '10px', padding: '10px 14px', lineHeight: 1.5 }}>
+                    {t('leave_clean')}
+                  </div>
+                  {invitePanel && <div style={{ marginTop: '12px' }}>{invitePanel}</div>}
+                </div>
+              )}
+
+              {/* CHALLENGE */}
+              {isChallenge && (
+                <div className="card">
+                  <p style={{ fontSize: '13px', fontWeight: 500, color: 'var(--tx)', marginBottom: '12px' }}>{t('challenge_title')}</p>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <input placeholder={t('challenge_opponent')} className="form-input" />
+                    <input placeholder={t('challenge_time')} className="form-input" />
+                    <input placeholder={t('challenge_location')} className="form-input" />
+                    <button className="btn btn-primary" style={{ width: '100%' }}>{t('challenge_post')}</button>
+                  </div>
+                </div>
+              )}
+
+              {/* Success */}
+              {success && (
+                <div style={{ marginTop: '12px', background: '#f0fdf4', color: '#166534', border: '1px solid #bbf7d0', borderRadius: '12px', padding: '12px', fontSize: '12px', textAlign: 'center' }}>
+                  <div style={{ marginBottom: calendarUrl ? '10px' : 0 }}>{success}</div>
+                  {calendarUrl && (
+                    <a href={calendarUrl} target="_blank" rel="noopener noreferrer"
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 14px', borderRadius: '8px', background: '#fff', border: '1px solid #bbf7d0', color: '#166534', fontSize: '11px', fontWeight: 500, textDecoration: 'none' }}>
+                      📅 {t('add_to_calendar')}
+                    </a>
+                  )}
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  )
 
         {/* LEFT: Premises list */}
         <div>
