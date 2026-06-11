@@ -8,15 +8,11 @@ import { getMessages } from 'next-intl/server'
 export const metadata: Metadata = {
   title: 'Bermar — Community',
   description: 'Bermar community platform — Gavà Mar, Barcelona',
-  manifest: '/api/manifest',
-  themeColor: '#2d6b65',
+  themeColor: '#1a3d2b',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
     title: 'Bermar',
-  },
-  openGraph: {
-    images: [{ url: '/og-image.png', width: 1200, height: 630 }],
   },
 }
 
@@ -31,7 +27,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     .eq('slug', slug)
     .single()
 
-  const faviconUrl = community?.logo_url || '/icon-192x192.png'
+  const faviconUrl = community?.logo_url || '/icon-192.png'
 
   return (
     <html lang="en">
@@ -39,21 +35,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet" />
-        {/* Favicon — dynamic (Supabase logo) with static fallbacks */}
         <link rel="icon" href={faviconUrl} />
-        <link rel="icon" href="/favicon-32x32.png" type="image/png" sizes="32x32" />
-        <link rel="icon" href="/favicon-16x16.png" type="image/png" sizes="16x16" />
-        <link rel="shortcut icon" href="/favicon.ico" />
         <link rel="apple-touch-icon" href={faviconUrl} />
-
-        {/* Service Worker */}
-        <script dangerouslySetInnerHTML={{ __html: `
-          if ('serviceWorker' in navigator) {
-            window.addEventListener('load', function() {
-              navigator.serviceWorker.register('/sw.js');
-            });
-          }
-        `}} />
       </head>
       <body>
         <NextIntlClientProvider messages={messages}>
