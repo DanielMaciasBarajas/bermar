@@ -180,7 +180,7 @@ export default function MarketplaceClient({ listings, profile, shortTermAllowed,
               <button className="btn btn-sm" style={{ flex: 1 }}>{t('contact')} @{listing.apt_number}</button>
               <button className="btn btn-sm" title="Generate PDF poster" style={{ padding: '4px 8px' }} onClick={() => triggerPrint(listing)}>📄</button>
             </div>
-            {listing.profile_id === profile.id && (
+            {(listing.profile_id === profile.id || listing.apt_number === profile.apt_number) && (
               <div style={{ display: 'flex', gap: '6px', marginTop: '6px' }}>
                 <button
                   className="btn btn-sm"
@@ -209,7 +209,7 @@ export default function MarketplaceClient({ listings, profile, shortTermAllowed,
       </div>
 
       {printListing && (
-        <div className="beramar-poster">
+        <div className="bermar-poster">
           <div className="bermar-poster-header">
             <div className="bermar-poster-logo">🌿</div>
             <div><div className="bermar-poster-community">Bermar</div><div className="bermar-poster-sub">Community Marketplace</div></div>
