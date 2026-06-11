@@ -84,7 +84,7 @@ export default function AdminClient({ profile, community, activityLog, pendingPr
     const { error } = await supabase.storage
       .from('community-assets')
       .upload(path, logoFile, { upsert: true, contentType: logoFile.type })
-    if (error) { setLogoUploading(false); return }
+    if (error) { setLogoUploading(false); alert(JSON.stringify(error)); return }
     const { data: { publicUrl } } = supabase.storage.from('community-assets').getPublicUrl(path)
     await supabase.from('communities').update({ logo_url: publicUrl }).eq('id', profile.community_id)
     setLogoFile(null)
