@@ -26,6 +26,15 @@ export default function MarketplaceClient({ listings, profile, shortTermAllowed,
   const [printListing, setPrintListing] = useState<MarketplaceListing | null>(null)
   const [form, setForm] = useState({ category: 'favour' as MarketplaceListing['category'], title: '', body: '', price_eur: '', language_from: '', language_to: '' })
   const [saving, setSaving] = useState(false)
+  const [photoFile, setPhotoFile] = useState<File | null>(null)
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null)
+
+  function pickPhoto(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setPhotoFile(file)
+    setPhotoPreview(URL.createObjectURL(file))
+  }
 
   function getListingBody(listing: MarketplaceListing): string {
     if (listing.body_translations && typeof listing.body_translations === 'object') {
@@ -41,14 +50,32 @@ export default function MarketplaceClient({ listings, profile, shortTermAllowed,
 
   async function submitListing() {
     setSaving(true)
+    let photo_url: string | null = null
+
+    if (photoFile) {
+      const ext = photoFile.name.split('.').pop()
+      const path = `${profile.community_id}/${profile.id}/${Date.now()}.${ext}`
+      const { error: uploadError } = await supabase.storage
+        .from('marketplace')
+        .upload(path, photoFile, { upsert: false, contentType: photoFile.type })
+      if (!uploadError) {
+        const { data: urlData } = supabase.storage.from('marketplace').getPublicUrl(path)
+        photo_url = urlData.publicUrl
+      }
+    }
+
     await supabase.from('marketplace_listings').insert({
       community_id: profile.community_id, profile_id: profile.id, apt_number: profile.apt_number,
       category: form.category, title: form.title, body: form.body,
       price_eur: form.price_eur ? parseInt(form.price_eur) : null,
       rental_months_min: form.category === 'apartment_rental' ? rentalMinMonths : null,
-      language_from: form.language_from || null, language_to: form.language_to || null, status: 'active',
+      language_from: form.language_from || null, language_to: form.language_to || null,
+      status: 'active', photo_url,
     })
-    setShowNewForm(false); setSaving(false)
+    setShowNewForm(false)
+    setPhotoFile(null)
+    setPhotoPreview(null)
+    setSaving(false)
   }
 
   return (
@@ -80,6 +107,16 @@ export default function MarketplaceClient({ listings, profile, shortTermAllowed,
             </select>
             <input required value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} placeholder="Title" className="form-input" />
             <textarea required value={form.body} onChange={e => setForm(f => ({ ...f, body: e.target.value }))} placeholder="Description — add translations: ES: ... · FR: ... · EN: ..." rows={3} className="form-textarea" />
+            <div>
+              <label style={{ fontSize: '11px', color: 'var(--txm)', display: 'block', marginBottom: '6px' }}>📷 Photo (optional — listings with photos get 3× more responses)</label>
+              <input type="file" accept="image/*" onChange={pickPhoto} style={{ fontSize: '12px', color: 'var(--tx)' }} />
+              {photoPreview && (
+                <div style={{ marginTop: '8px', position: 'relative', display: 'inline-block' }}>
+                  <img src={photoPreview} alt="preview" style={{ width: '120px', height: '80px', objectFit: 'cover', borderRadius: '8px', border: '1px solid var(--br)' }} />
+                  <button onClick={() => { setPhotoFile(null); setPhotoPreview(null) }} style={{ position: 'absolute', top: '-6px', right: '-6px', background: 'var(--tx)', color: 'var(--bg)', border: 'none', borderRadius: '50%', width: '18px', height: '18px', fontSize: '10px', cursor: 'pointer', lineHeight: '18px', textAlign: 'center' }}>×</button>
+                </div>
+              )}
+            </div>
             {['parking', 'apartment_rental', 'apartment_sale', 'buy_sell_donate'].includes(form.category) && (
               <input type="number" value={form.price_eur} onChange={e => setForm(f => ({ ...f, price_eur: e.target.value }))} placeholder="Price (€)" className="form-input" />
             )}
@@ -93,7 +130,7 @@ export default function MarketplaceClient({ listings, profile, shortTermAllowed,
               <button onClick={submitListing} disabled={saving} className="btn btn-primary" style={{ opacity: saving ? 0.6 : 1 }}>
                 {saving ? tc('saving') : t('post_listing')}
               </button>
-              <button onClick={() => setShowNewForm(false)} className="btn">{tc('cancel')}</button>
+              <button onClick={() => { setShowNewForm(false); setPhotoFile(null); setPhotoPreview(null) }} className="btn">{tc('cancel')}</button>
             </div>
           </div>
         </div>
