@@ -23,7 +23,18 @@
     "activity_feed": "Activity feed",
     "premises_today": "Premises today",
     "my_bookings": "My bookings",
-    "community_voice": "Community voice"
+    "community_voice": "Community voice",
+    "of_total": "of {n} TBC",
+    "open_voting": "open / voting",
+    "bookings_sub": "bookings",
+    "active_listings": "active listings",
+    "apt_booked": "Apt {apt} booked a premise",
+    "new_proposal": "New proposal: {title}",
+    "new_listing": "New listing: {title}",
+    "maintenance_submitted": "Maintenance ticket submitted",
+    "no_activity": "No activity yet — will update live as things happen.",
+    "community_update": "Community update",
+    "feed_by": "by @{apt}"
   },
   "booking": {
     "select_premise": "Select premise",

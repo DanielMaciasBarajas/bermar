@@ -23,7 +23,18 @@
     "activity_feed": "Activitat recent",
     "premises_today": "Instal·lacions avui",
     "my_bookings": "Les meves reserves",
-    "community_voice": "Veu comunitària"
+    "community_voice": "Veu comunitària",
+    "of_total": "de {n} TBC",
+    "open_voting": "obertes / votació",
+    "bookings_sub": "reserves",
+    "active_listings": "anuncis actius",
+    "apt_booked": "Apt {apt} ha reservat una instal·lació",
+    "new_proposal": "Nova proposta: {title}",
+    "new_listing": "Nou anunci: {title}",
+    "maintenance_submitted": "Incidència de manteniment enviada",
+    "no_activity": "Sense activitat encara — s'actualitzarà en temps real.",
+    "community_update": "Actualització comunitària",
+    "feed_by": "per @{apt}"
   },
   "booking": {
     "select_premise": "Selecciona la instal·lació",

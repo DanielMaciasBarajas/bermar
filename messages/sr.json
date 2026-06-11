@@ -23,7 +23,18 @@
     "activity_feed": "Недавна активност",
     "premises_today": "Просторије данас",
     "my_bookings": "Моје резервације",
-    "community_voice": "Глас заједнице"
+    "community_voice": "Глас заједнице",
+    "of_total": "од {n} TBC",
+    "open_voting": "отворено / гласање",
+    "bookings_sub": "резервације",
+    "active_listings": "активни огласи",
+    "apt_booked": "Стан {apt} је резервисао просторију",
+    "new_proposal": "Нови предлог: {title}",
+    "new_listing": "Нови оглас: {title}",
+    "maintenance_submitted": "Захтев за одржавање послат",
+    "no_activity": "Нема активности — ажурираће се уживо.",
+    "community_update": "Ажурирање заједнице",
+    "feed_by": "@{apt}"
   },
   "booking": {
     "select_premise": "Изабери просторију",

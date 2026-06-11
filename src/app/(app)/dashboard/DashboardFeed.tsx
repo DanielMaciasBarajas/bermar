@@ -17,24 +17,33 @@ interface Props {
   communityId: string
   initialItems: FeedItem[]
   activityLabel: string
-}
-
-function toFeedItem(table: string, row: any): FeedItem {
-  switch (table) {
-    case 'bookings':
-      return { id: row.id, type: 'booking', icon: '📅', text: `Apt ${row.apt_number} booked a premise`, meta: row.date, created_at: row.created_at }
-    case 'proposals':
-      return { id: row.id, type: 'proposal', icon: '📢', text: `New proposal: ${row.title}`, meta: `by @${row.apt_number}`, created_at: row.created_at }
-    case 'marketplace_listings':
-      return { id: row.id, type: 'listing', icon: '⇄', text: `New listing: ${row.title}`, meta: `@${row.apt_number}`, created_at: row.created_at }
-    case 'maintenance_tickets':
-      return { id: row.id, type: 'maintenance', icon: '🔧', text: `Maintenance ticket submitted`, meta: `@${row.apt_number} · ${row.category}`, created_at: row.created_at }
-    default:
-      return { id: row.id, type: 'voice', icon: '💬', text: 'Community update', meta: '', created_at: row.created_at }
+  noActivityLabel: string
+  labels: {
+    apt_booked: string
+    new_proposal: string
+    new_listing: string
+    maintenance_submitted: string
+    community_update: string
+    feed_by: string
   }
 }
 
-export default function DashboardFeed({ communityId, initialItems, activityLabel }: Props) {
+function toFeedItem(table: string, row: any, labels: Props['labels']): FeedItem {
+  switch (table) {
+    case 'bookings':
+      return { id: row.id, type: 'booking', icon: '📅', text: labels.apt_booked.replace('__APT__', row.apt_number), meta: row.date, created_at: row.created_at }
+    case 'proposals':
+      return { id: row.id, type: 'proposal', icon: '📢', text: labels.new_proposal.replace('__TITLE__', row.title), meta: labels.feed_by.replace('__APT__', row.apt_number), created_at: row.created_at }
+    case 'marketplace_listings':
+      return { id: row.id, type: 'listing', icon: '⇄', text: labels.new_listing.replace('__TITLE__', row.title), meta: `@${row.apt_number}`, created_at: row.created_at }
+    case 'maintenance_tickets':
+      return { id: row.id, type: 'maintenance', icon: '🔧', text: labels.maintenance_submitted, meta: `@${row.apt_number} · ${row.category}`, created_at: row.created_at }
+    default:
+      return { id: row.id, type: 'voice', icon: '💬', text: labels.community_update, meta: '', created_at: row.created_at }
+  }
+}
+
+export default function DashboardFeed({ communityId, initialItems, activityLabel, noActivityLabel, labels }: Props) {
   const [items, setItems] = useState<FeedItem[]>(initialItems)
   const [pulse, setPulse] = useState(false)
   const supabase = createClient()
@@ -42,7 +51,7 @@ export default function DashboardFeed({ communityId, initialItems, activityLabel
   useEffect(() => {
     function addItem(table: string, row: any) {
       if (row.community_id !== communityId) return
-      const item = toFeedItem(table, row)
+      const item = toFeedItem(table, row, labels)
       setItems(prev => [item, ...prev].slice(0, 20))
       setPulse(true)
       setTimeout(() => setPulse(false), 1000)
@@ -73,7 +82,7 @@ export default function DashboardFeed({ communityId, initialItems, activityLabel
       <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
         {items.length === 0 && (
           <div style={{ color: 'var(--txl)', fontSize: '12px', textAlign: 'center', padding: '24px 0' }}>
-            No activity yet — will update live as things happen.
+            {noActivityLabel}
           </div>
         )}
         {items.map((item, i) => (

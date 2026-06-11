@@ -23,7 +23,18 @@
     "activity_feed": "Последние события",
     "premises_today": "Объекты сегодня",
     "my_bookings": "Мои брони",
-    "community_voice": "Голос сообщества"
+    "community_voice": "Голос сообщества",
+    "of_total": "из {n} TBC",
+    "open_voting": "открыто / голосование",
+    "bookings_sub": "брони",
+    "active_listings": "активные объявления",
+    "apt_booked": "Квартира {apt} забронировала объект",
+    "new_proposal": "Новое предложение: {title}",
+    "new_listing": "Новое объявление: {title}",
+    "maintenance_submitted": "Заявка на обслуживание отправлена",
+    "no_activity": "Пока нет активности — обновляется в реальном времени.",
+    "community_update": "Обновление сообщества",
+    "feed_by": "@{apt}"
   },
   "booking": {
     "select_premise": "Выбрать объект",

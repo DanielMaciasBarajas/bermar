@@ -23,7 +23,18 @@
     "activity_feed": "Activité récente",
     "premises_today": "Installations aujourd'hui",
     "my_bookings": "Mes réservations",
-    "community_voice": "Voix communautaire"
+    "community_voice": "Voix communautaire",
+    "of_total": "sur {n} TBC",
+    "open_voting": "ouvertes / vote",
+    "bookings_sub": "réservations",
+    "active_listings": "annonces actives",
+    "apt_booked": "Apt {apt} a réservé une installation",
+    "new_proposal": "Nouvelle proposition : {title}",
+    "new_listing": "Nouvelle annonce : {title}",
+    "maintenance_submitted": "Ticket de maintenance soumis",
+    "no_activity": "Aucune activité pour l'instant — mise à jour en temps réel.",
+    "community_update": "Mise à jour communautaire",
+    "feed_by": "par @{apt}"
   },
   "booking": {
     "select_premise": "Choisir une installation",
