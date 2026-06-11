@@ -82,7 +82,11 @@
     "privacy_show_directory": "Apparaître dans l'annuaire de l'immeuble",
     "privacy_birthday": "Vœux d'anniversaire communautaires",
     "privacy_email": "Notifications par e-mail",
-    "privacy_calendar": "Synchroniser les réservations avec Google Calendar"
+    "privacy_calendar": "Synchroniser les réservations avec Google Calendar",
+    "download_data": "Télécharger mes données",
+    "download_data_desc": "Exportez toutes les données personnelles que Bermar détient sur votre appartement en fichier JSON. Votre droit selon le RGPD Art. 20.",
+    "download_data_btn": "⬇ Télécharger mes données",
+    "download_data_preparing": "⏳ Préparation de l'export..."
   },
   "common": {
     "loading": "Chargement...",

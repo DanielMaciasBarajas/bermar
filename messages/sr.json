@@ -82,7 +82,11 @@
     "privacy_show_directory": "Прикажи се у именику зграде",
     "privacy_birthday": "Честитке за рођендан заједнице",
     "privacy_email": "Имејл обавештења",
-    "privacy_calendar": "Синхронизуј резервације са Google Calendar"
+    "privacy_calendar": "Синхронизуј резервације са Google Calendar",
+    "download_data": "Преузми моје податке",
+    "download_data_desc": "Извези све личне податке које Bermar чува о твом стану као JSON фајл. Твоје право по GDPR чл. 20.",
+    "download_data_btn": "⬇ Преузми моје податке",
+    "download_data_preparing": "⏳ Припрема извоза..."
   },
   "common": {
     "loading": "Учитавање...",

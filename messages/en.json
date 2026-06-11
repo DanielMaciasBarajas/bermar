@@ -82,7 +82,11 @@
     "privacy_show_directory": "Appear in building directory",
     "privacy_birthday": "Birthday community wishes",
     "privacy_email": "Email notifications",
-    "privacy_calendar": "Sync bookings to Google Calendar"
+    "privacy_calendar": "Sync bookings to Google Calendar",
+    "download_data": "Download my data",
+    "download_data_desc": "Export all personal data Bermar holds about your apartment as a JSON file. Your right under GDPR Art. 20.",
+    "download_data_btn": "⬇ Download my data",
+    "download_data_preparing": "⏳ Preparing export..."
   },
   "common": {
     "loading": "Loading...",

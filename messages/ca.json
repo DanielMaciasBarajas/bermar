@@ -82,7 +82,11 @@
     "privacy_show_directory": "Apareix al directori de l'edifici",
     "privacy_birthday": "Felicitació d'aniversari comunitari",
     "privacy_email": "Notificacions per correu",
-    "privacy_calendar": "Sincronitza reserves amb Google Calendar"
+    "privacy_calendar": "Sincronitza reserves amb Google Calendar",
+    "download_data": "Descarrega les meves dades",
+    "download_data_desc": "Exporta totes les dades personals que Bermar té del teu apartament com a fitxer JSON. El teu dret segons el RGPD Art. 20.",
+    "download_data_btn": "⬇ Descarrega les meves dades",
+    "download_data_preparing": "⏳ Preparant exportació..."
   },
   "common": {
     "loading": "Carregant...",
