@@ -13,7 +13,6 @@ export default function SettingsClient({ profile, apartment, email }: Props) {
   const router = useRouter()
   const t = useTranslations('settings')
   const tc = useTranslations('common')
-  const ti = useTranslations('interests')
 
   const [occupants] = useState<any[]>(profile?.occupants || [])
   const [selectedInterests, setSelectedInterests] = useState<string[]>((profile?.interests || []).map((i: any) => i.interest))
@@ -138,7 +137,7 @@ export default function SettingsClient({ profile, apartment, email }: Props) {
             </div>
           ))}
         </div>
-        <div style={{ fontSize: '11px', color: 'var(--txl)' }}>{t('occupants_contact')}</div>
+        <div style={{ fontSize: '11px', color: 'var(--txl)' }}>To update occupants, contact your community admin.</div>
       </div>
 
       <div className="section-title" style={{ marginBottom: '8px' }}>{t('interests')}</div>
@@ -146,7 +145,7 @@ export default function SettingsClient({ profile, apartment, email }: Props) {
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
           {INTERESTS.map(interest => (
             <button key={interest} onClick={() => toggleInterest(interest)} style={{ ...chipBase, background: selectedInterests.includes(interest) ? 'var(--pine)' : 'transparent', color: selectedInterests.includes(interest) ? '#fff' : 'var(--txm)', borderColor: selectedInterests.includes(interest) ? 'var(--pine)' : 'var(--br)' }}>
-              {ti(interest)}
+              {interest}
             </button>
           ))}
         </div>
@@ -155,14 +154,14 @@ export default function SettingsClient({ profile, apartment, email }: Props) {
       <div className="section-title" style={{ marginBottom: '8px' }}>{t('privacy')}</div>
       <div className="card" style={{ marginBottom: '16px' }}>
         {[
-          { key: 'show_names', label: t('privacy_show_names') },
-          { key: 'show_ages', label: t('privacy_show_ages') },
-          { key: 'show_interests', label: t('privacy_show_interests') },
-          { key: 'show_phone', label: t('privacy_show_phone') },
-          { key: 'show_in_directory', label: t('privacy_show_directory') },
-          { key: 'birthday_wishes', label: t('privacy_birthday') },
-          { key: 'email_notifications', label: t('privacy_email') },
-          { key: 'google_calendar_sync', label: t('privacy_calendar') },
+          { key: 'show_names', label: 'Show occupant names in directory' },
+          { key: 'show_ages', label: 'Show ages' },
+          { key: 'show_interests', label: 'Show interests' },
+          { key: 'show_phone', label: 'Show phone to neighbours' },
+          { key: 'show_in_directory', label: 'Appear in building directory' },
+          { key: 'birthday_wishes', label: 'Birthday community wishes' },
+          { key: 'email_notifications', label: 'Email notifications' },
+          { key: 'google_calendar_sync', label: 'Sync bookings to Google Calendar' },
         ].map(({ key, label }, i) => (
           <label key={key} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 0', cursor: 'pointer', borderTop: i === 0 ? 'none' : '1px solid var(--br)' }}>
             <input type="checkbox" checked={privacy[key as keyof typeof privacy]} onChange={e => setPrivacy(p => ({ ...p, [key]: e.target.checked }))} style={{ width: '14px', height: '14px', accentColor: 'var(--pine)', flexShrink: 0 }} />
@@ -183,19 +182,19 @@ export default function SettingsClient({ profile, apartment, email }: Props) {
 
         {/* GDPR data export */}
         <div>
-          <div style={{ fontSize: '13px', fontWeight: 500, color: 'var(--tx)', marginBottom: '4px' }}>Download my data</div>
+          <div style={{ fontSize: '13px', fontWeight: 500, color: 'var(--tx)', marginBottom: '4px' }}>{t('download_data')}</div>
           <div style={{ fontSize: '11px', color: 'var(--txm)', marginBottom: '10px', lineHeight: 1.5 }}>
-            Export all data Bermar holds about your apartment — profile, bookings, votes, proposals, listings and maintenance tickets — as a JSON file. Your right under GDPR Art. 20.
+            {t('download_data_desc')}
           </div>
           <button onClick={exportData} disabled={exporting} style={{ padding: '8px 16px', borderRadius: '10px', fontSize: '12px', fontWeight: 500, background: 'transparent', border: '1px solid var(--br)', color: 'var(--tx)', cursor: 'pointer', opacity: exporting ? 0.6 : 1 }}>
-            {exporting ? '⏳ Preparing export...' : '⬇ Download my data'}
+            {exporting ? t('download_data_preparing') : t('download_data_btn')}
           </button>
         </div>
 
         <div style={{ borderTop: '1px solid #fecaca' }} />
         <div style={{ fontSize: '13px', fontWeight: 500, color: '#dc2626', marginBottom: '4px' }}>{t('delete_account')}</div>
         <div style={{ fontSize: '11px', color: 'var(--txm)', marginBottom: '12px', lineHeight: 1.5 }}>
-          {t('delete_account_desc', { apt: profile.apt_number })}
+          This permanently deletes all data associated with Apt {profile.apt_number} — bookings, votes, proposals, and your profile. The apartment remains in the building directory but will show as unregistered. This cannot be undone.
         </div>
         {!deleteConfirm ? (
           <button onClick={() => setDeleteConfirm(true)} style={{ padding: '8px 16px', borderRadius: '10px', fontSize: '12px', fontWeight: 500, background: 'transparent', border: '1px solid #fecaca', color: '#dc2626', cursor: 'pointer' }}>
@@ -203,11 +202,11 @@ export default function SettingsClient({ profile, apartment, email }: Props) {
           </button>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            <div style={{ fontSize: '12px', color: 'var(--tx)' }}>{t('delete_confirm_label', { apt: profile.apt_number })}</div>
+            <div style={{ fontSize: '12px', color: 'var(--tx)' }}>Type your apartment number <strong>{profile.apt_number}</strong> to confirm:</div>
             <input value={deleteInput} onChange={e => setDeleteInput(e.target.value.toUpperCase())} placeholder={profile.apt_number} className="form-input" style={{ borderColor: '#fecaca' }} />
             <div style={{ display: 'flex', gap: '8px' }}>
               <button onClick={deleteAccount} disabled={deleteInput !== profile.apt_number || deleting} style={{ flex: 1, padding: '8px', borderRadius: '10px', fontSize: '12px', fontWeight: 500, background: deleteInput === profile.apt_number ? '#dc2626' : '#fecaca', color: '#fff', border: 'none', cursor: deleteInput === profile.apt_number ? 'pointer' : 'default', transition: 'background 0.15s' }}>
-                {deleting ? t('deleting') : t('delete_permanent')}
+                {deleting ? 'Deleting...' : 'Permanently delete'}
               </button>
               <button onClick={() => { setDeleteConfirm(false); setDeleteInput('') }} className="btn btn-sm">{tc('cancel')}</button>
             </div>
