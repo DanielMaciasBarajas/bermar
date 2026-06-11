@@ -18,6 +18,7 @@ interface Props {
   initialItems: FeedItem[]
   activityLabel: string
   noActivityLabel: string
+  locale: string
   labels: {
     apt_booked: string
     new_proposal: string
@@ -43,7 +44,7 @@ function toFeedItem(table: string, row: any, labels: Props['labels']): FeedItem 
   }
 }
 
-export default function DashboardFeed({ communityId, initialItems, activityLabel, noActivityLabel, labels }: Props) {
+export default function DashboardFeed({ communityId, initialItems, activityLabel, noActivityLabel, locale, labels }: Props) {
   const [items, setItems] = useState<FeedItem[]>(initialItems)
   const [pulse, setPulse] = useState(false)
   const supabase = createClient()
@@ -103,7 +104,7 @@ export default function DashboardFeed({ communityId, initialItems, activityLabel
               {item.meta && <div style={{ fontSize: '10px', color: 'var(--txl)', marginTop: '1px' }}>{item.meta}</div>}
             </div>
             <div style={{ fontSize: '10px', color: 'var(--txl)', flexShrink: 0 }}>
-              {formatDate(item.created_at)}
+              {formatDate(item.created_at, locale)}
             </div>
           </div>
         ))}

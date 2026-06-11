@@ -39,7 +39,7 @@ export default async function DashboardPage() {
     supabase.from('bookings').select('*', { count: 'exact', head: true }).eq('community_id', communityId).eq('date', new Date().toISOString().split('T')[0]).eq('status', 'confirmed'),
     supabase.from('marketplace_listings').select('*', { count: 'exact', head: true }).eq('community_id', communityId).eq('status', 'active'),
     supabase.from('community_voice').select('*').eq('community_id', communityId).order('created_at', { ascending: false }).limit(3),
-    supabase.from('bookings').select('*, premise:premises(name)').eq('profile_id', user.id).eq('status', 'confirmed').gte('date', new Date().toISOString().split('T')[0]).order('date').limit(5),
+    supabase.from('bookings').select('*, premise:premises(name, name_translations)').eq('profile_id', user.id).eq('status', 'confirmed').gte('date', new Date().toISOString().split('T')[0]).order('date').limit(5),
     supabase.from('premises').select('*').eq('community_id', communityId).eq('active', true).order('sort_order'),
     supabase.from('bookings').select('*').eq('community_id', communityId).order('created_at', { ascending: false }).limit(5),
     supabase.from('proposals').select('*').eq('community_id', communityId).order('created_at', { ascending: false }).limit(5),
@@ -123,7 +123,7 @@ export default async function DashboardPage() {
                 <div className="cv-icon">{triggerIcons[post.trigger_type] || '💬'}</div>
                 <div>
                   <div className="cv-text">{text}</div>
-                  <div className="cv-time">{formatDate(post.created_at)}</div>
+                  <div className="cv-time">{formatDate(post.created_at, locale)}</div>
                 </div>
               </div>
             )
@@ -138,6 +138,7 @@ export default async function DashboardPage() {
           initialItems={feedItems}
           activityLabel={t('activity_feed')}
           noActivityLabel={t('no_activity')}
+          locale={locale}
           labels={{
             apt_booked: t('apt_booked', { apt: '__APT__' }),
             new_proposal: t('new_proposal', { title: '__TITLE__' }),
@@ -168,17 +169,23 @@ export default async function DashboardPage() {
             <>
               <div className="section-title">{t('my_bookings')}</div>
               <div className="card card-sm">
-                {myBookings.map((b: any) => (
-                  <div key={b.id} className="feed-item">
-                    <div className="feed-dot" style={{ background: '#3b82f6' }} />
-                    <div>
-                      <div className="feed-text">{b.premise?.name} · {formatDate(b.date)}</div>
-                      {b.slot_start && (
-                        <div className="feed-meta">{b.slot_start.slice(0,5)}–{b.slot_end?.slice(0,5)}</div>
-                      )}
+                {myBookings.map((b: any) => {
+                  const premiseName = (b.premise?.name_translations as any)?.[profile.preferred_lang]
+                    || (b.premise?.name_translations as any)?.['CA']
+                    || (b.premise?.name_translations as any)?.['ES']
+                    || b.premise?.name
+                  return (
+                    <div key={b.id} className="feed-item">
+                      <div className="feed-dot" style={{ background: '#3b82f6' }} />
+                      <div>
+                        <div className="feed-text">{premiseName} · {formatDate(b.date, locale)}</div>
+                        {b.slot_start && (
+                          <div className="feed-meta">{b.slot_start.slice(0,5)}–{b.slot_end?.slice(0,5)}</div>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             </>
           )}

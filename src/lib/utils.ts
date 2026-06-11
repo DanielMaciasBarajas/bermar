@@ -18,8 +18,12 @@ export function getAptInitials(aptNumber: string): string {
   return aptNumber.toUpperCase()
 }
 
-export function formatDate(date: string | Date): string {
-  return new Intl.DateTimeFormat('ca-ES', {
+export function formatDate(date: string | Date, locale?: string): string {
+  const langMap: Record<string, string> = {
+    ca: 'ca-ES', es: 'es-ES', en: 'en-GB', fr: 'fr-FR', ru: 'ru-RU', sr: 'sr-RS',
+  }
+  const intlLocale = locale ? (langMap[locale.toLowerCase()] || 'ca-ES') : 'ca-ES'
+  return new Intl.DateTimeFormat(intlLocale, {
     day: 'numeric',
     month: 'short',
     year: 'numeric',
