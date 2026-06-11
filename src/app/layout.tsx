@@ -7,7 +7,7 @@ import { getMessages } from 'next-intl/server'
 export const metadata: Metadata = {
   title: 'Bermar — Community',
   description: 'Bermar community platform — Gavà Mar, Barcelona',
-  manifest: '/api/manifest',
+  manifest: '/manifest.json',
   themeColor: '#2d6b65',
   appleWebApp: {
     capable: true,
