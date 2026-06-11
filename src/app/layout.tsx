@@ -41,15 +41,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <link rel="icon" href="/favicon-16x16.png" type="image/png" sizes="16x16" />
         <link rel="shortcut icon" href="/favicon.ico" />
         <link rel="apple-touch-icon" href={faviconUrl} />
-
-        {/* Service Worker */}
-        <script dangerouslySetInnerHTML={{ __html: `
-          if ('serviceWorker' in navigator) {
-            window.addEventListener('load', function() {
-              navigator.serviceWorker.register('/sw.js');
-            });
-          }
-        `}} />
       </head>
       <body>
         <NextIntlClientProvider messages={messages}>
