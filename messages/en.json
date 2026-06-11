@@ -70,10 +70,19 @@
     "save": "Save settings",
     "danger_zone": "Danger zone",
     "delete_account": "Delete account",
-    "download_data": "Download my data",
-    "download_data_desc": "Export all personal data Bermar holds about your apartment as a JSON file. Your right under GDPR Art. 20.",
-    "download_data_btn": "⬇ Download my data",
-    "download_data_preparing": "⏳ Preparing export..."
+    "occupants_contact": "To update occupants, contact your community admin.",
+    "delete_account_desc": "This permanently deletes all data associated with Apt {apt} — bookings, votes, proposals, and your profile. The apartment remains in the building directory but will show as unregistered. This cannot be undone.",
+    "delete_confirm_label": "Type your apartment number {apt} to confirm:",
+    "delete_permanent": "Permanently delete",
+    "deleting": "Deleting...",
+    "privacy_show_names": "Show occupant names in directory",
+    "privacy_show_ages": "Show ages",
+    "privacy_show_interests": "Show interests",
+    "privacy_show_phone": "Show phone to neighbours",
+    "privacy_show_directory": "Appear in building directory",
+    "privacy_birthday": "Birthday community wishes",
+    "privacy_email": "Email notifications",
+    "privacy_calendar": "Sync bookings to Google Calendar"
   },
   "common": {
     "loading": "Loading...",
@@ -84,5 +93,19 @@
     "leave": "Leave",
     "approve": "Approve",
     "reject": "Reject"
+  },
+  "interests": {
+    "Tennis": "Tennis",
+    "Padel": "Padel",
+    "Swimming": "Swimming",
+    "Football": "Football",
+    "Basketball": "Basketball",
+    "Cycling": "Cycling",
+    "Chess": "Chess",
+    "SUP / Beach": "SUP / Beach",
+    "Music": "Music",
+    "Dogs": "Dogs",
+    "Cooking": "Cooking",
+    "Language exchange": "Language exchange"
   }
 }

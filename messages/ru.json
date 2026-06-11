@@ -70,10 +70,19 @@
     "save": "Сохранить настройки",
     "danger_zone": "Опасная зона",
     "delete_account": "Удалить аккаунт",
-    "download_data": "Скачать мои данные",
-    "download_data_desc": "Экспортируйте все личные данные Bermar о вашей квартире в файл JSON. Ваше право по GDPR Ст. 20.",
-    "download_data_btn": "⬇ Скачать мои данные",
-    "download_data_preparing": "⏳ Подготовка экспорта..."
+    "occupants_contact": "Для обновления списка жильцов обратитесь к администратору сообщества.",
+    "delete_account_desc": "Это навсегда удалит все данные квартиры {apt} — брони, голоса, предложения и ваш профиль. Квартира останется в справочнике, но будет отображаться как незарегистрированная. Отменить невозможно.",
+    "delete_confirm_label": "Введите номер квартиры {apt} для подтверждения:",
+    "delete_permanent": "Удалить навсегда",
+    "deleting": "Удаление...",
+    "privacy_show_names": "Показывать имена жильцов в справочнике",
+    "privacy_show_ages": "Показывать возраст",
+    "privacy_show_interests": "Показывать интересы",
+    "privacy_show_phone": "Показывать телефон соседям",
+    "privacy_show_directory": "Отображаться в справочнике здания",
+    "privacy_birthday": "Поздравления с днём рождения",
+    "privacy_email": "Email-уведомления",
+    "privacy_calendar": "Синхронизировать брони с Google Calendar"
   },
   "common": {
     "loading": "Загрузка...",
@@ -84,5 +93,19 @@
     "leave": "Выйти",
     "approve": "Одобрить",
     "reject": "Отклонить"
+  },
+  "interests": {
+    "Tennis": "Теннис",
+    "Padel": "Падел",
+    "Swimming": "Плавание",
+    "Football": "Футбол",
+    "Basketball": "Баскетбол",
+    "Cycling": "Велоспорт",
+    "Chess": "Шахматы",
+    "SUP / Beach": "SUP / Пляж",
+    "Music": "Музыка",
+    "Dogs": "Собаки",
+    "Cooking": "Кулинария",
+    "Language exchange": "Языковой обмен"
   }
 }

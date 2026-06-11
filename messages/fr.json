@@ -70,10 +70,19 @@
     "save": "Enregistrer les paramètres",
     "danger_zone": "Zone dangereuse",
     "delete_account": "Supprimer le compte",
-    "download_data": "Télécharger mes données",
-    "download_data_desc": "Exportez toutes les données personnelles que Bermar détient sur votre appartement en fichier JSON. Votre droit selon le RGPD Art. 20.",
-    "download_data_btn": "⬇ Télécharger mes données",
-    "download_data_preparing": "⏳ Préparation de l'export..."
+    "occupants_contact": "Pour mettre à jour les occupants, contactez l'administrateur de la communauté.",
+    "delete_account_desc": "Cela supprime définitivement toutes les données associées à l'apt {apt} — réservations, votes, propositions et votre profil. L'appartement restera dans le répertoire mais apparaîtra comme non enregistré. Cette action est irréversible.",
+    "delete_confirm_label": "Saisissez le numéro de votre appartement {apt} pour confirmer :",
+    "delete_permanent": "Supprimer définitivement",
+    "deleting": "Suppression...",
+    "privacy_show_names": "Afficher les noms des occupants dans l'annuaire",
+    "privacy_show_ages": "Afficher les âges",
+    "privacy_show_interests": "Afficher les intérêts",
+    "privacy_show_phone": "Afficher le téléphone aux voisins",
+    "privacy_show_directory": "Apparaître dans l'annuaire de l'immeuble",
+    "privacy_birthday": "Vœux d'anniversaire communautaires",
+    "privacy_email": "Notifications par e-mail",
+    "privacy_calendar": "Synchroniser les réservations avec Google Calendar"
   },
   "common": {
     "loading": "Chargement...",
@@ -84,5 +93,19 @@
     "leave": "Quitter",
     "approve": "Approuver",
     "reject": "Rejeter"
+  },
+  "interests": {
+    "Tennis": "Tennis",
+    "Padel": "Padel",
+    "Swimming": "Natation",
+    "Football": "Football",
+    "Basketball": "Basketball",
+    "Cycling": "Cyclisme",
+    "Chess": "Échecs",
+    "SUP / Beach": "SUP / Plage",
+    "Music": "Musique",
+    "Dogs": "Chiens",
+    "Cooking": "Cuisine",
+    "Language exchange": "Échange linguistique"
   }
 }

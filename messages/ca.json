@@ -70,10 +70,19 @@
     "save": "Desar configuració",
     "danger_zone": "Zona de perill",
     "delete_account": "Eliminar compte",
-    "download_data": "Descarrega les meves dades",
-    "download_data_desc": "Exporta totes les dades personals que Bermar té del teu apartament com a fitxer JSON. El teu dret segons el RGPD Art. 20.",
-    "download_data_btn": "⬇ Descarrega les meves dades",
-    "download_data_preparing": "⏳ Preparant exportació..."
+    "occupants_contact": "Per actualitzar els ocupants, contacta l'administrador de la comunitat.",
+    "delete_account_desc": "Això elimina permanentment totes les dades associades a l'apt {apt} — reserves, vots, propostes i el teu perfil. L'apartament continuarà al directori però apareixerà com a no registrat. Aquesta acció no es pot desfer.",
+    "delete_confirm_label": "Escriu el número del teu apartament {apt} per confirmar:",
+    "delete_permanent": "Eliminar permanentment",
+    "deleting": "Eliminant...",
+    "privacy_show_names": "Mostra els noms dels ocupants al directori",
+    "privacy_show_ages": "Mostra les edats",
+    "privacy_show_interests": "Mostra els interessos",
+    "privacy_show_phone": "Mostra el telèfon als veïns",
+    "privacy_show_directory": "Apareix al directori de l'edifici",
+    "privacy_birthday": "Felicitació d'aniversari comunitari",
+    "privacy_email": "Notificacions per correu",
+    "privacy_calendar": "Sincronitza reserves amb Google Calendar"
   },
   "common": {
     "loading": "Carregant...",
@@ -84,5 +93,19 @@
     "leave": "Sortir",
     "approve": "Aprovar",
     "reject": "Rebutjar"
+  },
+  "interests": {
+    "Tennis": "Tennis",
+    "Padel": "Pàdel",
+    "Swimming": "Natació",
+    "Football": "Futbol",
+    "Basketball": "Bàsquet",
+    "Cycling": "Ciclisme",
+    "Chess": "Escacs",
+    "SUP / Beach": "SUP / Platja",
+    "Music": "Música",
+    "Dogs": "Gossos",
+    "Cooking": "Cuina",
+    "Language exchange": "Intercanvi d'idiomes"
   }
 }

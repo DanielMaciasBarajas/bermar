@@ -70,10 +70,19 @@
     "save": "Сачувај подешавања",
     "danger_zone": "Опасна зона",
     "delete_account": "Обриши налог",
-    "download_data": "Преузми моје податке",
-    "download_data_desc": "Извези све личне податке које Bermar чува о твом стану као JSON фајл. Твоје право по GDPR чл. 20.",
-    "download_data_btn": "⬇ Преузми моје податке",
-    "download_data_preparing": "⏳ Припрема извоза..."
+    "occupants_contact": "За ажурирање станара, контактирајте администратора заједнице.",
+    "delete_account_desc": "Ово трајно брише све податке стана {apt} — резервације, гласове, предлоге и ваш профил. Стан остаје у именику али ће бити приказан као нерегистрован. Ово се не може поништити.",
+    "delete_confirm_label": "Унесите број стана {apt} за потврду:",
+    "delete_permanent": "Трајно обриши",
+    "deleting": "Брисање...",
+    "privacy_show_names": "Прикажи имена станара у именику",
+    "privacy_show_ages": "Прикажи године",
+    "privacy_show_interests": "Прикажи интересовања",
+    "privacy_show_phone": "Прикажи телефон комшијама",
+    "privacy_show_directory": "Прикажи се у именику зграде",
+    "privacy_birthday": "Честитке за рођендан заједнице",
+    "privacy_email": "Имејл обавештења",
+    "privacy_calendar": "Синхронизуј резервације са Google Calendar"
   },
   "common": {
     "loading": "Учитавање...",
@@ -84,5 +93,19 @@
     "leave": "Напусти",
     "approve": "Одобри",
     "reject": "Одбиј"
+  },
+  "interests": {
+    "Tennis": "Тенис",
+    "Padel": "Падел",
+    "Swimming": "Пливање",
+    "Football": "Фудбал",
+    "Basketball": "Кошарка",
+    "Cycling": "Бициклизам",
+    "Chess": "Шах",
+    "SUP / Beach": "SUP / Плажа",
+    "Music": "Музика",
+    "Dogs": "Пси",
+    "Cooking": "Кување",
+    "Language exchange": "Размена језика"
   }
 }
