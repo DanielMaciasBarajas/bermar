@@ -423,15 +423,15 @@ h1, h2, h3, h4 {
 }
 
 @media print {
-  /* Hide everything except the poster */
-  body > * {
-    display: none !important;
+  body *:not(.bermar-poster):not(.bermar-poster *) {
+    visibility: hidden !important;
   }
 
   .bermar-poster {
+    visibility: visible !important;
     display: block !important;
-    position: fixed;
-    inset: 0;
+    position: fixed !important;
+    inset: 0 !important;
     width: 210mm;
     min-height: 297mm;
     padding: 20mm 18mm;
@@ -450,10 +450,7 @@ h1, h2, h3, h4 {
     border-bottom: 2px solid #1a3d2b;
   }
 
-  .bermar-poster-logo {
-    font-size: 32px;
-    line-height: 1;
-  }
+  .bermar-poster-logo { font-size: 32px; line-height: 1; }
 
   .bermar-poster-community {
     font-family: 'DM Serif Display', serif;
@@ -537,131 +534,7 @@ h1, h2, h3, h4 {
     color: #8a8780;
     letter-spacing: 0.5px;
   }
-}/* ============================================================
-   BERMAR — Marketplace Poster Print Styles
-   Append this to the bottom of globals.css
-   ============================================================ */
-
-/* Hide poster on screen */
-.bermar-poster {
-  display: none;
 }
-
-@media print {
-  /* Hide everything except the poster */
-  body > * {
-    display: none !important;
-  }
-
-  .bermar-poster {
-    display: block !important;
-    position: fixed;
-    inset: 0;
-    width: 210mm;
-    min-height: 297mm;
-    padding: 20mm 18mm;
-    background: #fff;
-    font-family: 'DM Sans', sans-serif;
-    color: #1c1c1a;
-    box-sizing: border-box;
-  }
-
-  .bermar-poster-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 24px;
-    padding-bottom: 16px;
-    border-bottom: 2px solid #1a3d2b;
-  }
-
-  .bermar-poster-logo {
-    font-size: 32px;
-    line-height: 1;
-  }
-
-  .bermar-poster-community {
-    font-family: 'DM Serif Display', serif;
-    font-size: 28px;
-    color: #1a3d2b;
-    line-height: 1;
-  }
-
-  .bermar-poster-sub {
-    font-size: 12px;
-    color: #8a8780;
-    margin-top: 2px;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-  }
-
-  .bermar-poster-category {
-    display: inline-block;
-    padding: 4px 12px;
-    border-radius: 999px;
-    background: #f4efe6;
-    color: #4a4a45;
-    font-size: 11px;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 16px;
-  }
-
-  .bermar-poster-title {
-    font-family: 'DM Serif Display', serif;
-    font-size: 36px;
-    color: #1a3d2b;
-    line-height: 1.2;
-    margin: 0 0 20px 0;
-  }
-
-  .bermar-poster-photo {
-    width: 100%;
-    max-height: 120mm;
-    object-fit: cover;
-    border-radius: 8px;
-    margin-bottom: 20px;
-  }
-
-  .bermar-poster-price {
-    font-size: 24px;
-    font-weight: 600;
-    color: #b8922a;
-    margin-bottom: 16px;
-  }
-
-  .bermar-poster-body {
-    font-size: 14px;
-    line-height: 1.7;
-    color: #4a4a45;
-    white-space: pre-line;
-    margin-bottom: 32px;
-  }
-
-  .bermar-poster-footer {
-    position: absolute;
-    bottom: 20mm;
-    left: 18mm;
-    right: 18mm;
-    padding-top: 16px;
-    border-top: 1px solid #ddd8cc;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  .bermar-poster-contact {
-    font-size: 14px;
-    font-weight: 500;
-    color: #1a3d2b;
-  }
-
-  .bermar-poster-url {
-    font-size: 11px;
-    color: #8a8780;
-    letter-spacing: 0.5px;
-  }
 }
 /* ============================================================
    BERMAR — Mobile nav additions
