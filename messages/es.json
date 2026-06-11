@@ -47,7 +47,7 @@
     "premise_slots_sub": "Franjas de {min}min · regla de margen",
     "premise_halfday_sub": "Mañana / Tarde / Noche",
     "premise_challenge_sub": "Reto · sin pista",
-    "gap_rule_desc": "mínimo 1 franja libre entre tus propias reservas en el mismo espacio.",
+    "gap_rule_desc": "Debe quedar 1 franja libre entre tus reservas en el mismo espacio el mismo día.",
     "open_invite": "Abrir reserva a los vecinos",
     "invite_spots": "{name} — máx. {n} plazas",
     "invite_scope_interest": "Vecinos con intereses similares",
@@ -86,7 +86,10 @@
       "Vi",
       "Sá",
       "Do"
-    ]
+    ],
+    "halfday_instruction": "Selecciona uno o más períodos del día. Puedes reservar hasta 3 períodos consecutivos.",
+    "leave_clean": "🧹 Por favor, deja el espacio limpio y recogido tal como lo encontraste.",
+    "invite_panel_title": "Abrir a los vecinos"
   },
   "proposals": {
     "new_proposal": "+ Nueva propuesta",

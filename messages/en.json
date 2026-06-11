@@ -47,7 +47,7 @@
     "premise_slots_sub": "{min}min slots · gap rule",
     "premise_halfday_sub": "Morning / Afternoon / Evening",
     "premise_challenge_sub": "Challenge · no court needed",
-    "gap_rule_desc": "min. 1 free slot between your own bookings on the same premise.",
+    "gap_rule_desc": "There must be 1 free slot between your own bookings on the same premise on the same day.",
     "open_invite": "Open this booking to neighbours",
     "invite_spots": "{name} — max {n} neighbour spots",
     "invite_scope_interest": "All residents with matching interest",
@@ -86,7 +86,10 @@
       "Fr",
       "Sa",
       "Su"
-    ]
+    ],
+    "halfday_instruction": "Select one or more periods. You can book up to 3 consecutive periods.",
+    "leave_clean": "🧹 Please leave the space clean and tidy, exactly as you found it.",
+    "invite_panel_title": "Open to neighbours"
   },
   "proposals": {
     "new_proposal": "+ New proposal",

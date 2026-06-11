@@ -47,7 +47,7 @@
     "premise_slots_sub": "Franges de {min}min · regla de marge",
     "premise_halfday_sub": "Matí / Tarda / Vespre",
     "premise_challenge_sub": "Repte · sense pista",
-    "gap_rule_desc": "mínim 1 franja lliure entre les teves reserves al mateix espai.",
+    "gap_rule_desc": "Ha de quedar 1 franja lliure entre les teves reserves al mateix espai el mateix dia.",
     "open_invite": "Obre la reserva als veïns",
     "invite_spots": "{name} — màx. {n} places",
     "invite_scope_interest": "Veïns amb interessos similars",
@@ -86,7 +86,10 @@
       "Dv",
       "Ds",
       "Dg"
-    ]
+    ],
+    "halfday_instruction": "Selecciona un o més períodes del dia. Pots reservar fins a 3 períodes consecutius.",
+    "leave_clean": "🧹 Si us plau, deixa l'espai net i recollit tal com el vas trobar.",
+    "invite_panel_title": "Obrir als veïns"
   },
   "proposals": {
     "new_proposal": "+ Nova proposta",

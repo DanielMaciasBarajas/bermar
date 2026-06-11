@@ -47,7 +47,7 @@
     "premise_slots_sub": "Créneaux de {min}min · règle d'intervalle",
     "premise_halfday_sub": "Matin / Après-midi / Soir",
     "premise_challenge_sub": "Défi · sans terrain",
-    "gap_rule_desc": "minimum 1 créneau libre entre vos propres réservations sur le même espace.",
+    "gap_rule_desc": "Un créneau libre doit séparer vos propres réservations sur le même espace le même jour.",
     "open_invite": "Ouvrir la réservation aux voisins",
     "invite_spots": "{name} — max {n} places voisins",
     "invite_scope_interest": "Résidents avec des intérêts similaires",
@@ -86,7 +86,10 @@
       "Ve",
       "Sa",
       "Di"
-    ]
+    ],
+    "halfday_instruction": "Sélectionnez une ou plusieurs périodes. Vous pouvez réserver jusqu'à 3 périodes consécutives.",
+    "leave_clean": "🧹 Merci de laisser l'espace propre et rangé, tel que vous l'avez trouvé.",
+    "invite_panel_title": "Ouvrir aux voisins"
   },
   "proposals": {
     "new_proposal": "+ Nouvelle proposition",
