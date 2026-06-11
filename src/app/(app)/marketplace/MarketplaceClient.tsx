@@ -52,35 +52,30 @@ export default function MarketplaceClient({ listings, profile, shortTermAllowed,
     const langHtml = (listing.language_from && listing.language_to)
       ? '<div class="price">' + listing.language_from + ' ↔ ' + listing.language_to + ' · In person</div>'
       : ''
-
     const html = '<!DOCTYPE html><html><head><meta charset="utf-8"/><title>Bermar — ' + listing.title + '</title><style>'
-      + '@import url(\'https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Serif+Display&display=swap\');'
-      + '* { margin: 0; padding: 0; box-sizing: border-box; }'
-      + 'body { font-family: \'DM Sans\', sans-serif; color: #1c1c1a; background: #fff; padding: 20mm 18mm; width: 210mm; min-height: 297mm; }'
-      + '.header { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 2px solid #1a3d2b; }'
-      + '.logo { font-size: 32px; }'
-      + '.community { font-family: \'DM Serif Display\', serif; font-size: 28px; color: #1a3d2b; }'
-      + '.sub { font-size: 12px; color: #8a8780; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }'
-      + '.category { display: inline-block; padding: 4px 12px; border-radius: 999px; background: #f4efe6; color: #4a4a45; font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 16px; }'
-      + 'h1 { font-family: \'DM Serif Display\', serif; font-size: 36px; color: #1a3d2b; line-height: 1.2; margin-bottom: 20px; }'
-      + '.photo { width: 100%; max-height: 120mm; object-fit: cover; border-radius: 8px; margin-bottom: 20px; }'
-      + '.price { font-size: 24px; font-weight: 600; color: #b8922a; margin-bottom: 16px; }'
-      + '.body { font-size: 14px; line-height: 1.7; color: #4a4a45; white-space: pre-line; margin-bottom: 32px; }'
-      + '.footer { position: fixed; bottom: 20mm; left: 18mm; right: 18mm; padding-top: 16px; border-top: 1px solid #ddd8cc; display: flex; justify-content: space-between; align-items: center; }'
-      + '.contact { font-size: 14px; font-weight: 500; color: #1a3d2b; }'
-      + '.url { font-size: 11px; color: #8a8780; letter-spacing: 0.5px; }'
+      + "* { margin: 0; padding: 0; box-sizing: border-box; }"
+      + "body { font-family: sans-serif; color: #1c1c1a; background: #fff; padding: 20mm 18mm; width: 210mm; min-height: 297mm; }"
+      + ".header { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 2px solid #1a3d2b; }"
+      + ".logo { font-size: 32px; }"
+      + ".community { font-size: 28px; color: #1a3d2b; font-weight: 700; }"
+      + ".sub { font-size: 12px; color: #8a8780; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }"
+      + ".category { display: inline-block; padding: 4px 12px; border-radius: 999px; background: #f4efe6; color: #4a4a45; font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 16px; }"
+      + "h1 { font-size: 36px; color: #1a3d2b; line-height: 1.2; margin-bottom: 20px; }"
+      + ".photo { width: 100%; max-height: 120mm; object-fit: cover; border-radius: 8px; margin-bottom: 20px; }"
+      + ".price { font-size: 24px; font-weight: 600; color: #b8922a; margin-bottom: 16px; }"
+      + ".body { font-size: 14px; line-height: 1.7; color: #4a4a45; white-space: pre-line; margin-bottom: 32px; }"
+      + ".footer { position: fixed; bottom: 20mm; left: 18mm; right: 18mm; padding-top: 16px; border-top: 1px solid #ddd8cc; display: flex; justify-content: space-between; align-items: center; }"
+      + ".contact { font-size: 14px; font-weight: 500; color: #1a3d2b; }"
+      + ".url { font-size: 11px; color: #8a8780; letter-spacing: 0.5px; }"
       + '</style></head><body>'
       + '<div class="header"><div class="logo">🌿</div><div><div class="community">Bermar</div><div class="sub">Community Marketplace</div></div></div>'
       + '<div class="category">' + categoryLabel + '</div>'
       + '<h1>' + listing.title + '</h1>'
-      + photoHtml
-      + priceHtml
-      + langHtml
+      + photoHtml + priceHtml + langHtml
       + '<p class="body">' + body + '</p>'
-      + '<div class="footer"><div class="contact">📱 Contact via Bermar app — Apt ' + listing.apt_number + '</div><div class="url">beramar.vercel.app</div></div>'
-      + '<script>window.onload = function() { window.print(); window.onafterprint = function() { window.close(); }; }<\/script>'
+      + '<div class="footer"><div class="contact">Contact via Bermar app — Apt ' + listing.apt_number + '</div><div class="url">beramar.vercel.app</div></div>'
+      + '<scr' + 'ipt>window.onload=function(){window.print();window.onafterprint=function(){window.close();};};</scr' + 'ipt>'
       + '</body></html>'
-
     const win = window.open('', '_blank')
     if (win) { win.document.write(html); win.document.close() }
   }
@@ -99,8 +94,6 @@ export default function MarketplaceClient({ listings, profile, shortTermAllowed,
 
   const categories = Object.entries(MARKETPLACE_CATEGORY_LABELS)
   const filtered = listings.filter(l => categoryFilter === 'all' || l.category === categoryFilter)
-  // debug — remove after confirming
-  if (typeof window !== 'undefined') console.log('profile.id:', profile.id, 'listing profile_ids:', filtered.map(l => l.profile_id))
 
   async function submitListing() {
     setSaving(true)
@@ -108,13 +101,12 @@ export default function MarketplaceClient({ listings, profile, shortTermAllowed,
 
     if (photoFile) {
       const ext = photoFile.name.split('.').pop()
-      const path = `${profile.community_id}/${profile.id}/${Date.now()}.${ext}`
+      const path = profile.community_id + '/' + profile.id + '/' + Date.now() + '.' + ext
       const { error: uploadError } = await supabase.storage
         .from('marketplace')
         .upload(path, photoFile, { upsert: false, contentType: photoFile.type })
       if (uploadError) {
         console.error('Photo upload error:', uploadError)
-        // continue without photo — don't block the listing
       } else {
         const { data: urlData } = supabase.storage.from('marketplace').getPublicUrl(path)
         photo_url = urlData.publicUrl
@@ -131,7 +123,6 @@ export default function MarketplaceClient({ listings, profile, shortTermAllowed,
     })
 
     if (insertError) {
-      console.error('Insert error:', insertError)
       alert('Error posting listing: ' + insertError.message)
       setSaving(false)
       return
@@ -174,7 +165,7 @@ export default function MarketplaceClient({ listings, profile, shortTermAllowed,
             <input required value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} placeholder="Title" className="form-input" />
             <textarea required value={form.body} onChange={e => setForm(f => ({ ...f, body: e.target.value }))} placeholder="Description — add translations: ES: ... · FR: ... · EN: ..." rows={3} className="form-textarea" />
             <div>
-              <label style={{ fontSize: '11px', color: 'var(--txm)', display: 'block', marginBottom: '6px' }}>📷 Photo (optional — listings with photos get 3× more responses)</label>
+              <label style={{ fontSize: '11px', color: 'var(--txm)', display: 'block', marginBottom: '6px' }}>📷 Photo (optional)</label>
               <input type="file" accept="image/*" onChange={pickPhoto} style={{ fontSize: '12px', color: 'var(--tx)' }} />
               {photoPreview && (
                 <div style={{ marginTop: '8px', position: 'relative', display: 'inline-block' }}>
@@ -220,7 +211,7 @@ export default function MarketplaceClient({ listings, profile, shortTermAllowed,
             {listing.language_from && listing.language_to && <p style={{ fontSize: '11px', color: '#0f766e', marginBottom: '4px' }}>{listing.language_from} → {listing.language_to} · In person</p>}
             <div style={{ display: 'flex', gap: '6px', marginTop: '8px' }}>
               <button className="btn btn-sm" style={{ flex: 1 }}>{t('contact')} @{listing.apt_number}</button>
-              <button className="btn btn-sm" title="Generate PDF poster" style={{ padding: '4px 8px' }} onClick={() => triggerPrint(listing)}>📄</button>
+              <button className="btn btn-sm" title="Print poster" style={{ padding: '4px 8px' }} onClick={() => triggerPrint(listing)}>📄</button>
             </div>
             {listing.profile_id === profile.id && (
               <div style={{ display: 'flex', gap: '6px', marginTop: '6px' }}>
@@ -249,7 +240,6 @@ export default function MarketplaceClient({ listings, profile, shortTermAllowed,
           <span style={{ fontSize: '11px', textAlign: 'center' }}>Photo · PDF poster for lobby board</span>
         </button>
       </div>
-
     </div>
   )
 }
