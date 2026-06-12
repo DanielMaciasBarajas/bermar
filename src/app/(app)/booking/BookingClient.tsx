@@ -202,8 +202,14 @@ export default function BookingClient({ premises, existingBookings, profile }: P
 
   return (
     <div style={{ maxWidth: '960px', margin: '0 auto' }}>
-      {/* 3-col on desktop: premises | calendar | timetable+invite */}
-      <div style={{ display: 'grid', gridTemplateColumns: '200px 1fr 1fr', gap: '16px', alignItems: 'start' }}>
+      {/* Desktop: 3-col | Mobile: single column stack */}
+      <style>{`
+        @media (max-width: 700px) {
+          .booking-grid { grid-template-columns: 1fr !important; }
+          .booking-slot-grid { grid-template-columns: 1fr !important; }
+        }
+      `}</style>
+      <div className="booking-grid" style={{ display: 'grid', gridTemplateColumns: '200px 1fr 1fr', gap: '16px', alignItems: 'start' }}>
 
         {/* COL 1: Premises list */}
         <div>
@@ -273,7 +279,7 @@ export default function BookingClient({ premises, existingBookings, profile }: P
               {/* SLOTS */}
               {!isHalfday && !isChallenge && (
                 <>
-                  <div style={{ display: 'grid', gridTemplateColumns: invitePanel ? '1fr 180px' : '1fr', gap: '12px', alignItems: 'start' }}>
+                  <div className='booking-slot-grid' style={{ display: 'grid', gridTemplateColumns: invitePanel ? '1fr 180px' : '1fr', gap: '12px', alignItems: 'start' }}>
                     <div>
                       <div className="section-title" style={{ marginBottom: '6px' }}>{t('slots_header', { date: selectedDate })}</div>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
@@ -377,8 +383,7 @@ export default function BookingClient({ premises, existingBookings, profile }: P
               {/* Success */}
               {success && (
                 <div style={{ marginTop: '12px', background: '#f0fdf4', color: '#166534', border: '1px solid #bbf7d0', borderRadius: '12px', padding: '12px', fontSize: '12px', textAlign: 'center' }}>
-                  <div style={{ marginBottom: '6px' }}>{success}</div>
-                  <button onClick={() => window.location.reload()} style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '4px 12px', borderRadius: '8px', background: '#fff', border: '1px solid #bbf7d0', color: '#166534', fontSize: '11px', fontWeight: 500, cursor: 'pointer', marginBottom: calendarUrl ? '10px' : 0 }}>{t('refresh_notice')}</button>
+                  <div style={{ marginBottom: calendarUrl ? '10px' : 0 }}>{success}</div>
                   {calendarUrl && (
                     <a href={calendarUrl} target="_blank" rel="noopener noreferrer"
                       style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 14px', borderRadius: '8px', background: '#fff', border: '1px solid #bbf7d0', color: '#166534', fontSize: '11px', fontWeight: 500, textDecoration: 'none' }}>
@@ -560,8 +565,7 @@ export default function BookingClient({ premises, existingBookings, profile }: P
               {/* Success */}
               {success && (
                 <div style={{ marginTop: '12px', background: '#f0fdf4', color: '#166534', border: '1px solid #bbf7d0', borderRadius: '12px', padding: '12px', fontSize: '12px', textAlign: 'center' }}>
-                  <div style={{ marginBottom: '6px' }}>{success}</div>
-                  <button onClick={() => window.location.reload()} style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '4px 12px', borderRadius: '8px', background: '#fff', border: '1px solid #bbf7d0', color: '#166534', fontSize: '11px', fontWeight: 500, cursor: 'pointer', marginBottom: calendarUrl ? '10px' : 0 }}>{t('refresh_notice')}</button>
+                  <div style={{ marginBottom: calendarUrl ? '10px' : 0 }}>{success}</div>
                   {calendarUrl && (
                     <a href={calendarUrl} target="_blank" rel="noopener noreferrer"
                       style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 14px', borderRadius: '8px', background: '#fff', border: '1px solid #bbf7d0', color: '#166534', fontSize: '11px', fontWeight: 500, textDecoration: 'none' }}>
