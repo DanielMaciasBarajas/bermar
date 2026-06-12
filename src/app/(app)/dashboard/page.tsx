@@ -48,11 +48,19 @@ export default async function DashboardPage() {
   ])
 
   const feedItems = [
-    ...(recentBookings || []).map((r: any) => ({
-      id: r.id, type: 'booking' as const, icon: '📅',
-      text: t('apt_booked', { apt: r.apt_number }),
-      meta: r.date, created_at: r.created_at,
-    })),
+    ...(recentBookings || []).map((r: any) => {
+      const timeMeta = r.slot_start
+        ? `${r.slot_start.slice(0,5)}-${r.slot_end?.slice(0,5)}`
+        : r.halfday_period
+        ? r.halfday_period
+        : ''
+      return {
+        id: r.id, type: 'booking' as const, icon: '📅',
+        text: t('apt_booked', { apt: r.apt_number }),
+        meta: timeMeta ? `${r.date} · ${timeMeta}` : r.date,
+        created_at: r.created_at,
+      }
+    }),
     ...(recentProposals || []).map((r: any) => ({
       id: r.id, type: 'proposal' as const, icon: '📢',
       text: t('new_proposal', { title: r.title }),
@@ -180,7 +188,10 @@ export default async function DashboardPage() {
                       <div>
                         <div className="feed-text">{premiseName} · {formatDate(b.date, locale)}</div>
                         {b.slot_start && (
-                          <div className="feed-meta">{b.slot_start.slice(0,5)}–{b.slot_end?.slice(0,5)}</div>
+                          <div className="feed-meta">{b.slot_start.slice(0,5)}-{b.slot_end?.slice(0,5)}</div>
+                        )}
+                        {!b.slot_start && b.halfday_period && (
+                          <div className="feed-meta">{b.halfday_period}</div>
                         )}
                       </div>
                     </div>
