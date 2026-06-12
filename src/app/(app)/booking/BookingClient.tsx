@@ -18,6 +18,7 @@ export default function BookingClient({ premises, existingBookings, profile }: P
   const tc = useTranslations('common')
   const lang = (profile as any).preferred_lang || 'CA'
 
+  const [bookings, setBookings] = useState(existingBookings)
   const [selectedPremise, setSelectedPremise] = useState<Premise | null>(premises[0] || null)
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0])
   const [inviteOpen, setInviteOpen] = useState(false)
@@ -51,8 +52,8 @@ export default function BookingClient({ premises, existingBookings, profile }: P
 
   const dayBookings = useMemo(() => {
     if (!selectedPremise) return []
-    return existingBookings.filter(b => b.premise_id === selectedPremise.id && b.date === selectedDate)
-  }, [selectedPremise, selectedDate, existingBookings])
+    return bookings.filter(b => b.premise_id === selectedPremise.id && b.date === selectedDate)
+  }, [selectedPremise, selectedDate, bookings])
 
   const myDayBookings = dayBookings.filter(b => b.profile_id === profile.id)
 
@@ -99,9 +100,9 @@ export default function BookingClient({ premises, existingBookings, profile }: P
     const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2,'0')}-${String(day).padStart(2,'0')}`
     const todayStr = today.toISOString().split('T')[0]
     if (dateStr === todayStr) return 'today'
-    const hasMyBooking = existingBookings.some(b => b.premise_id === selectedPremise?.id && b.date === dateStr && b.profile_id === profile.id)
+    const hasMyBooking = bookings.some(b => b.premise_id === selectedPremise?.id && b.date === dateStr && b.profile_id === profile.id)
     if (hasMyBooking) return 'mine'
-    const hasBooking = existingBookings.some(b => b.premise_id === selectedPremise?.id && b.date === dateStr)
+    const hasBooking = bookings.some(b => b.premise_id === selectedPremise?.id && b.date === dateStr)
     if (hasBooking) return 'booked'
     return 'free'
   }
@@ -133,6 +134,19 @@ export default function BookingClient({ premises, existingBookings, profile }: P
     })
     setSaving(false)
     if (!error) {
+      const newBooking = {
+        id: crypto.randomUUID(), community_id: profile.community_id,
+        premise_id: selectedPremise.id, profile_id: profile.id,
+        apt_number: profile.apt_number, date: selectedDate,
+        slot_start: start, slot_end: end, status: 'confirmed' as const,
+        invite_open: inviteOpen, invite_scope: inviteOpen ? inviteScope : 'none' as const,
+        invite_target_apt: inviteScope === 'apt' ? inviteTargetApt : null,
+        invite_max_slots: inviteOpen ? (selectedPremise.max_invite_slots || null) : null,
+        halfday_period: null, google_event_id: null,
+        created_at: new Date().toISOString(), updated_at: new Date().toISOString(),
+        participants: [],
+      }
+      setBookings(prev => [...prev, newBooking])
       setSuccess(`✓ ${formatTime(start)}–${formatTime(end)} · ${selectedDate}`)
       setCalendarUrl(buildCalendarUrl(selectedDate, start, end, getPremiseName(selectedPremise)))
       setTimeout(() => { setSuccess(''); setCalendarUrl('') }, 10000)
@@ -141,18 +155,33 @@ export default function BookingClient({ premises, existingBookings, profile }: P
 
   async function cancelBooking(bookingId: string) {
     await supabase.from('bookings').update({ status: 'cancelled' }).eq('id', bookingId)
+    setBookings(prev => prev.filter(b => b.id !== bookingId))
   }
 
   async function bookHalfday(period: string) {
     if (!selectedPremise) return
     setSaving(true)
-    await supabase.from('bookings').insert({
+    const { error } = await supabase.from('bookings').insert({
       community_id: profile.community_id, premise_id: selectedPremise.id,
       profile_id: profile.id, apt_number: profile.apt_number,
       date: selectedDate, halfday_period: period, status: 'confirmed',
       invite_open: false, invite_scope: 'none',
     })
     setSaving(false)
+    if (!error) {
+      const newBooking = {
+        id: crypto.randomUUID(), community_id: profile.community_id,
+        premise_id: selectedPremise.id, profile_id: profile.id,
+        apt_number: profile.apt_number, date: selectedDate,
+        halfday_period: period as any, status: 'confirmed' as const,
+        invite_open: false, invite_scope: 'none' as const,
+        invite_target_apt: null, invite_max_slots: null,
+        slot_start: null, slot_end: null, google_event_id: null,
+        created_at: new Date().toISOString(), updated_at: new Date().toISOString(),
+        participants: [],
+      }
+      setBookings(prev => [...prev, newBooking])
+    }
     const timeMap: Record<string, { start: string; end: string }> = {
       morning: { start: '08:00', end: '13:00' },
       afternoon: { start: '13:00', end: '18:00' },
