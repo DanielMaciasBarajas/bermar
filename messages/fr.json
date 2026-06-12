@@ -89,7 +89,8 @@
     ],
     "halfday_instruction": "Sélectionnez une ou plusieurs périodes. Vous pouvez réserver jusqu'à 3 périodes consécutives.",
     "leave_clean": "🧹 Merci de laisser l'espace propre et rangé, tel que vous l'avez trouvé.",
-    "invite_panel_title": "Ouvrir aux voisins"
+    "invite_panel_title": "Ouvrir aux voisins",
+    "refresh_notice": "↻ Actualiser"
   },
   "proposals": {
     "new_proposal": "+ Nouvelle proposition",

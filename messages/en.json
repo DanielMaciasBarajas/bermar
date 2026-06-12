@@ -89,7 +89,8 @@
     ],
     "halfday_instruction": "Select one or more periods. You can book up to 3 consecutive periods.",
     "leave_clean": "🧹 Please leave the space clean and tidy, exactly as you found it.",
-    "invite_panel_title": "Open to neighbours"
+    "invite_panel_title": "Open to neighbours",
+    "refresh_notice": "↻ Refresh"
   },
   "proposals": {
     "new_proposal": "+ New proposal",
