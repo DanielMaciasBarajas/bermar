@@ -112,7 +112,7 @@ export default function BookingClient({ premises, existingBookings, profile }: P
       return `${y}${m}${day}T${h}${min}00`
     }
     const params = new URLSearchParams({
-      action: 'TEMPLATE', text: `${premiseName} — Bermar`,
+      action: 'TEMPLATE', text: `${premiseName} - Bermar`,
       dates: `${toGCal(date, start)}/${toGCal(date, end)}`,
       details: `Booking at ${premiseName}, Apt ${profile.apt_number}`,
       location: 'Bermar, Gavà',
@@ -133,7 +133,7 @@ export default function BookingClient({ premises, existingBookings, profile }: P
     })
     setSaving(false)
     if (!error) {
-      setSuccess(`✓ ${formatTime(start)}–${formatTime(end)} · ${selectedDate}`)
+      setSuccess(`OK ${formatTime(start)}-${formatTime(end)} - ${selectedDate}`)
       setCalendarUrl(buildCalendarUrl(selectedDate, start, end, getPremiseName(selectedPremise)))
       setTimeout(() => { setSuccess(''); setCalendarUrl('') }, 10000)
     }
@@ -159,7 +159,7 @@ export default function BookingClient({ premises, existingBookings, profile }: P
       evening: { start: '18:00', end: '23:00' },
     }
     const tm = timeMap[period] || { start: '08:00', end: '13:00' }
-    setSuccess(`✓ ${period} · ${selectedDate}`)
+    setSuccess(`OK ${period} - ${selectedDate}`)
     setCalendarUrl(buildCalendarUrl(selectedDate, tm.start, tm.end, getPremiseName(selectedPremise)))
     setTimeout(() => { setSuccess(''); setCalendarUrl('') }, 10000)
   }
@@ -168,9 +168,9 @@ export default function BookingClient({ premises, existingBookings, profile }: P
   const isChallenge = selectedPremise?.booking_type === 'challenge'
 
   const halfdayPeriods = [
-    { id: 'morning',   label: t('morning'),   time: '08:00–13:00' },
-    { id: 'afternoon', label: t('afternoon'), time: '13:00–18:00' },
-    { id: 'evening',   label: t('evening'),   time: '18:00–23:00' },
+    { id: 'morning',   label: t('morning'),   time: '08:00-13:00' },
+    { id: 'afternoon', label: t('afternoon'), time: '13:00-18:00' },
+    { id: 'evening',   label: t('evening'),   time: '18:00-23:00' },
   ]
 
   const invitePanel = !isChallenge && selectedPremise?.max_invite_slots ? (
@@ -298,9 +298,9 @@ export default function BookingClient({ premises, existingBookings, profile }: P
                                 }}>
                                 {status === 'free' ? t('tap_to_book') :
                                  status === 'mine' ? `${t('your_booking')} @${profile.apt_number}` :
-                                 status === 'taken' ? `@${booking?.apt_number} · ${t('taken')}` :
+                                 status === 'taken' ? `@${booking?.apt_number} - ${t('taken')}` :
                                  status === 'invite' ? `@${booking?.apt_number} ${t('open_invite_tag')}` :
-                                 `@${getGapCausingApt(slot.start, slot.end)} · ${t('gap_rule')}`}
+                                 `@${getGapCausingApt(slot.start, slot.end)} - ${t('gap_rule')}`}
                               </button>
                               {status === 'mine' && (
                                 <button onClick={() => booking && cancelBooking(booking.id)}
@@ -479,7 +479,7 @@ export default function BookingClient({ premises, existingBookings, profile }: P
                               }}>
                               {status === 'free' ? t('tap_to_book') :
                                status === 'mine' ? t('your_booking') :
-                               status === 'taken' ? `@${booking?.apt_number} · ${t('taken')}` :
+                               status === 'taken' ? `@${booking?.apt_number} - ${t('taken')}` :
                                status === 'invite' ? `@${booking?.apt_number} ${t('open_invite_tag')}` :
                                t('gap_rule')}
                             </button>
