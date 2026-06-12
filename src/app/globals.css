@@ -585,3 +585,9 @@ h1, h2, h3, h4 {
     display: none !important;
   }
 }
+
+/* Booking page responsive grid */
+@media (max-width: 700px) {
+  .booking-grid { grid-template-columns: 1fr !important; }
+  .booking-slot-grid { grid-template-columns: 1fr !important; }
+}

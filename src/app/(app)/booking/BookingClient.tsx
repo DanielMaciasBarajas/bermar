@@ -202,13 +202,7 @@ export default function BookingClient({ premises, existingBookings, profile }: P
 
   return (
     <div style={{ maxWidth: '960px', margin: '0 auto' }}>
-      {/* Desktop: 3-col | Mobile: single column stack */}
-      <style>{`
-        @media (max-width: 700px) {
-          .booking-grid { grid-template-columns: 1fr !important; }
-          .booking-slot-grid { grid-template-columns: 1fr !important; }
-        }
-      `}</style>
+      {/* 3-col on desktop: premises | calendar | timetable+invite */}
       <div className="booking-grid" style={{ display: 'grid', gridTemplateColumns: '200px 1fr 1fr', gap: '16px', alignItems: 'start' }}>
 
         {/* COL 1: Premises list */}
@@ -279,7 +273,7 @@ export default function BookingClient({ premises, existingBookings, profile }: P
               {/* SLOTS */}
               {!isHalfday && !isChallenge && (
                 <>
-                  <div className='booking-slot-grid' style={{ display: 'grid', gridTemplateColumns: invitePanel ? '1fr 180px' : '1fr', gap: '12px', alignItems: 'start' }}>
+                  <div className="booking-slot-grid" style={{ display: 'grid', gridTemplateColumns: invitePanel ? '1fr 180px' : '1fr', gap: '12px', alignItems: 'start' }}>
                     <div>
                       <div className="section-title" style={{ marginBottom: '6px' }}>{t('slots_header', { date: selectedDate })}</div>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
@@ -460,7 +454,7 @@ export default function BookingClient({ premises, existingBookings, profile }: P
 
               {/* SLOTS type — timetable + invite side by side */}
               {!isHalfday && !isChallenge && (
-                <div style={{ display: 'grid', gridTemplateColumns: invitePanel ? '1fr auto' : '1fr', gap: '12px', alignItems: 'start' }}>
+                <div className="booking-slot-grid" style={{ display: 'grid', gridTemplateColumns: invitePanel ? '1fr auto' : '1fr', gap: '12px', alignItems: 'start' }}>
                   <div>
                     <div className="section-title" style={{ marginBottom: '6px' }}>{t('slots_header', { date: selectedDate })}</div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
