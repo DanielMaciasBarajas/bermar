@@ -182,52 +182,68 @@ export default function EventsClient({ todayBookings, weekBookings, announcement
       )}
 
       {activeTab === 'notices' && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          {announcements.length === 0 && socialProposals.length === 0 && (
-            <div style={{ textAlign: 'center', padding: '48px 0', color: 'var(--txl)', fontSize: '13px' }}>
-              <div style={{ fontSize: '32px', marginBottom: '12px' }}>📋</div>
-              {t('no_notices')}
-            </div>
-          )}
-          {announcements.map(ann => {
-            const style = annTypeColors[ann.type] || annTypeColors.announcement
-            return (
-              <div key={ann.id} style={{ borderRadius: '16px', border: '1px solid ' + style.border, background: style.bg, padding: '16px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-                  <span style={{ fontSize: '10px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', color: style.color, background: 'rgba(255,255,255,0.6)', padding: '2px 8px', borderRadius: '999px', border: '1px solid ' + style.border }}>
-                    {style.label}
-                  </span>
-                  <span style={{ fontSize: '10px', color: 'var(--txl)' }}>{formatDate(ann.created_at, locale)}</span>
-                </div>
-                <div style={{ fontSize: '14px', fontWeight: 500, color: 'var(--tx)', marginBottom: ann.body ? '6px' : 0 }}>{ann.title}</div>
-                {ann.body && <div style={{ fontSize: '12px', color: 'var(--txm)', lineHeight: 1.5 }}>{ann.body}</div>}
-                {ann.meeting_date && (
-                  <div style={{ marginTop: '10px', fontSize: '12px', color: style.color, fontWeight: 500 }}>
-                    📅 {formatDate(ann.meeting_date, locale)}{ann.meeting_location ? ' - ' + ann.meeting_location : ''}
-                  </div>
-                )}
-                {ann.pdf_url && (
-                  <a href={ann.pdf_url} target="_blank" rel="noopener noreferrer"
-                    style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', marginTop: '10px', fontSize: '11px', color: style.color, textDecoration: 'none', fontWeight: 500 }}>
-                    📄 PDF
-                  </a>
-                )}
+        <div>
+          <style>{`
+            .cork-board { background: #c8a96e; background-image: radial-gradient(ellipse at 20% 30%, rgba(180,130,60,0.4) 0%, transparent 50%), radial-gradient(ellipse at 70% 60%, rgba(210,160,80,0.3) 0%, transparent 40%), repeating-linear-gradient(45deg, rgba(160,110,50,0.06) 0px, rgba(160,110,50,0.06) 2px, transparent 2px, transparent 8px), repeating-linear-gradient(-45deg, rgba(200,150,70,0.05) 0px, rgba(200,150,70,0.05) 2px, transparent 2px, transparent 8px); border-radius: 12px; border: 6px solid #8b6520; box-shadow: inset 0 2px 8px rgba(0,0,0,0.25); padding: 28px 20px 36px; }
+            .cork-frame { border: 3px solid #6b4e1a; border-radius: 8px; padding: 20px; background: #c09050; background-image: repeating-linear-gradient(90deg, rgba(140,90,30,0.07) 0px, rgba(140,90,30,0.07) 1px, transparent 1px, transparent 12px); box-shadow: inset 0 1px 6px rgba(0,0,0,0.2); }
+            .cork-title { font-size: 11px; font-weight: 600; color: #3d2a00; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 20px; text-align: center; }
+            .cork-notes { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 32px 16px; }
+            .cork-note { position: relative; padding: 14px 14px 18px; border-radius: 2px; box-shadow: 2px 3px 8px rgba(0,0,0,0.22); min-height: 110px; }
+            .cork-note.r-l { transform: rotate(-2.1deg); }
+            .cork-note.r-r { transform: rotate(1.8deg); }
+            .cork-note.r-t { transform: rotate(-0.7deg); }
+            .cork-note.r-m { transform: rotate(2.8deg); }
+            .cork-pin { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); width: 14px; height: 14px; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.4), inset 0 1px 2px rgba(255,255,255,0.3); z-index: 2; }
+            .cork-tag { display: inline-block; font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.6px; padding: 2px 6px; border-radius: 3px; margin-bottom: 6px; }
+            .cork-note-title { font-size: 13px; font-weight: 600; color: #2c2c2a; margin: 0 0 5px; line-height: 1.3; }
+            .cork-note-body { font-size: 11px; color: #555; line-height: 1.5; margin: 0 0 8px; }
+            .cork-note-meta { font-size: 10px; color: #888; margin: 0; }
+            .cork-empty { text-align: center; padding: 40px 0; color: #7a5c20; font-size: 13px; }
+          `}</style>
+          <div className="cork-board">
+            <div className="cork-frame">
+              <p className="cork-title">Bermar Park</p>
+              {announcements.length === 0 && socialProposals.length === 0 && (
+                <div className="cork-empty">{t('no_notices')}</div>
+              )}
+              <div className="cork-notes">
+                {announcements.map((ann, i) => {
+                  const rotations = ['r-l','r-r','r-t','r-m']
+                  const rot = rotations[i % 4]
+                  const pinColors = { warning: '#d32f2f', announcement: '#e65100', convocatoria: '#1565c0' }
+                  const pinColor = pinColors[ann.type as keyof typeof pinColors] || '#555'
+                  const bgColors = { warning: '#fff8e1', announcement: '#fffef0', convocatoria: '#e8f4fd' }
+                  const bg = bgColors[ann.type as keyof typeof bgColors] || '#fffef0'
+                  return (
+                    <div key={ann.id} className={'cork-note ' + rot} style={{ background: bg }}>
+                      <div className="cork-pin" style={{ background: pinColor }} />
+                      <span className="cork-tag" style={ann.type === 'warning' ? {background:'#fff3cd',color:'#856404',border:'1px solid #ffc107'} : ann.type === 'convocatoria' ? {background:'#cce5ff',color:'#004085',border:'1px solid #0d6efd'} : {background:'#fff3e0',color:'#7f3f00',border:'1px solid #ff8c00'}}>{t(ann.type as any)}</span>
+                      <p className="cork-note-title">{ann.title}</p>
+                      {ann.body && <p className="cork-note-body">{ann.body}</p>}
+                      {ann.meeting_date && <p className="cork-note-meta">📅 {formatDate(ann.meeting_date, locale)}{ann.meeting_location ? ' - ' + ann.meeting_location : ''}</p>}
+                      {ann.pdf_url && <a href={ann.pdf_url} target="_blank" rel="noopener noreferrer" style={{ fontSize: '10px', color: '#555', display: 'block', marginTop: '6px' }}>📄 PDF</a>}
+                      <p className="cork-note-meta">{formatDate(ann.created_at, locale)}</p>
+                    </div>
+                  )
+                })}
+                {socialProposals.map((p, i) => {
+                  const rotations = ['r-r','r-l','r-m','r-t']
+                  const rot = rotations[i % 4]
+                  const pinColors = ['#2e7d32','#f9a825','#7b1fa2','#c62828']
+                  const pinColor = pinColors[i % 4]
+                  return (
+                    <div key={p.id} className={'cork-note ' + rot} style={{ background: '#f0fff4' }}>
+                      <div className="cork-pin" style={{ background: pinColor }} />
+                      <span className="cork-tag" style={{ background: '#d4edda', color: '#155724', border: '1px solid #28a745' }}>{t(p.category as any)}</span>
+                      <p className="cork-note-title">{p.title}</p>
+                      <p className="cork-note-body">{p.body}</p>
+                      <p className="cork-note-meta">@{p.apt_number} - 👍 {p.supports} - 👎 {p.against}</p>
+                    </div>
+                  )
+                })}
               </div>
-            )
-          })}
-          {socialProposals.map(p => (
-            <div key={p.id} className="card">
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-                <span style={{ fontSize: '10px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', color: '#0f766e', background: '#f0fdfa', padding: '2px 8px', borderRadius: '999px', border: '1px solid #99f6e4' }}>
-                  {t(p.category as any)}
-                </span>
-                <span style={{ fontSize: '10px', color: 'var(--txl)' }}>@{p.apt_number} - {formatDate(p.created_at, locale)}</span>
-              </div>
-              <div style={{ fontSize: '14px', fontWeight: 500, color: 'var(--tx)', marginBottom: '4px' }}>{p.title}</div>
-              <div style={{ fontSize: '12px', color: 'var(--txm)', lineHeight: 1.5, marginBottom: '10px' }}>{p.body}</div>
-              <div style={{ fontSize: '11px', color: 'var(--txl)' }}>👍 {p.supports} - 👎 {p.against}</div>
             </div>
-          ))}
+          </div>
         </div>
       )}
     </div>
