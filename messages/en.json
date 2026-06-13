@@ -121,7 +121,12 @@
     "sort_most_support": "Most support",
     "sort_apt": "By apartment",
     "lang_nudge": "Post in as many languages as you can — neighbours read CA, ES, EN, FR, RU and more.",
-    "new_proposal_title": "New proposal"
+    "new_proposal_title": "New proposal",
+    "comments": "Comments",
+    "add_comment": "Add a comment...",
+    "post_comment": "Post",
+    "no_comments": "No comments yet.",
+    "delete_comment": "Delete"
   },
   "marketplace": {
     "post_listing": "+ Post listing",

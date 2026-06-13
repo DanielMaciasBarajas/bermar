@@ -121,7 +121,12 @@
     "sort_most_support": "Més suport",
     "sort_apt": "Per apartament",
     "lang_nudge": "Escriu en tants idiomes com puguis — els veïns llegeixen CA, ES, EN, FR, RU i més.",
-    "new_proposal_title": "Nova proposta"
+    "new_proposal_title": "Nova proposta",
+    "comments": "Comentaris",
+    "add_comment": "Afegeix un comentari...",
+    "post_comment": "Publicar",
+    "no_comments": "Sense comentaris encara.",
+    "delete_comment": "Eliminar"
   },
   "marketplace": {
     "post_listing": "+ Publicar anunci",

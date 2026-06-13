@@ -15,7 +15,8 @@ export default async function ProposalsPage() {
     .select(`
       *,
       votes:proposal_votes(vote, profile_id),
-      flags:proposal_flags(is_important, is_following, is_dismissed, last_read_at, profile_id)
+      flags:proposal_flags(is_important, is_following, is_dismissed, last_read_at, profile_id),
+      comments:proposal_comments(id, proposal_id, profile_id, apt_number, body, created_at)
     `)
     .eq('community_id', profile.community_id)
     .not('status', 'eq', 'archived')

@@ -121,7 +121,12 @@
     "sort_most_support": "Najvise podrske",
     "sort_apt": "Po stanu",
     "lang_nudge": "Pisi na sto vise jezika — komšije citaju CA, ES, EN, FR, RU i više.",
-    "new_proposal_title": "Novi predlog"
+    "new_proposal_title": "Novi predlog",
+    "comments": "Komentari",
+    "add_comment": "Dodaj komentar...",
+    "post_comment": "Objavi",
+    "no_comments": "Nema komentara jos.",
+    "delete_comment": "Obriši"
   },
   "marketplace": {
     "post_listing": "+ Постави оглас",

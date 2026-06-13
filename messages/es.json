@@ -121,7 +121,12 @@
     "sort_most_support": "Más apoyo",
     "sort_apt": "Por apartamento",
     "lang_nudge": "Escribe en tantos idiomas como puedas — los vecinos leen CA, ES, EN, FR, RU y más.",
-    "new_proposal_title": "Nueva propuesta"
+    "new_proposal_title": "Nueva propuesta",
+    "comments": "Comentarios",
+    "add_comment": "Añade un comentario...",
+    "post_comment": "Publicar",
+    "no_comments": "Sin comentarios todavía.",
+    "delete_comment": "Eliminar"
   },
   "marketplace": {
     "post_listing": "+ Publicar anuncio",

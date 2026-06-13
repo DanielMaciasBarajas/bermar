@@ -6,21 +6,23 @@ import { CATEGORY_LABELS, formatDate } from '@/lib/utils'
 import { useTranslations } from 'next-intl'
 import type { Profile } from '@/lib/supabase/types'
 
+interface Comment {
+  id: string; proposal_id: string; profile_id: string; apt_number: string; body: string; created_at: string
+}
 interface ProposalData {
   id: string; title: string; body: string; body_translations: any; category: string; status: string
   voting_closes_at: string | null; tagged_apts: string[]; tag_all: boolean; supports: number; against: number
   apt_number: string; created_at: string
   votes: { vote: string; profile_id: string }[]
   flags: { is_important: boolean; is_following: boolean; is_dismissed: boolean; last_read_at: string | null; profile_id: string }[]
-  comment_count: { count: number }[]
+  comments: Comment[]
 }
 
 const STATUS_TAG: Record<string, string> = { open: 'tag tag-green', voting: 'tag tag-amber', resolved: 'tag tag-gray', promoted: 'tag tag-blue', archived: 'tag tag-gray' }
 const CATEGORY_TAG: Record<string, string> = { social: 'tag tag-green', infrastructure: 'tag tag-blue', rules: 'tag tag-pine', complaint: 'tag tag-red', project: 'tag tag-amber', meeting: 'tag tag-gray', other: 'tag tag-gray' }
-
 type SortKey = 'newest' | 'oldest' | 'most_support' | 'apt'
 
-export default function ProposalsClient({ proposals, profile }: { proposals: ProposalData[]; profile: Profile & { preferred_lang?: string } }) {
+export default function ProposalsClient({ proposals: initialProposals, profile }: { proposals: ProposalData[]; profile: Profile & { preferred_lang?: string } }) {
   const lang = profile.preferred_lang || 'ES'
   const locale = lang.toLowerCase()
   const t = useTranslations('proposals')
@@ -39,6 +41,7 @@ export default function ProposalsClient({ proposals, profile }: { proposals: Pro
   }
 
   const supabase = createClient()
+  const [proposals, setProposals] = useState<ProposalData[]>(initialProposals)
   const [categoryFilter, setCategoryFilter] = useState('all')
   const [statusFilter, setStatusFilter] = useState('all')
   const [personalFilter, setPersonalFilter] = useState('all')
@@ -48,6 +51,9 @@ export default function ProposalsClient({ proposals, profile }: { proposals: Pro
   const [newBody, setNewBody] = useState('')
   const [newCategory, setNewCategory] = useState('infrastructure')
   const [saving, setSaving] = useState(false)
+  const [openComments, setOpenComments] = useState<string | null>(null)
+  const [commentTexts, setCommentTexts] = useState<Record<string, string>>({})
+  const [postingComment, setPostingComment] = useState(false)
 
   const statusLabel = (status: string) => {
     const map: Record<string, string> = {
@@ -76,21 +82,85 @@ export default function ProposalsClient({ proposals, profile }: { proposals: Pro
   })
 
   async function vote(proposalId: string, voteType: 'support' | 'against') {
-    const existing = proposals.find(p => p.id === proposalId)?.votes?.find(v => v.profile_id === profile.id)
-    if (existing) await supabase.from('proposal_votes').delete().eq('proposal_id', proposalId).eq('profile_id', profile.id)
-    else await supabase.from('proposal_votes').upsert({ proposal_id: proposalId, profile_id: profile.id, vote: voteType })
+    const proposal = proposals.find(p => p.id === proposalId)
+    if (!proposal) return
+    const existing = proposal.votes?.find(v => v.profile_id === profile.id)
+
+    // Optimistic update
+    setProposals(prev => prev.map(p => {
+      if (p.id !== proposalId) return p
+      let newVotes = p.votes?.filter(v => v.profile_id !== profile.id) || []
+      let newSupports = p.supports
+      let newAgainst = p.against
+      if (existing) {
+        if (existing.vote === 'support') newSupports--
+        else newAgainst--
+      }
+      if (!existing || existing.vote !== voteType) {
+        newVotes = [...newVotes, { vote: voteType, profile_id: profile.id }]
+        if (voteType === 'support') newSupports++
+        else newAgainst++
+      }
+      return { ...p, votes: newVotes, supports: newSupports, against: newAgainst }
+    }))
+
+    if (existing) {
+      if (existing.vote === voteType) {
+        await supabase.from('proposal_votes').delete().eq('proposal_id', proposalId).eq('profile_id', profile.id)
+      } else {
+        await supabase.from('proposal_votes').update({ vote: voteType }).eq('proposal_id', proposalId).eq('profile_id', profile.id)
+      }
+    } else {
+      await supabase.from('proposal_votes').upsert({ proposal_id: proposalId, profile_id: profile.id, vote: voteType })
+    }
   }
 
   async function setFlag(proposalId: string, field: 'is_important' | 'is_following' | 'is_dismissed', value: boolean) {
+    // Optimistic update
+    setProposals(prev => prev.map(p => {
+      if (p.id !== proposalId) return p
+      const existingFlag = p.flags?.find(f => f.profile_id === profile.id)
+      const newFlag = { ...existingFlag, profile_id: profile.id, [field]: value, is_important: false, is_following: false, is_dismissed: false }
+      const newFlags = [...(p.flags?.filter(f => f.profile_id !== profile.id) || []), newFlag]
+      return { ...p, flags: newFlags }
+    }))
     await supabase.from('proposal_flags').upsert({ proposal_id: proposalId, profile_id: profile.id, [field]: value })
+  }
+
+  async function postComment(proposalId: string) {
+    const body = commentTexts[proposalId]?.trim()
+    if (!body) return
+    setPostingComment(true)
+    const { data: newComment } = await supabase.from('proposal_comments').insert({
+      proposal_id: proposalId, profile_id: profile.id, apt_number: profile.apt_number, body,
+    }).select().single()
+    if (newComment) {
+      setProposals(prev => prev.map(p => {
+        if (p.id !== proposalId) return p
+        return { ...p, comments: [...(p.comments || []), newComment] }
+      }))
+      setCommentTexts(prev => ({ ...prev, [proposalId]: '' }))
+    }
+    setPostingComment(false)
+  }
+
+  async function deleteComment(proposalId: string, commentId: string) {
+    await supabase.from('proposal_comments').delete().eq('id', commentId)
+    setProposals(prev => prev.map(p => {
+      if (p.id !== proposalId) return p
+      return { ...p, comments: p.comments?.filter(c => c.id !== commentId) || [] }
+    }))
   }
 
   async function submitProposal(e: React.FormEvent) {
     e.preventDefault(); setSaving(true)
-    await supabase.from('proposals').insert({
+    const { data: newProposal } = await supabase.from('proposals').insert({
       community_id: profile.community_id, profile_id: profile.id, apt_number: profile.apt_number,
       title: newTitle, body: newBody, category: newCategory as any, status: 'open', tagged_apts: [], tag_all: false,
-    })
+    }).select().single()
+    if (newProposal) {
+      setProposals(prev => [{ ...newProposal, votes: [], flags: [], comments: [] }, ...prev])
+    }
     setShowNewForm(false); setNewTitle(''); setNewBody(''); setSaving(false)
   }
 
@@ -164,8 +234,10 @@ export default function ProposalsClient({ proposals, profile }: { proposals: Pro
         {filtered.map(p => {
           const myVote = p.votes?.find(v => v.profile_id === profile.id)
           const myFlag = p.flags?.find(f => f.profile_id === profile.id)
-          const commentCount = p.comment_count?.[0]?.count || 0
+          const comments = p.comments || []
+          const commentCount = comments.length
           const closesIn = p.voting_closes_at ? Math.ceil((new Date(p.voting_closes_at).getTime() - Date.now()) / (1000 * 60 * 60 * 24)) : null
+          const isCommentsOpen = openComments === p.id
 
           return (
             <div key={p.id} className="card">
@@ -173,11 +245,12 @@ export default function ProposalsClient({ proposals, profile }: { proposals: Pro
                 <span className={CATEGORY_TAG[p.category] || 'tag tag-gray'}>{getCategoryLabel(p.category)}</span>
                 <span className={STATUS_TAG[p.status] || 'tag tag-gray'}>{statusLabel(p.status)}</span>
                 <div style={{ marginLeft: 'auto', display: 'flex', gap: '4px' }}>
-                  <button onClick={() => setFlag(p.id, 'is_important', !myFlag?.is_important)} style={{ ...chipBase, padding: '2px 8px', background: myFlag?.is_important ? '#fee2e2' : 'transparent', color: myFlag?.is_important ? '#b91c1c' : 'var(--txl)', borderColor: myFlag?.is_important ? 'transparent' : 'var(--br)' }}>⭐</button>
-                  <button onClick={() => setFlag(p.id, 'is_following', !myFlag?.is_following)} style={{ ...chipBase, padding: '2px 8px', background: myFlag?.is_following ? '#dbeafe' : 'transparent', color: myFlag?.is_following ? '#1e40af' : 'var(--txl)', borderColor: myFlag?.is_following ? 'transparent' : 'var(--br)' }}>🔖</button>
-                  <button onClick={() => setFlag(p.id, 'is_dismissed', !myFlag?.is_dismissed)} style={{ ...chipBase, padding: '2px 8px', background: 'transparent', color: 'var(--txl)', borderColor: 'var(--br)' }}>🙈</button>
+                  <button title="Important" onClick={() => setFlag(p.id, 'is_important', !myFlag?.is_important)} style={{ ...chipBase, padding: '2px 8px', background: myFlag?.is_important ? '#fee2e2' : 'transparent', color: myFlag?.is_important ? '#b91c1c' : 'var(--txl)', borderColor: myFlag?.is_important ? '#fca5a5' : 'var(--br)' }}>⭐</button>
+                  <button title="Follow" onClick={() => setFlag(p.id, 'is_following', !myFlag?.is_following)} style={{ ...chipBase, padding: '2px 8px', background: myFlag?.is_following ? '#dbeafe' : 'transparent', color: myFlag?.is_following ? '#1e40af' : 'var(--txl)', borderColor: myFlag?.is_following ? '#bfdbfe' : 'var(--br)' }}>🔖</button>
+                  <button title="Dismiss" onClick={() => setFlag(p.id, 'is_dismissed', !myFlag?.is_dismissed)} style={{ ...chipBase, padding: '2px 8px', background: myFlag?.is_dismissed ? '#f3f4f6' : 'transparent', color: myFlag?.is_dismissed ? '#374151' : 'var(--txl)', borderColor: myFlag?.is_dismissed ? '#d1d5db' : 'var(--br)' }}>🙈</button>
                 </div>
               </div>
+
               <h3 style={{ fontSize: '13px', fontWeight: 500, color: 'var(--tx)', marginBottom: '4px' }}>{p.title}</h3>
               <div style={{ fontSize: '11px', color: 'var(--txm)', marginBottom: '6px' }}>
                 {t('by_apt', { apt: p.apt_number })} · {formatDate(p.created_at, locale)}
@@ -185,15 +258,16 @@ export default function ProposalsClient({ proposals, profile }: { proposals: Pro
                 {p.tag_all && <span> · <strong>@tots</strong></span>}
               </div>
               <p style={{ fontSize: '11px', color: 'var(--txm)', lineHeight: 1.5, marginBottom: '12px', whiteSpace: 'pre-line' }}>{getBody(p)}</p>
+
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                <button onClick={() => vote(p.id, 'support')} style={{ ...chipBase, background: myVote?.vote === 'support' ? '#dcfce7' : 'transparent', color: myVote?.vote === 'support' ? '#166534' : 'var(--txm)', borderColor: myVote?.vote === 'support' ? 'transparent' : 'var(--br)', fontWeight: myVote?.vote === 'support' ? 500 : 400, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <button onClick={() => vote(p.id, 'support')} style={{ ...chipBase, background: myVote?.vote === 'support' ? '#dcfce7' : 'transparent', color: myVote?.vote === 'support' ? '#166534' : 'var(--txm)', borderColor: myVote?.vote === 'support' ? '#86efac' : 'var(--br)', fontWeight: myVote?.vote === 'support' ? 500 : 400, display: 'flex', alignItems: 'center', gap: '4px' }}>
                   👍 {t('support')} ({p.supports})
                 </button>
-                <button onClick={() => vote(p.id, 'against')} style={{ ...chipBase, background: myVote?.vote === 'against' ? '#fee2e2' : 'transparent', color: myVote?.vote === 'against' ? '#991b1b' : 'var(--txm)', borderColor: myVote?.vote === 'against' ? 'transparent' : 'var(--br)', fontWeight: myVote?.vote === 'against' ? 500 : 400, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <button onClick={() => vote(p.id, 'against')} style={{ ...chipBase, background: myVote?.vote === 'against' ? '#fee2e2' : 'transparent', color: myVote?.vote === 'against' ? '#991b1b' : 'var(--txm)', borderColor: myVote?.vote === 'against' ? '#fca5a5' : 'var(--br)', fontWeight: myVote?.vote === 'against' ? 500 : 400, display: 'flex', alignItems: 'center', gap: '4px' }}>
                   👎 {t('against')} ({p.against})
                 </button>
-                <button style={{ ...chipBase, background: 'transparent', color: 'var(--txm)', borderColor: 'var(--br)', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  💬 {t('comment')} ({commentCount})
+                <button onClick={() => setOpenComments(isCommentsOpen ? null : p.id)} style={{ ...chipBase, background: isCommentsOpen ? '#f0fdf4' : 'transparent', color: isCommentsOpen ? 'var(--pine)' : 'var(--txm)', borderColor: isCommentsOpen ? 'var(--pine)' : 'var(--br)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  💬 {t('comments')} ({commentCount})
                 </button>
                 {closesIn !== null && closesIn > 0 && (
                   <span style={{ marginLeft: 'auto', fontSize: '11px', color: 'var(--txl)' }}>
@@ -201,6 +275,51 @@ export default function ProposalsClient({ proposals, profile }: { proposals: Pro
                   </span>
                 )}
               </div>
+
+              {/* Comment thread */}
+              {isCommentsOpen && (
+                <div style={{ marginTop: '12px', borderTop: '1px solid var(--br)', paddingTop: '12px' }}>
+                  {comments.length === 0 && (
+                    <p style={{ fontSize: '11px', color: 'var(--txl)', marginBottom: '10px' }}>{t('no_comments')}</p>
+                  )}
+                  {comments.map(c => (
+                    <div key={c.id} style={{ display: 'flex', gap: '8px', marginBottom: '10px', alignItems: 'flex-start' }}>
+                      <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: 'var(--pine)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '9px', fontWeight: 600, color: '#fff', flexShrink: 0 }}>
+                        {c.apt_number.slice(0,2)}
+                      </div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontSize: '10px', color: 'var(--txl)', marginBottom: '2px' }}>
+                          @{c.apt_number} · {formatDate(c.created_at, locale)}
+                          {c.profile_id === profile.id && (
+                            <button onClick={() => deleteComment(p.id, c.id)} style={{ marginLeft: '8px', fontSize: '10px', color: '#ef4444', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
+                              {t('delete_comment')}
+                            </button>
+                          )}
+                        </div>
+                        <p style={{ fontSize: '12px', color: 'var(--tx)', margin: 0, lineHeight: 1.4 }}>{c.body}</p>
+                      </div>
+                    </div>
+                  ))}
+                  <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
+                    <input
+                      value={commentTexts[p.id] || ''}
+                      onChange={e => setCommentTexts(prev => ({ ...prev, [p.id]: e.target.value }))}
+                      onKeyDown={e => e.key === 'Enter' && !e.shiftKey && postComment(p.id)}
+                      placeholder={t('add_comment')}
+                      className="form-input"
+                      style={{ flex: 1, fontSize: '12px' }}
+                    />
+                    <button
+                      onClick={() => postComment(p.id)}
+                      disabled={postingComment || !commentTexts[p.id]?.trim()}
+                      className="btn btn-primary btn-sm"
+                      style={{ opacity: postingComment ? 0.6 : 1 }}
+                    >
+                      {t('post_comment')}
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           )
         })}
