@@ -156,9 +156,7 @@
     "newest_first": "Најновији прво",
     "oldest_first": "Најстарији прво",
     "title_az": "Наслов А–Ж",
-    "by_category": "По категорији",
-    "no_documents": "Nema pronađenih dokumenata.",
-    "admin_hint": "Admin: otpremite dokumente i prevode putem Admin → kartica Dokumenti."
+    "by_category": "По категорији"
   },
   "maintenance": {
     "submit_ticket": "Пошаљи захтев за одржавање",
@@ -280,12 +278,27 @@
     "on_hold": "Na cekanju",
     "completed": "Završeno"
   },
-  "document_categories": {
-    "statutes": "Statut i pravila",
-    "minutes": "Zapisnici sastanaka",
-    "contracts": "Ugovori",
-    "projects": "Projekti",
-    "urban": "Urbanizam",
-    "other": "Ostalo"
+  "projects": {
+    "title": "Projekti",
+    "subtitle": "Aktivne inicijative — predlozi koji su postali pravi projekti",
+    "filter_all": "Svi statusi",
+    "sort_newest": "Najnoviji",
+    "sort_status": "Po statusu",
+    "sort_cost": "Po troskovima",
+    "no_projects": "Nema aktivnih projekata. Administrator moze promovisati odobrene predloge u projekte.",
+    "from_proposal": "Iz predloga",
+    "projected": "Planirano",
+    "actual": "Potroseno",
+    "quotes": "Ponude",
+    "provider": "Izvrsitelj",
+    "started": "Pocetak",
+    "est_completion": "Ocekivano zavrsenje",
+    "completed_on": "Zavrseno",
+    "progress_updates": "Azuriranja",
+    "admin_posted": "Admin @{apt}",
+    "latest": "Poslednje",
+    "add_photo": "📷 Dodaj foto",
+    "post_update": "📝 Objavi azuriranje",
+    "contract": "📎 Ugovor"
   }
 }

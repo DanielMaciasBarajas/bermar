@@ -156,9 +156,7 @@
     "newest_first": "Más recientes primero",
     "oldest_first": "Más antiguos primero",
     "title_az": "Título A–Z",
-    "by_category": "Por categoría",
-    "no_documents": "No se encontraron documentos.",
-    "admin_hint": "Admin: sube documentos y traducciones en Admin → pestaña Documentos."
+    "by_category": "Por categoría"
   },
   "maintenance": {
     "submit_ticket": "Envía una incidencia de mantenimiento",
@@ -280,12 +278,27 @@
     "on_hold": "En espera",
     "completed": "Completado"
   },
-  "document_categories": {
-    "statutes": "Estatutos y normas",
-    "minutes": "Actas de reuniones",
-    "contracts": "Contratos",
-    "projects": "Proyectos",
-    "urban": "Urbanismo",
-    "other": "Otros"
+  "projects": {
+    "title": "Proyectos",
+    "subtitle": "Iniciativas activas — propuestas que se convirtieron en proyectos reales",
+    "filter_all": "Todos los estados",
+    "sort_newest": "Más recientes",
+    "sort_status": "Por estado",
+    "sort_cost": "Por coste",
+    "no_projects": "No hay proyectos activos aún. El administrador puede promover propuestas aprobadas a proyectos.",
+    "from_proposal": "Desde propuesta",
+    "projected": "Proyectado",
+    "actual": "Gastado hasta ahora",
+    "quotes": "Presupuestos",
+    "provider": "Proveedor",
+    "started": "Inicio",
+    "est_completion": "Fin estimado",
+    "completed_on": "Completado",
+    "progress_updates": "Actualizaciones",
+    "admin_posted": "Admin @{apt}",
+    "latest": "Último",
+    "add_photo": "📷 Añadir foto",
+    "post_update": "📝 Publicar actualización",
+    "contract": "📎 Contrato"
   }
 }

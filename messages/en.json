@@ -156,9 +156,7 @@
     "newest_first": "Newest first",
     "oldest_first": "Oldest first",
     "title_az": "Title A–Z",
-    "by_category": "By category",
-    "no_documents": "No documents found.",
-    "admin_hint": "Admin: upload documents and translations via Admin → Documents tab."
+    "by_category": "By category"
   },
   "maintenance": {
     "submit_ticket": "Submit a maintenance ticket",
@@ -280,12 +278,27 @@
     "on_hold": "On hold",
     "completed": "Completed"
   },
-  "document_categories": {
-    "statutes": "Statutes & rules",
-    "minutes": "Meeting minutes",
-    "contracts": "Contracts",
-    "projects": "Projects",
-    "urban": "Urban development",
-    "other": "Other"
+  "projects": {
+    "title": "Projects",
+    "subtitle": "Active initiatives — proposals that became real projects",
+    "filter_all": "All statuses",
+    "sort_newest": "Newest first",
+    "sort_status": "By status",
+    "sort_cost": "By cost",
+    "no_projects": "No active projects yet. Approved proposals can be promoted to projects by the community admin.",
+    "from_proposal": "From proposal",
+    "projected": "Projected",
+    "actual": "Actual to date",
+    "quotes": "Quotes",
+    "provider": "Provider",
+    "started": "Started",
+    "est_completion": "Est. completion",
+    "completed_on": "Completed",
+    "progress_updates": "Progress updates",
+    "admin_posted": "Admin @{apt}",
+    "latest": "Latest",
+    "add_photo": "📷 Add status photo",
+    "post_update": "📝 Post update",
+    "contract": "📎 Contract"
   }
 }

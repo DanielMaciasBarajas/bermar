@@ -156,9 +156,7 @@
     "newest_first": "Plus récents d'abord",
     "oldest_first": "Plus anciens d'abord",
     "title_az": "Titre A–Z",
-    "by_category": "Par catégorie",
-    "no_documents": "Aucun document trouvé.",
-    "admin_hint": "Admin : téléversez des documents et traductions via Admin → onglet Documents."
+    "by_category": "Par catégorie"
   },
   "maintenance": {
     "submit_ticket": "Soumettre un ticket de maintenance",
@@ -280,12 +278,27 @@
     "on_hold": "En attente",
     "completed": "Terminé"
   },
-  "document_categories": {
-    "statutes": "Statuts et règles",
-    "minutes": "Procès-verbaux",
-    "contracts": "Contrats",
-    "projects": "Projets",
-    "urban": "Urbanisme",
-    "other": "Autres"
+  "projects": {
+    "title": "Projets",
+    "subtitle": "Initiatives actives — propositions devenues de vrais projets",
+    "filter_all": "Tous les statuts",
+    "sort_newest": "Plus récents",
+    "sort_status": "Par statut",
+    "sort_cost": "Par coût",
+    "no_projects": "Aucun projet actif pour l'instant. L'administrateur peut promouvoir des propositions approuvées en projets.",
+    "from_proposal": "Depuis proposition",
+    "projected": "Prévu",
+    "actual": "Dépensé à ce jour",
+    "quotes": "Devis",
+    "provider": "Prestataire",
+    "started": "Début",
+    "est_completion": "Fin estimée",
+    "completed_on": "Terminé",
+    "progress_updates": "Mises à jour",
+    "admin_posted": "Admin @{apt}",
+    "latest": "Dernier",
+    "add_photo": "📷 Ajouter une photo",
+    "post_update": "📝 Publier une mise à jour",
+    "contract": "📎 Contrat"
   }
 }

@@ -156,9 +156,7 @@
     "newest_first": "Més recents primer",
     "oldest_first": "Més antics primer",
     "title_az": "Títol A–Z",
-    "by_category": "Per categoria",
-    "no_documents": "No s'han trobat documents.",
-    "admin_hint": "Admin: puja documents i traduccions a Admin → pestanya Documents."
+    "by_category": "Per categoria"
   },
   "maintenance": {
     "submit_ticket": "Envia una incidència de manteniment",
@@ -280,12 +278,27 @@
     "on_hold": "En espera",
     "completed": "Completat"
   },
-  "document_categories": {
-    "statutes": "Estatuts i normes",
-    "minutes": "Actes de reunions",
-    "contracts": "Contractes",
-    "projects": "Projectes",
-    "urban": "Urbanisme",
-    "other": "Altres"
+  "projects": {
+    "title": "Projectes",
+    "subtitle": "Iniciatives actives — propostes que es van convertir en projectes reals",
+    "filter_all": "Tots els estats",
+    "sort_newest": "Més recents",
+    "sort_status": "Per estat",
+    "sort_cost": "Per cost",
+    "no_projects": "Encara no hi ha projectes actius. L'administrador pot promoure propostes aprovades a projectes.",
+    "from_proposal": "Des de proposta",
+    "projected": "Previst",
+    "actual": "Gastat fins ara",
+    "quotes": "Pressupostos",
+    "provider": "Proveïdor",
+    "started": "Inici",
+    "est_completion": "Fi estimada",
+    "completed_on": "Completat",
+    "progress_updates": "Actualitzacions",
+    "admin_posted": "Admin @{apt}",
+    "latest": "Darrer",
+    "add_photo": "📷 Afegir foto",
+    "post_update": "📝 Publicar actualització",
+    "contract": "📎 Contracte"
   }
 }
