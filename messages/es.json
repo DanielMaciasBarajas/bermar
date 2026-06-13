@@ -278,27 +278,21 @@
     "on_hold": "En espera",
     "completed": "Completado"
   },
-  "projects": {
-    "title": "Proyectos",
-    "subtitle": "Iniciativas activas — propuestas que se convirtieron en proyectos reales",
-    "filter_all": "Todos los estados",
-    "sort_newest": "Más recientes",
-    "sort_status": "Por estado",
-    "sort_cost": "Por coste",
-    "no_projects": "No hay proyectos activos aún. El administrador puede promover propuestas aprobadas a proyectos.",
-    "from_proposal": "Desde propuesta",
-    "projected": "Proyectado",
-    "actual": "Gastado hasta ahora",
-    "quotes": "Presupuestos",
-    "provider": "Proveedor",
-    "started": "Inicio",
-    "est_completion": "Fin estimado",
-    "completed_on": "Completado",
-    "progress_updates": "Actualizaciones",
-    "admin_posted": "Admin @{apt}",
-    "latest": "Último",
-    "add_photo": "📷 Añadir foto",
-    "post_update": "📝 Publicar actualización",
-    "contract": "📎 Contrato"
+  "directory": {
+    "title": "Directorio",
+    "building": "Directorio del edificio — Bermar 6 & 8",
+    "registered_count": "{registered} de {total} registrados",
+    "hover_hint": "Toca una celda para ver los ocupantes",
+    "legend_registered": "Registrado",
+    "legend_unregistered": "No registrado",
+    "legend_opted_out": "Privado",
+    "legend_duplex": "dúplex",
+    "opted_out": "Privado",
+    "emergency_contacts": "Contactos de emergencia",
+    "no_emergency": "Contactos de emergencia aún no configurados. El administrador los añadirá.",
+    "your_profile": "Tu perfil en el directorio",
+    "visible": "Visible en el directorio",
+    "hidden": "Oculto del directorio",
+    "change_visibility": "Para cambiar tu visibilidad, ve a Ajustes → Privacidad."
   }
 }

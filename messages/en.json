@@ -278,27 +278,21 @@
     "on_hold": "On hold",
     "completed": "Completed"
   },
-  "projects": {
-    "title": "Projects",
-    "subtitle": "Active initiatives — proposals that became real projects",
-    "filter_all": "All statuses",
-    "sort_newest": "Newest first",
-    "sort_status": "By status",
-    "sort_cost": "By cost",
-    "no_projects": "No active projects yet. Approved proposals can be promoted to projects by the community admin.",
-    "from_proposal": "From proposal",
-    "projected": "Projected",
-    "actual": "Actual to date",
-    "quotes": "Quotes",
-    "provider": "Provider",
-    "started": "Started",
-    "est_completion": "Est. completion",
-    "completed_on": "Completed",
-    "progress_updates": "Progress updates",
-    "admin_posted": "Admin @{apt}",
-    "latest": "Latest",
-    "add_photo": "📷 Add status photo",
-    "post_update": "📝 Post update",
-    "contract": "📎 Contract"
+  "directory": {
+    "title": "Directory",
+    "building": "Building directory — Bermar 6 & 8",
+    "registered_count": "{registered} of {total} registered",
+    "hover_hint": "Tap a cell to see occupants",
+    "legend_registered": "Registered",
+    "legend_unregistered": "Unregistered",
+    "legend_opted_out": "Opted out",
+    "legend_duplex": "duplex",
+    "opted_out": "Opted out",
+    "emergency_contacts": "Emergency contacts",
+    "no_emergency": "Emergency contacts not yet configured. Admin will add them.",
+    "your_profile": "Your profile in directory",
+    "visible": "Visible in directory",
+    "hidden": "Hidden from directory",
+    "change_visibility": "To change your visibility, go to Settings → Privacy."
   }
 }

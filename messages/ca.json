@@ -278,27 +278,21 @@
     "on_hold": "En espera",
     "completed": "Completat"
   },
-  "projects": {
-    "title": "Projectes",
-    "subtitle": "Iniciatives actives — propostes que es van convertir en projectes reals",
-    "filter_all": "Tots els estats",
-    "sort_newest": "Més recents",
-    "sort_status": "Per estat",
-    "sort_cost": "Per cost",
-    "no_projects": "Encara no hi ha projectes actius. L'administrador pot promoure propostes aprovades a projectes.",
-    "from_proposal": "Des de proposta",
-    "projected": "Previst",
-    "actual": "Gastat fins ara",
-    "quotes": "Pressupostos",
-    "provider": "Proveïdor",
-    "started": "Inici",
-    "est_completion": "Fi estimada",
-    "completed_on": "Completat",
-    "progress_updates": "Actualitzacions",
-    "admin_posted": "Admin @{apt}",
-    "latest": "Darrer",
-    "add_photo": "📷 Afegir foto",
-    "post_update": "📝 Publicar actualització",
-    "contract": "📎 Contracte"
+  "directory": {
+    "title": "Directori",
+    "building": "Directori de l'edifici — Bermar 6 & 8",
+    "registered_count": "{registered} de {total} registrats",
+    "hover_hint": "Toca una cel·la per veure els ocupants",
+    "legend_registered": "Registrat",
+    "legend_unregistered": "No registrat",
+    "legend_opted_out": "Privat",
+    "legend_duplex": "dúplex",
+    "opted_out": "Privat",
+    "emergency_contacts": "Contactes d'emergència",
+    "no_emergency": "Contactes d'emergència encara no configurats. L'administrador els afegirà.",
+    "your_profile": "El teu perfil al directori",
+    "visible": "Visible al directori",
+    "hidden": "Ocult del directori",
+    "change_visibility": "Per canviar la teva visibilitat, ves a Configuració → Privacitat."
   }
 }

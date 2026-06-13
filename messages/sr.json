@@ -278,27 +278,21 @@
     "on_hold": "Na cekanju",
     "completed": "Završeno"
   },
-  "projects": {
-    "title": "Projekti",
-    "subtitle": "Aktivne inicijative — predlozi koji su postali pravi projekti",
-    "filter_all": "Svi statusi",
-    "sort_newest": "Najnoviji",
-    "sort_status": "Po statusu",
-    "sort_cost": "Po troskovima",
-    "no_projects": "Nema aktivnih projekata. Administrator moze promovisati odobrene predloge u projekte.",
-    "from_proposal": "Iz predloga",
-    "projected": "Planirano",
-    "actual": "Potroseno",
-    "quotes": "Ponude",
-    "provider": "Izvrsitelj",
-    "started": "Pocetak",
-    "est_completion": "Ocekivano zavrsenje",
-    "completed_on": "Zavrseno",
-    "progress_updates": "Azuriranja",
-    "admin_posted": "Admin @{apt}",
-    "latest": "Poslednje",
-    "add_photo": "📷 Dodaj foto",
-    "post_update": "📝 Objavi azuriranje",
-    "contract": "📎 Ugovor"
+  "directory": {
+    "title": "Imenik",
+    "building": "Imenik zgrade — Bermar 6 & 8",
+    "registered_count": "{registered} od {total} registrovanih",
+    "hover_hint": "Dodirnite celiju da vidite stanare",
+    "legend_registered": "Registrovan",
+    "legend_unregistered": "Nije registrovan",
+    "legend_opted_out": "Privatan",
+    "legend_duplex": "dupleks",
+    "opted_out": "Privatan",
+    "emergency_contacts": "Kontakti za hitne slucajeve",
+    "no_emergency": "Kontakti za hitne slucajeve nisu konfigurisani. Administrator ce ih dodati.",
+    "your_profile": "Vas profil u imeniku",
+    "visible": "Vidljiv u imeniku",
+    "hidden": "Skriven iz imenika",
+    "change_visibility": "Da promenite vidljivost, idite na Podesavanja → Privatnost."
   }
 }
