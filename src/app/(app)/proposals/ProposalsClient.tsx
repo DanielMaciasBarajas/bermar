@@ -13,7 +13,7 @@ interface Comment {
 interface ProposalData {
   id: string; title: string; body: string; body_translations: any; category: string; status: string
   voting_closes_at: string | null; tagged_apts: string[]; tag_all: boolean; supports: number; against: number
-  apt_number: string; created_at: string
+  apt_number: string; created_at: string; photo_url?: string | null
   votes: { vote: string; profile_id: string }[]
   flags: { is_important: boolean; is_following: boolean; is_dismissed: boolean; last_read_at: string | null; profile_id: string }[]
   comments: Comment[]
@@ -53,6 +53,8 @@ export default function ProposalsClient({ proposals: initialProposals, profile }
   const [newTitle, setNewTitle] = useState('')
   const [newBody, setNewBody] = useState('')
   const [newCategory, setNewCategory] = useState('infrastructure')
+  const [newPhoto, setNewPhoto] = useState<File | null>(null)
+  const [newPhotoPreview, setNewPhotoPreview] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
   const [openComments, setOpenComments] = useState<string | null>(null)
   const [commentTexts, setCommentTexts] = useState<Record<string, string>>({})
@@ -74,6 +76,18 @@ export default function ProposalsClient({ proposals: initialProposals, profile }
     if (!file) return
     setCommentPhotos(prev => ({ ...prev, [proposalId]: file }))
     setCommentPhotoPreviews(prev => ({ ...prev, [proposalId]: URL.createObjectURL(file) }))
+  }
+
+  function pickNewPhoto(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setNewPhoto(file)
+    setNewPhotoPreview(URL.createObjectURL(file))
+  }
+
+  function clearNewPhoto() {
+    setNewPhoto(null)
+    setNewPhotoPreview(null)
   }
 
   // ── Filtered + sorted list ──────────────────────────────
@@ -173,14 +187,42 @@ export default function ProposalsClient({ proposals: initialProposals, profile }
     setProposals(prev => prev.map(p => p.id !== proposalId ? p : { ...p, comments: p.comments?.filter(c => c.id !== commentId) || [] }))
   }
 
+  async function deleteProposal(proposalId: string) {
+    if (!confirm(t('delete_proposal_confirm'))) return
+    await supabase.from('proposals').delete().eq('id', proposalId)
+    setProposals(prev => prev.filter(p => p.id !== proposalId))
+  }
+
   async function submitProposal(e: React.FormEvent) {
-    e.preventDefault(); setSaving(true)
+    e.preventDefault()
+    if (!newTitle.trim() || !newBody.trim()) return
+    setSaving(true)
+
+    // Upload photo if provided
+    let photo_url: string | null = null
+    if (newPhoto) {
+      const ext = newPhoto.name.split('.').pop()
+      const path = profile.community_id + '/proposal-' + Date.now() + '.' + ext
+      const { error: uploadError } = await supabase.storage.from('proposals').upload(path, newPhoto, { upsert: false, contentType: newPhoto.type })
+      if (!uploadError) {
+        const { data: urlData } = supabase.storage.from('proposals').getPublicUrl(path)
+        photo_url = urlData.publicUrl
+      }
+    }
+
     const { data: newProposal } = await supabase.from('proposals').insert({
       community_id: profile.community_id, profile_id: profile.id, apt_number: profile.apt_number,
-      title: newTitle, body: newBody, category: newCategory as any, status: 'open', tagged_apts: [], tag_all: false,
+      title: newTitle, body: newBody, category: newCategory as any, status: 'open',
+      tagged_apts: [], tag_all: false, photo_url,
     }).select().single()
+
     if (newProposal) setProposals(prev => [{ ...newProposal, votes: [], flags: [], comments: [] }, ...prev])
-    setShowNewForm(false); setNewTitle(''); setNewBody(''); setSaving(false)
+    setShowNewForm(false)
+    setNewTitle('')
+    setNewBody('')
+    setNewPhoto(null)
+    setNewPhotoPreview(null)
+    setSaving(false)
   }
 
   // ── Styles ──────────────────────────────────────────────
@@ -244,11 +286,30 @@ export default function ProposalsClient({ proposals: initialProposals, profile }
             </select>
             <input required value={newTitle} onChange={e => setNewTitle(e.target.value)} placeholder={t('title_placeholder')} className="form-input" />
             <textarea required value={newBody} onChange={e => setNewBody(e.target.value)} placeholder={t('body_placeholder')} rows={4} className="form-textarea" />
+
+            {/* Photo upload for new proposal */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <label style={{ fontSize: '12px', color: 'var(--txm)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 12px', border: '1px dashed var(--br)', borderRadius: '8px' }}>
+                📷 {t('add_photo')}
+                <input type="file" accept="image/*" onChange={pickNewPhoto} style={{ display: 'none' }} />
+              </label>
+              {newPhotoPreview && (
+                <div style={{ position: 'relative', display: 'inline-block' }}>
+                  <img src={newPhotoPreview} alt="" style={{ width: '72px', height: '48px', objectFit: 'cover', borderRadius: '8px', border: '1px solid var(--br)' }} />
+                  <button
+                    onClick={clearNewPhoto}
+                    style={{ position: 'absolute', top: '-5px', right: '-5px', background: 'var(--tx)', color: 'var(--bg)', border: 'none', borderRadius: '50%', width: '16px', height: '16px', fontSize: '9px', cursor: 'pointer', lineHeight: '16px', textAlign: 'center' }}>
+                    x
+                  </button>
+                </div>
+              )}
+            </div>
+
             <div style={{ display: 'flex', gap: '8px' }}>
               <button onClick={submitProposal} disabled={saving} className="btn btn-primary" style={{ opacity: saving ? 0.6 : 1 }}>
                 {saving ? tc('saving') : t('post_proposal')}
               </button>
-              <button onClick={() => setShowNewForm(false)} className="btn">{tc('cancel')}</button>
+              <button onClick={() => { setShowNewForm(false); clearNewPhoto() }} className="btn">{tc('cancel')}</button>
             </div>
           </div>
         </div>
@@ -265,6 +326,7 @@ export default function ProposalsClient({ proposals: initialProposals, profile }
           const comments = p.comments || []
           const closesIn = p.voting_closes_at ? Math.ceil((new Date(p.voting_closes_at).getTime() - Date.now()) / (1000 * 60 * 60 * 24)) : null
           const isCommentsOpen = openComments === p.id
+          const isOwner = p.apt_number === profile.apt_number
 
           return (
             <div key={p.id} className="card">
@@ -292,6 +354,15 @@ export default function ProposalsClient({ proposals: initialProposals, profile }
                     style={{ ...chipBase, padding: '2px 8px', background: myFlag?.is_dismissed ? '#f3f4f6' : 'transparent', color: myFlag?.is_dismissed ? '#374151' : 'var(--txl)', borderColor: myFlag?.is_dismissed ? '#d1d5db' : 'var(--br)' }}>
                     🙈
                   </button>
+                  {/* Delete own proposal */}
+                  {isOwner && (
+                    <button
+                      title={t('delete_proposal')}
+                      onClick={() => deleteProposal(p.id)}
+                      style={{ ...chipBase, padding: '2px 8px', background: 'transparent', color: '#ef4444', borderColor: 'var(--br)' }}>
+                      🗑
+                    </button>
+                  )}
                 </div>
               </div>
 
@@ -303,6 +374,11 @@ export default function ProposalsClient({ proposals: initialProposals, profile }
                 {p.tag_all && <span> · <strong>@tots</strong></span>}
               </div>
               <p style={{ fontSize: '11px', color: 'var(--txm)', lineHeight: 1.5, marginBottom: '12px', whiteSpace: 'pre-line' }}>{getBody(p)}</p>
+
+              {/* Proposal photo */}
+              {p.photo_url && (
+                <img src={p.photo_url} alt="" style={{ width: '100%', maxHeight: '240px', objectFit: 'cover', borderRadius: '10px', marginBottom: '12px', border: '1px solid var(--br)' }} />
+              )}
 
               {/* Vote + comment buttons */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
