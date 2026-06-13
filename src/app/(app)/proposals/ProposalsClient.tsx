@@ -15,11 +15,14 @@ interface ProposalData {
   comment_count: { count: number }[]
 }
 
-const STATUS_TAG: Record<string, string> = { open: 'tag tag-green', voting: 'tag tag-amber', resolved: 'tag tag-gray', promoted: 'tag tag-blue' }
+const STATUS_TAG: Record<string, string> = { open: 'tag tag-green', voting: 'tag tag-amber', resolved: 'tag tag-gray', promoted: 'tag tag-blue', archived: 'tag tag-gray' }
 const CATEGORY_TAG: Record<string, string> = { social: 'tag tag-green', infrastructure: 'tag tag-blue', rules: 'tag tag-pine', complaint: 'tag tag-red', project: 'tag tag-amber', meeting: 'tag tag-gray', other: 'tag tag-gray' }
+
+type SortKey = 'newest' | 'oldest' | 'most_support' | 'apt'
 
 export default function ProposalsClient({ proposals, profile }: { proposals: ProposalData[]; profile: Profile & { preferred_lang?: string } }) {
   const lang = profile.preferred_lang || 'ES'
+  const locale = lang.toLowerCase()
   const t = useTranslations('proposals')
   const tc = useTranslations('common')
 
@@ -34,11 +37,20 @@ export default function ProposalsClient({ proposals, profile }: { proposals: Pro
   const [categoryFilter, setCategoryFilter] = useState('all')
   const [statusFilter, setStatusFilter] = useState('all')
   const [personalFilter, setPersonalFilter] = useState('all')
+  const [sortKey, setSortKey] = useState<SortKey>('newest')
   const [showNewForm, setShowNewForm] = useState(false)
   const [newTitle, setNewTitle] = useState('')
   const [newBody, setNewBody] = useState('')
   const [newCategory, setNewCategory] = useState('infrastructure')
   const [saving, setSaving] = useState(false)
+
+  const statusLabel = (status: string) => {
+    const map: Record<string, string> = {
+      open: t('status_open'), voting: t('status_voting'), resolved: t('status_resolved'),
+      archived: t('status_archived'), promoted: t('status_promoted'),
+    }
+    return map[status] || status
+  }
 
   const filtered = proposals.filter(p => {
     const myFlag = p.flags?.find(f => f.profile_id === profile.id)
@@ -50,6 +62,12 @@ export default function ProposalsClient({ proposals, profile }: { proposals: Pro
     if (categoryFilter !== 'all' && p.category !== categoryFilter) return false
     if (statusFilter !== 'all' && p.status !== statusFilter) return false
     return true
+  }).sort((a, b) => {
+    if (sortKey === 'newest') return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    if (sortKey === 'oldest') return new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+    if (sortKey === 'most_support') return b.supports - a.supports
+    if (sortKey === 'apt') return a.apt_number.localeCompare(b.apt_number)
+    return 0
   })
 
   async function vote(proposalId: string, voteType: 'support' | 'against') {
@@ -73,6 +91,21 @@ export default function ProposalsClient({ proposals, profile }: { proposals: Pro
 
   const chipBase: React.CSSProperties = { padding: '4px 10px', borderRadius: '999px', fontSize: '11px', border: '1px solid', cursor: 'pointer', transition: 'all 0.15s' }
 
+  const personalFilters = [
+    { key: 'all', label: t('all') },
+    { key: 'unread', label: t('unread') },
+    { key: 'important', label: t('important') },
+    { key: 'following', label: t('following') },
+    { key: 'dismissed', label: t('dismissed') },
+  ]
+
+  const sortOptions: { key: SortKey; label: string }[] = [
+    { key: 'newest', label: t('sort_newest') },
+    { key: 'oldest', label: t('sort_oldest') },
+    { key: 'most_support', label: t('sort_most_support') },
+    { key: 'apt', label: t('sort_apt') },
+  ]
+
   return (
     <div style={{ maxWidth: '720px', margin: '0 auto' }}>
       <div style={{ display: 'flex', gap: '8px', marginBottom: '10px', flexWrap: 'wrap', alignItems: 'center' }}>
@@ -82,37 +115,38 @@ export default function ProposalsClient({ proposals, profile }: { proposals: Pro
         </select>
         <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} className="form-select" style={{ width: 'auto' }}>
           <option value="all">{t('all_statuses')}</option>
-          <option value="open">Open</option>
-          <option value="voting">Voting active</option>
-          <option value="resolved">Resolved</option>
+          <option value="open">{t('status_open')}</option>
+          <option value="voting">{t('status_voting')}</option>
+          <option value="resolved">{t('status_resolved')}</option>
+        </select>
+        <select value={sortKey} onChange={e => setSortKey(e.target.value as SortKey)} className="form-select" style={{ width: 'auto' }}>
+          {sortOptions.map(o => <option key={o.key} value={o.key}>{o.label}</option>)}
         </select>
         <button onClick={() => setShowNewForm(true)} className="btn btn-primary btn-sm" style={{ marginLeft: 'auto' }}>{t('new_proposal')}</button>
       </div>
 
       <div style={{ display: 'flex', gap: '6px', marginBottom: '10px', flexWrap: 'wrap' }}>
-        {[{ key: 'all', label: 'All' }, { key: 'unread', label: 'Unread' }, { key: 'important', label: '⭐ Important' }, { key: 'following', label: '🔖 Following' }, { key: 'dismissed', label: 'Dismissed' }].map(f => (
+        {personalFilters.map(f => (
           <button key={f.key} onClick={() => setPersonalFilter(f.key)} style={{ ...chipBase, background: personalFilter === f.key ? 'var(--pine)' : '#fff', color: personalFilter === f.key ? '#fff' : 'var(--txm)', borderColor: personalFilter === f.key ? 'var(--pine)' : 'var(--br)' }}>
             {f.label}
           </button>
         ))}
       </div>
 
-      <div className="lang-nudge" style={{ marginBottom: '12px' }}>
-        🌐 Post in as many languages as you can — neighbours read CA, ES, EN, FR, RU, DE, UK and more.
-      </div>
+      <div className="lang-nudge" style={{ marginBottom: '12px' }}>{t('lang_nudge')}</div>
 
       {showNewForm && (
         <div className="card" style={{ marginBottom: '16px' }}>
-          <h3 style={{ fontSize: '13px', fontWeight: 500, color: 'var(--tx)', marginBottom: '12px' }}>New proposal</h3>
+          <h3 style={{ fontSize: '13px', fontWeight: 500, color: 'var(--tx)', marginBottom: '12px' }}>{t('new_proposal_title')}</h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
             <select value={newCategory} onChange={e => setNewCategory(e.target.value)} className="form-select">
               {Object.entries(CATEGORY_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
             </select>
-            <input required value={newTitle} onChange={e => setNewTitle(e.target.value)} placeholder="Title — clear and specific" className="form-input" />
-            <textarea required value={newBody} onChange={e => setNewBody(e.target.value)} placeholder="Describe your proposal. Add translations: ES: ... · FR: ..." rows={4} className="form-textarea" />
+            <input required value={newTitle} onChange={e => setNewTitle(e.target.value)} placeholder={t('title_placeholder')} className="form-input" />
+            <textarea required value={newBody} onChange={e => setNewBody(e.target.value)} placeholder={t('body_placeholder')} rows={4} className="form-textarea" />
             <div style={{ display: 'flex', gap: '8px' }}>
               <button onClick={submitProposal} disabled={saving} className="btn btn-primary" style={{ opacity: saving ? 0.6 : 1 }}>
-                {saving ? tc('saving') : 'Post proposal'}
+                {saving ? tc('saving') : t('post_proposal')}
               </button>
               <button onClick={() => setShowNewForm(false)} className="btn">{tc('cancel')}</button>
             </div>
@@ -121,7 +155,7 @@ export default function ProposalsClient({ proposals, profile }: { proposals: Pro
       )}
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-        {filtered.length === 0 && <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--txl)', fontSize: '13px' }}>No proposals match your filters.</div>}
+        {filtered.length === 0 && <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--txl)', fontSize: '13px' }}>{t('no_proposals')}</div>}
         {filtered.map(p => {
           const myVote = p.votes?.find(v => v.profile_id === profile.id)
           const myFlag = p.flags?.find(f => f.profile_id === profile.id)
@@ -132,7 +166,7 @@ export default function ProposalsClient({ proposals, profile }: { proposals: Pro
             <div key={p.id} className="card">
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: '6px', marginBottom: '8px', flexWrap: 'wrap' }}>
                 <span className={CATEGORY_TAG[p.category] || 'tag tag-gray'}>{CATEGORY_LABELS[p.category] || p.category}</span>
-                <span className={STATUS_TAG[p.status] || 'tag tag-gray'}>{p.status === 'voting' ? 'Voting active' : p.status.charAt(0).toUpperCase() + p.status.slice(1)}</span>
+                <span className={STATUS_TAG[p.status] || 'tag tag-gray'}>{statusLabel(p.status)}</span>
                 <div style={{ marginLeft: 'auto', display: 'flex', gap: '4px' }}>
                   <button onClick={() => setFlag(p.id, 'is_important', !myFlag?.is_important)} style={{ ...chipBase, padding: '2px 8px', background: myFlag?.is_important ? '#fee2e2' : 'transparent', color: myFlag?.is_important ? '#b91c1c' : 'var(--txl)', borderColor: myFlag?.is_important ? 'transparent' : 'var(--br)' }}>⭐</button>
                   <button onClick={() => setFlag(p.id, 'is_following', !myFlag?.is_following)} style={{ ...chipBase, padding: '2px 8px', background: myFlag?.is_following ? '#dbeafe' : 'transparent', color: myFlag?.is_following ? '#1e40af' : 'var(--txl)', borderColor: myFlag?.is_following ? 'transparent' : 'var(--br)' }}>🔖</button>
@@ -141,8 +175,8 @@ export default function ProposalsClient({ proposals, profile }: { proposals: Pro
               </div>
               <h3 style={{ fontSize: '13px', fontWeight: 500, color: 'var(--tx)', marginBottom: '4px' }}>{p.title}</h3>
               <div style={{ fontSize: '11px', color: 'var(--txm)', marginBottom: '6px' }}>
-                By <strong>@{p.apt_number}</strong> · {formatDate(p.created_at)}
-                {p.tagged_apts.length > 0 && <span> · tagged <strong>{p.tagged_apts.map(a => `@${a}`).join(' ')}</strong></span>}
+                {t('by_apt', { apt: p.apt_number })} · {formatDate(p.created_at, locale)}
+                {p.tagged_apts.length > 0 && <span> · {t('tagged')} <strong>{p.tagged_apts.map((a: string) => '@' + a).join(' ')}</strong></span>}
                 {p.tag_all && <span> · <strong>@tots</strong></span>}
               </div>
               <p style={{ fontSize: '11px', color: 'var(--txm)', lineHeight: 1.5, marginBottom: '12px', whiteSpace: 'pre-line' }}>{getBody(p)}</p>
