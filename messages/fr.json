@@ -131,7 +131,24 @@
   "marketplace": {
     "post_listing": "+ Publier une annonce",
     "contact": "Contacter",
-    "all_categories": "Toutes les catégories"
+    "all_categories": "Toutes les catégories",
+    "lang_nudge": "Écrivez dans le plus de langues possible. Ajoutez une photo — les annonces avec photo reçoivent 3x plus de réponses.",
+    "rental_rule": "Location d'appartements : minimum {months} mois (règle de la communauté). Les locations courte durée ne sont pas autorisées.",
+    "new_listing": "Nouvelle annonce",
+    "title_placeholder": "Titre",
+    "body_placeholder": "Description — ajoutez des traductions : ES: ... · FR: ... · EN: ...",
+    "photo_label": "📷 Photo (optionnelle)",
+    "price_placeholder": "Prix (€)",
+    "i_speak": "Je parle (ex. Espagnol)",
+    "i_learn": "Je veux apprendre (ex. Anglais)",
+    "closed": "Fermé",
+    "min_months": "Min. {months} mois",
+    "in_person": "En personne",
+    "mark_closed": "✓ Marquer fermé",
+    "reopen": "↺ Rouvrir",
+    "print_poster": "Imprimer l'affiche",
+    "post_listing_hint": "Photo · Affiche PDF pour le tableau",
+    "delete_confirm": "Supprimer cette annonce ?"
   },
   "documents": {
     "search": "Rechercher des documents...",
@@ -139,7 +156,9 @@
     "newest_first": "Plus récents d'abord",
     "oldest_first": "Plus anciens d'abord",
     "title_az": "Titre A–Z",
-    "by_category": "Par catégorie"
+    "by_category": "Par catégorie",
+    "no_documents": "Aucun document trouvé.",
+    "admin_hint": "Admin : téléversez des documents et traductions via Admin → onglet Documents."
   },
   "maintenance": {
     "submit_ticket": "Soumettre un ticket de maintenance",
@@ -260,5 +279,13 @@
     "in_progress": "En cours",
     "on_hold": "En attente",
     "completed": "Terminé"
+  },
+  "document_categories": {
+    "statutes": "Statuts et règles",
+    "minutes": "Procès-verbaux",
+    "contracts": "Contrats",
+    "projects": "Projets",
+    "urban": "Urbanisme",
+    "other": "Autres"
   }
 }

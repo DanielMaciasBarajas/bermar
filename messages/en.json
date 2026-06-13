@@ -131,7 +131,24 @@
   "marketplace": {
     "post_listing": "+ Post listing",
     "contact": "Contact",
-    "all_categories": "All categories"
+    "all_categories": "All categories",
+    "lang_nudge": "Write in as many languages as you can. Add a photo — listings with photos get 3x more responses.",
+    "rental_rule": "Apartment rentals: minimum {months} months (community rule). Short-term / holiday rentals are not permitted.",
+    "new_listing": "New listing",
+    "title_placeholder": "Title",
+    "body_placeholder": "Description — add translations: ES: ... · FR: ... · EN: ...",
+    "photo_label": "📷 Photo (optional)",
+    "price_placeholder": "Price (€)",
+    "i_speak": "I speak (e.g. Spanish)",
+    "i_learn": "I want to learn (e.g. English)",
+    "closed": "Closed",
+    "min_months": "Min. {months} months",
+    "in_person": "In person",
+    "mark_closed": "✓ Mark closed",
+    "reopen": "↺ Reopen",
+    "print_poster": "Print poster",
+    "post_listing_hint": "Photo · PDF poster for lobby board",
+    "delete_confirm": "Delete this listing?"
   },
   "documents": {
     "search": "Search documents...",
@@ -139,7 +156,9 @@
     "newest_first": "Newest first",
     "oldest_first": "Oldest first",
     "title_az": "Title A–Z",
-    "by_category": "By category"
+    "by_category": "By category",
+    "no_documents": "No documents found.",
+    "admin_hint": "Admin: upload documents and translations via Admin → Documents tab."
   },
   "maintenance": {
     "submit_ticket": "Submit a maintenance ticket",
@@ -260,5 +279,13 @@
     "in_progress": "In progress",
     "on_hold": "On hold",
     "completed": "Completed"
+  },
+  "document_categories": {
+    "statutes": "Statutes & rules",
+    "minutes": "Meeting minutes",
+    "contracts": "Contracts",
+    "projects": "Projects",
+    "urban": "Urban development",
+    "other": "Other"
   }
 }

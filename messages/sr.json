@@ -131,7 +131,24 @@
   "marketplace": {
     "post_listing": "+ Постави оглас",
     "contact": "Контакт",
-    "all_categories": "Све категорије"
+    "all_categories": "Све категорије",
+    "lang_nudge": "Пишите на што више језика. Додајте фотографију — огласи са фотографијом добијају 3x више одговора.",
+    "rental_rule": "Издавање станова: минимум {months} месеци (правило заједнице). Краткорочни најам није дозвољен.",
+    "new_listing": "Нови оглас",
+    "title_placeholder": "Наслов",
+    "body_placeholder": "Опис — додајте преводе: ES: ... · FR: ... · EN: ...",
+    "photo_label": "📷 Фотографија (необавезно)",
+    "price_placeholder": "Цена (€)",
+    "i_speak": "Говорим (нпр. Шпански)",
+    "i_learn": "Желим да научим (нпр. Енглески)",
+    "closed": "Затворено",
+    "min_months": "Мин. {months} мес.",
+    "in_person": "Лично",
+    "mark_closed": "✓ Означи затворено",
+    "reopen": "↺ Поново отвори",
+    "print_poster": "Штампај постер",
+    "post_listing_hint": "Фото · PDF постер за таблу",
+    "delete_confirm": "Обрисати овај оглас?"
   },
   "documents": {
     "search": "Претражи документе...",
@@ -139,7 +156,9 @@
     "newest_first": "Најновији прво",
     "oldest_first": "Најстарији прво",
     "title_az": "Наслов А–Ж",
-    "by_category": "По категорији"
+    "by_category": "По категорији",
+    "no_documents": "Nema pronađenih dokumenata.",
+    "admin_hint": "Admin: otpremite dokumente i prevode putem Admin → kartica Dokumenti."
   },
   "maintenance": {
     "submit_ticket": "Пошаљи захтев за одржавање",
@@ -260,5 +279,13 @@
     "in_progress": "U toku",
     "on_hold": "Na cekanju",
     "completed": "Završeno"
+  },
+  "document_categories": {
+    "statutes": "Statut i pravila",
+    "minutes": "Zapisnici sastanaka",
+    "contracts": "Ugovori",
+    "projects": "Projekti",
+    "urban": "Urbanizam",
+    "other": "Ostalo"
   }
 }

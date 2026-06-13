@@ -8,10 +8,6 @@ import type { Profile } from '@/lib/supabase/types'
 interface DocumentFile { id: string; language: string; file_url: string; file_name: string | null; uploaded_at: string }
 interface DocumentData { id: string; title: string; category: string; created_at: string; description?: string | null; files: DocumentFile[] }
 
-const CATEGORY_LABELS: Record<string, string> = {
-  statutes: 'Statutes & rules', minutes: 'Meeting minutes', contracts: 'Contracts',
-  projects: 'Projects', urban: 'Urban development', other: 'Other',
-}
 const CATEGORY_ICONS: Record<string, string> = {
   statutes: '📜', minutes: '📋', contracts: '🤝', projects: '🏗', urban: '🌳', other: '📄',
 }
@@ -25,9 +21,15 @@ interface Props { documents: DocumentData[]; allLangs: string[]; profile: Profil
 
 export default function DocumentsClient({ documents, allLangs, profile }: Props) {
   const t = useTranslations('documents')
+  const tNav = useTranslations('nav')
+  const tCat = useTranslations('document_categories')
   const [search, setSearch] = useState('')
   const [categoryFilter, setCategoryFilter] = useState('all')
   const [sort, setSort] = useState<SortKey>('date_desc')
+
+  function getCatLabel(key: string): string {
+    try { return tCat(key as any) } catch { return key }
+  }
 
   const filtered = documents
     .filter(doc => {
@@ -43,8 +45,15 @@ export default function DocumentsClient({ documents, allLangs, profile }: Props)
       return 0
     })
 
+  const categoryKeys = ['statutes', 'minutes', 'contracts', 'projects', 'urban', 'other']
+
   return (
     <div style={{ maxWidth: '720px', margin: '0 auto' }}>
+
+      <h2 style={{ fontSize: '18px', fontWeight: 600, color: 'var(--tx)', marginBottom: '14px' }}>
+        {tNav('documents')}
+      </h2>
+
       <div style={{ display: 'flex', gap: '8px', marginBottom: '10px', flexWrap: 'wrap' }}>
         <input
           value={search} onChange={e => setSearch(e.target.value)}
@@ -52,7 +61,7 @@ export default function DocumentsClient({ documents, allLangs, profile }: Props)
         />
         <select value={categoryFilter} onChange={e => setCategoryFilter(e.target.value)} className="form-select" style={{ width: 'auto' }}>
           <option value="all">{t('all_categories')}</option>
-          {Object.entries(CATEGORY_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+          {categoryKeys.map(k => <option key={k} value={k}>{getCatLabel(k)}</option>)}
         </select>
         <select value={sort} onChange={e => setSort(e.target.value as SortKey)} className="form-select" style={{ width: 'auto' }}>
           <option value="date_desc">{t('newest_first')}</option>
@@ -64,7 +73,7 @@ export default function DocumentsClient({ documents, allLangs, profile }: Props)
 
       <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
         {filtered.length === 0 && (
-          <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--txl)', fontSize: '13px' }}>No documents found.</div>
+          <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--txl)', fontSize: '13px' }}>{t('no_documents')}</div>
         )}
         {filtered.map((doc, i) => (
           <div key={doc.id} style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', padding: '14px 16px', borderTop: i === 0 ? 'none' : '1px solid var(--br)', cursor: 'pointer', transition: 'background 0.15s' }}
@@ -74,11 +83,14 @@ export default function DocumentsClient({ documents, allLangs, profile }: Props)
               {CATEGORY_ICONS[doc.category] || '📄'}
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: '13px', fontWeight: 500, color: 'var(--tx)', marginBottom: '2px' }}>{doc.title}</div>
+              <div style={{ fontSize: '13px', fontWeight: 500, color: 'var(--tx)', marginBottom: '2px' }}>
+                <span style={{ color: 'var(--txm)', fontWeight: 400 }}>{getCatLabel(doc.category)} — </span>
+                {doc.title}
+              </div>
               {doc.description && (
                 <div style={{ fontSize: '11px', color: 'var(--txm)', marginBottom: '6px', lineHeight: 1.5, fontStyle: 'italic' }}>{doc.description}</div>
               )}
-              <div style={{ fontSize: '11px', color: 'var(--txm)', marginBottom: '8px' }}>{CATEGORY_LABELS[doc.category] || doc.category} · {formatDate(doc.created_at)}</div>
+              <div style={{ fontSize: '11px', color: 'var(--txm)', marginBottom: '8px' }}>{formatDate(doc.created_at)}</div>
               {doc.files.length > 0 && (
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
                   {doc.files.map(f => (
@@ -104,7 +116,7 @@ export default function DocumentsClient({ documents, allLangs, profile }: Props)
 
       {profile.role !== 'resident' && (
         <div style={{ marginTop: '16px', padding: '12px', background: 'rgba(255,255,255,0.8)', borderRadius: '12px', border: '1px dashed var(--br)', textAlign: 'center', fontSize: '11px', color: 'var(--txl)' }}>
-          Admin: upload documents and translations via Admin → Documents tab.
+          {t('admin_hint')}
         </div>
       )}
     </div>

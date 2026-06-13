@@ -131,7 +131,24 @@
   "marketplace": {
     "post_listing": "+ Publicar anunci",
     "contact": "Contactar",
-    "all_categories": "Totes les categories"
+    "all_categories": "Totes les categories",
+    "lang_nudge": "Escriu en tants idiomes com puguis. Afegeix una foto — els anuncis amb foto reben 3x més respostes.",
+    "rental_rule": "Lloguer de pisos: mínim {months} mesos (norma de la comunitat). Els lloguers de curta durada no estan permesos.",
+    "new_listing": "Nou anunci",
+    "title_placeholder": "Títol",
+    "body_placeholder": "Descripció — afegeix traduccions: ES: ... · FR: ... · EN: ...",
+    "photo_label": "📷 Foto (opcional)",
+    "price_placeholder": "Preu (€)",
+    "i_speak": "Parlo (ex. Espanyol)",
+    "i_learn": "Vull aprendre (ex. Anglès)",
+    "closed": "Tancat",
+    "min_months": "Mín. {months} mesos",
+    "in_person": "En persona",
+    "mark_closed": "✓ Marcar tancat",
+    "reopen": "↺ Reobrir",
+    "print_poster": "Imprimir cartell",
+    "post_listing_hint": "Foto · Cartell PDF per al tauler",
+    "delete_confirm": "Voleu eliminar aquest anunci?"
   },
   "documents": {
     "search": "Cerca documents...",
@@ -139,7 +156,9 @@
     "newest_first": "Més recents primer",
     "oldest_first": "Més antics primer",
     "title_az": "Títol A–Z",
-    "by_category": "Per categoria"
+    "by_category": "Per categoria",
+    "no_documents": "No s'han trobat documents.",
+    "admin_hint": "Admin: puja documents i traduccions a Admin → pestanya Documents."
   },
   "maintenance": {
     "submit_ticket": "Envia una incidència de manteniment",
@@ -260,5 +279,13 @@
     "in_progress": "En curs",
     "on_hold": "En espera",
     "completed": "Completat"
+  },
+  "document_categories": {
+    "statutes": "Estatuts i normes",
+    "minutes": "Actes de reunions",
+    "contracts": "Contractes",
+    "projects": "Projectes",
+    "urban": "Urbanisme",
+    "other": "Altres"
   }
 }
