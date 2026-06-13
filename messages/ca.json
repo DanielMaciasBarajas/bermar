@@ -217,5 +217,43 @@
     "evening": "Vespre",
     "today_label": "Avui",
     "tomorrow_label": "Demà"
+  },
+  "categories": {
+    "social": "Esdeveniments socials",
+    "infrastructure": "Infraestructura",
+    "rules": "Normes i conducta",
+    "complaint": "Queixa",
+    "project": "Nou projecte",
+    "meeting": "Sol·licitud de reunió",
+    "other": "Altres"
+  },
+  "marketplace_categories": {
+    "favour": "Favor i ajuda",
+    "advice": "Consell de veí",
+    "borrow": "Préstec",
+    "buy_sell_donate": "Compra / Venda / Donació",
+    "parking": "Aparcament",
+    "apartment_rental": "Lloguer d'apartament",
+    "apartment_sale": "Apartament en venda",
+    "babysitting": "Cangur",
+    "language_exchange": "Intercanvi d'idiomes"
+  },
+  "ticket_categories": {
+    "common_areas": "Zones comunes",
+    "pool_garden": "Piscina / jardí (Moha)",
+    "elevator": "Ascensor",
+    "parking": "Aparcament / soterrani",
+    "structure": "Estructura de l'edifici",
+    "noise": "Soroll / problema de veí",
+    "insurance": "Reclamació d'assegurança",
+    "internal": "Problema interior de l'apartament",
+    "other": "Altres"
+  },
+  "project_statuses": {
+    "planning": "Planificació",
+    "tendering": "Licitació",
+    "in_progress": "En curs",
+    "on_hold": "En espera",
+    "completed": "Completat"
   }
 }

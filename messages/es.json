@@ -217,5 +217,43 @@
     "evening": "Noche",
     "today_label": "Hoy",
     "tomorrow_label": "Mañana"
+  },
+  "categories": {
+    "social": "Eventos sociales",
+    "infrastructure": "Infraestructura",
+    "rules": "Normas y conducta",
+    "complaint": "Queja",
+    "project": "Nuevo proyecto",
+    "meeting": "Solicitud de reunión",
+    "other": "Otros"
+  },
+  "marketplace_categories": {
+    "favour": "Favor y ayuda",
+    "advice": "Consejo de vecino",
+    "borrow": "Préstamo",
+    "buy_sell_donate": "Compra / Venta / Donación",
+    "parking": "Aparcamiento",
+    "apartment_rental": "Alquiler de apartamento",
+    "apartment_sale": "Apartamento en venta",
+    "babysitting": "Canguro",
+    "language_exchange": "Intercambio de idiomas"
+  },
+  "ticket_categories": {
+    "common_areas": "Zonas comunes",
+    "pool_garden": "Piscina / jardín (Moha)",
+    "elevator": "Ascensor",
+    "parking": "Aparcamiento / sótano",
+    "structure": "Estructura del edificio",
+    "noise": "Ruido / problema de vecino",
+    "insurance": "Reclamación de seguro",
+    "internal": "Problema interior del apartamento",
+    "other": "Otros"
+  },
+  "project_statuses": {
+    "planning": "Planificación",
+    "tendering": "Licitación",
+    "in_progress": "En curso",
+    "on_hold": "En espera",
+    "completed": "Completado"
   }
 }

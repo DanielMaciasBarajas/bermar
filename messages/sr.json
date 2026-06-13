@@ -217,5 +217,43 @@
     "evening": "Veče",
     "today_label": "Danas",
     "tomorrow_label": "Sutra"
+  },
+  "categories": {
+    "social": "Drustveni dogadjaji",
+    "infrastructure": "Infrastruktura",
+    "rules": "Pravila i ponasanje",
+    "complaint": "Zalba",
+    "project": "Novi projekat",
+    "meeting": "Zahtev za sastanak",
+    "other": "Ostalo"
+  },
+  "marketplace_categories": {
+    "favour": "Usluga i pomoc",
+    "advice": "Savet komšije",
+    "borrow": "Pozajmica",
+    "buy_sell_donate": "Kupovina / Prodaja / Donacija",
+    "parking": "Parking",
+    "apartment_rental": "Iznajmljivanje stana",
+    "apartment_sale": "Stan na prodaju",
+    "babysitting": "Čuvanje dece",
+    "language_exchange": "Jezicka razmena"
+  },
+  "ticket_categories": {
+    "common_areas": "Zajednicki prostori",
+    "pool_garden": "Bazen / basta (Moha)",
+    "elevator": "Lift",
+    "parking": "Parking / podrum",
+    "structure": "Konstrukcija zgrade",
+    "noise": "Buka / problem sa komšijom",
+    "insurance": "Osiguravajuci slucaj",
+    "internal": "Unutrasnji problem",
+    "other": "Ostalo"
+  },
+  "project_statuses": {
+    "planning": "Planiranje",
+    "tendering": "Tender",
+    "in_progress": "U toku",
+    "on_hold": "Na cekanju",
+    "completed": "Završeno"
   }
 }

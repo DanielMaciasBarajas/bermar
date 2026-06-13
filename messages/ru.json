@@ -217,5 +217,43 @@
     "evening": "Вечер",
     "today_label": "Сегодня",
     "tomorrow_label": "Завтра"
+  },
+  "categories": {
+    "social": "Социальные события",
+    "infrastructure": "Инфраструктура",
+    "rules": "Правила и поведение",
+    "complaint": "Жалоба",
+    "project": "Новый проект",
+    "meeting": "Запрос собрания",
+    "other": "Другое"
+  },
+  "marketplace_categories": {
+    "favour": "Помощь и услуга",
+    "advice": "Совет соседа",
+    "borrow": "Одолжить",
+    "buy_sell_donate": "Купить / Продать / Подарить",
+    "parking": "Парковка",
+    "apartment_rental": "Аренда квартиры",
+    "apartment_sale": "Квартира на продажу",
+    "babysitting": "Няня",
+    "language_exchange": "Языковой обмен"
+  },
+  "ticket_categories": {
+    "common_areas": "Общие зоны",
+    "pool_garden": "Бассейн / сад (Moha)",
+    "elevator": "Лифт",
+    "parking": "Парковка / подвал",
+    "structure": "Конструкция здания",
+    "noise": "Шум / проблема с соседом",
+    "insurance": "Страховой случай",
+    "internal": "Внутренняя проблема",
+    "other": "Другое"
+  },
+  "project_statuses": {
+    "planning": "Планирование",
+    "tendering": "Тендер",
+    "in_progress": "В процессе",
+    "on_hold": "На паузе",
+    "completed": "Завершено"
   }
 }

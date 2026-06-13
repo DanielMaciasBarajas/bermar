@@ -25,6 +25,11 @@ export default function ProposalsClient({ proposals, profile }: { proposals: Pro
   const locale = lang.toLowerCase()
   const t = useTranslations('proposals')
   const tc = useTranslations('common')
+  const tCat = useTranslations('categories')
+
+  function getCategoryLabel(key: string): string {
+    try { return tCat(key as any) } catch { return key }
+  }
 
   function getBody(p: ProposalData): string {
     if (p.body_translations && typeof p.body_translations === 'object') {
@@ -111,7 +116,7 @@ export default function ProposalsClient({ proposals, profile }: { proposals: Pro
       <div style={{ display: 'flex', gap: '8px', marginBottom: '10px', flexWrap: 'wrap', alignItems: 'center' }}>
         <select value={categoryFilter} onChange={e => setCategoryFilter(e.target.value)} className="form-select" style={{ width: 'auto' }}>
           <option value="all">{t('all_categories')}</option>
-          {Object.entries(CATEGORY_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+          {Object.keys(CATEGORY_LABELS).map(k => <option key={k} value={k}>{getCategoryLabel(k)}</option>)}
         </select>
         <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} className="form-select" style={{ width: 'auto' }}>
           <option value="all">{t('all_statuses')}</option>
@@ -140,7 +145,7 @@ export default function ProposalsClient({ proposals, profile }: { proposals: Pro
           <h3 style={{ fontSize: '13px', fontWeight: 500, color: 'var(--tx)', marginBottom: '12px' }}>{t('new_proposal_title')}</h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
             <select value={newCategory} onChange={e => setNewCategory(e.target.value)} className="form-select">
-              {Object.entries(CATEGORY_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+              {Object.keys(CATEGORY_LABELS).map(k => <option key={k} value={k}>{getCategoryLabel(k)}</option>)}
             </select>
             <input required value={newTitle} onChange={e => setNewTitle(e.target.value)} placeholder={t('title_placeholder')} className="form-input" />
             <textarea required value={newBody} onChange={e => setNewBody(e.target.value)} placeholder={t('body_placeholder')} rows={4} className="form-textarea" />
@@ -165,7 +170,7 @@ export default function ProposalsClient({ proposals, profile }: { proposals: Pro
           return (
             <div key={p.id} className="card">
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: '6px', marginBottom: '8px', flexWrap: 'wrap' }}>
-                <span className={CATEGORY_TAG[p.category] || 'tag tag-gray'}>{CATEGORY_LABELS[p.category] || p.category}</span>
+                <span className={CATEGORY_TAG[p.category] || 'tag tag-gray'}>{getCategoryLabel(p.category)}</span>
                 <span className={STATUS_TAG[p.status] || 'tag tag-gray'}>{statusLabel(p.status)}</span>
                 <div style={{ marginLeft: 'auto', display: 'flex', gap: '4px' }}>
                   <button onClick={() => setFlag(p.id, 'is_important', !myFlag?.is_important)} style={{ ...chipBase, padding: '2px 8px', background: myFlag?.is_important ? '#fee2e2' : 'transparent', color: myFlag?.is_important ? '#b91c1c' : 'var(--txl)', borderColor: myFlag?.is_important ? 'transparent' : 'var(--br)' }}>⭐</button>
