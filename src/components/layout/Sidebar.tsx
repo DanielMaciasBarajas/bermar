@@ -78,6 +78,26 @@ export default function Sidebar({ profile, community, mobileOpen, onMobileClose 
         />
       )}
 
+      {/* Wrapper so collapse button can escape sidebar overflow */}
+      <div style={{ position: 'relative', flexShrink: 0, zIndex: isMobile ? 50 : 'auto' as any }}>
+
+        {/* Desktop collapse button — outside sidebar so it's never clipped */}
+        {!isMobile && (
+          <button
+            onClick={() => setCollapsed(c => !c)}
+            style={{
+              position: 'absolute', top: '16px', right: '-10px',
+              width: '20px', height: '20px', borderRadius: '50%',
+              background: '#2d5a3f', border: '2px solid var(--bg)',
+              color: 'rgba(255,255,255,0.8)', fontSize: '10px', cursor: 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              zIndex: 60,
+            }}
+          >
+            {collapsed ? '›' : '‹'}
+          </button>
+        )}
+
       {/* Sidebar */}
       <div
         className="sidebar"
@@ -90,26 +110,8 @@ export default function Sidebar({ profile, community, mobileOpen, onMobileClose 
           transform: isMobile ? (mobileOpen ? 'translateX(0)' : 'translateX(-100%)') : 'none',
           transition: 'transform 0.25s ease, width 0.2s ease, min-width 0.2s ease',
           height: isMobile ? '100dvh' : undefined,
-          overflowY: 'auto',
         }}
       >
-        {/* Desktop collapse button */}
-        {!isMobile && (
-          <button
-            onClick={() => setCollapsed(c => !c)}
-            style={{
-              position: 'absolute', top: '16px', right: '-10px',
-              width: '20px', height: '20px', borderRadius: '50%',
-              background: '#2d5a3f', border: '1px solid rgba(255,255,255,0.15)',
-              color: 'rgba(255,255,255,0.6)', fontSize: '10px', cursor: 'pointer',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              zIndex: 10,
-            }}
-          >
-            {collapsed ? '›' : '‹'}
-          </button>
-        )}
-
         {/* Mobile close button */}
         {isMobile && (
           <button
@@ -208,6 +210,7 @@ export default function Sidebar({ profile, community, mobileOpen, onMobileClose 
             </button>
           )}
         </div>
+      </div>
       </div>
     </>
   )
