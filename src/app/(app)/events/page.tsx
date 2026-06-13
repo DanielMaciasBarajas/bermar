@@ -12,58 +12,55 @@ export default async function EventsPage() {
 
   const now = new Date()
   const todayStr = now.toISOString().split('T')[0]
-  const timeStr = now.toTimeString().slice(0, 8)
+  const sevenDaysLater = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
 
-  // Upcoming: future bookings with open invites
-  const { data: upcoming } = await supabase
-    .from('bookings')
-    .select('*, premise:premises(name, icon, name_translations), participants:booking_participants(apt_number, profile_id)')
-    .eq('community_id', profile.community_id)
-    .eq('status', 'confirmed')
-    .eq('invite_open', true)
-    .gte('date', todayStr)
-    .order('date')
-    .order('slot_start')
-    .limit(20)
+  const [
+    { data: todayBookings },
+    { data: weekBookings },
+    { data: announcements },
+    { data: socialProposals },
+  ] = await Promise.all([
+    supabase
+      .from('bookings')
+      .select('*, premise:premises(name, icon, name_translations), participants:booking_participants(apt_number, profile_id)')
+      .eq('community_id', profile.community_id)
+      .eq('status', 'confirmed')
+      .eq('date', todayStr)
+      .order('slot_start'),
 
-  // Live: bookings happening right now
-  const { data: live } = await supabase
-    .from('bookings')
-    .select('*, premise:premises(name, icon, name_translations), participants:booking_participants(apt_number, profile_id)')
-    .eq('community_id', profile.community_id)
-    .eq('status', 'confirmed')
-    .eq('date', todayStr)
-    .lte('slot_start', timeStr)
-    .gte('slot_end', timeStr)
-    .order('slot_start')
+    supabase
+      .from('bookings')
+      .select('*, premise:premises(name, icon, name_translations), participants:booking_participants(apt_number, profile_id)')
+      .eq('community_id', profile.community_id)
+      .eq('status', 'confirmed')
+      .gt('date', todayStr)
+      .lte('date', sevenDaysLater)
+      .order('date')
+      .order('slot_start'),
 
-  // Past: completed events from last 30 days
-  const thirtyAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
-  const { data: past } = await supabase
-    .from('bookings')
-    .select('*, premise:premises(name, icon, name_translations), participants:booking_participants(apt_number)')
-    .eq('community_id', profile.community_id)
-    .eq('status', 'confirmed')
-    .lt('date', todayStr)
-    .gte('date', thirtyAgo)
-    .order('date', { ascending: false })
-    .limit(10)
+    supabase
+      .from('admin_announcements')
+      .select('*')
+      .eq('community_id', profile.community_id)
+      .eq('active', true)
+      .order('created_at', { ascending: false }),
 
-  // Community voice for past events
-  const { data: voicePosts } = await supabase
-    .from('community_voice')
-    .select('*')
-    .eq('community_id', profile.community_id)
-    .eq('trigger_type', 'event_completed')
-    .order('created_at', { ascending: false })
-    .limit(5)
+    supabase
+      .from('proposals')
+      .select('*')
+      .eq('community_id', profile.community_id)
+      .in('category', ['meeting', 'social'])
+      .in('status', ['open', 'voting'])
+      .order('created_at', { ascending: false })
+      .limit(5),
+  ])
 
   return (
     <EventsClient
-      upcoming={upcoming || []}
-      live={live || []}
-      past={past || []}
-      voicePosts={voicePosts || []}
+      todayBookings={todayBookings || []}
+      weekBookings={weekBookings || []}
+      announcements={announcements || []}
+      socialProposals={socialProposals || []}
       profile={profile}
     />
   )
