@@ -28,6 +28,7 @@ export default function MaintenanceClient({ profile, community, myTickets }: Pro
   const [insuranceFlag, setInsuranceFlag] = useState(false)
   const [saving, setSaving] = useState(false)
   const [submitted, setSubmitted] = useState(false)
+  const [submitError, setSubmitError] = useState('')
 
   function getCatLabel(key: string): string {
     try { return tTC(key as any) } catch { return key }
@@ -46,6 +47,9 @@ export default function MaintenanceClient({ profile, community, myTickets }: Pro
   const categoryKeys = ['common_areas', 'pool_garden', 'elevator', 'parking', 'structure', 'noise', 'insurance', 'internal', 'other']
 
   async function handleSubmit() {
+    setSubmitError('')
+    if (!category) { setSubmitError('Please select a category.'); return }
+    if (!description.trim()) { setSubmitError('Please add a description.'); return }
     setSaving(true)
     const { data: ticket, error } = await supabase.from('maintenance_tickets').insert({
       community_id: profile.community_id, profile_id: profile.id, apt_number: profile.apt_number,
@@ -64,6 +68,8 @@ export default function MaintenanceClient({ profile, community, myTickets }: Pro
     if (!error) {
       setSubmitted(true)
       setCategory(''); setLocation(''); setDescription(''); setUrgency('normal'); setInsuranceFlag(false)
+    } else {
+      setSubmitError('Error: ' + error.message)
     }
   }
 
@@ -97,6 +103,12 @@ export default function MaintenanceClient({ profile, community, myTickets }: Pro
         {submitted && (
           <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '12px', padding: '12px', marginBottom: '10px', fontSize: '11px', color: '#166534' }}>
             ✓ {t('success')}
+          </div>
+        )}
+
+        {submitError && (
+          <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '12px', padding: '12px', marginBottom: '10px', fontSize: '11px', color: '#991b1b' }}>
+            ⚠️ {submitError}
           </div>
         )}
 
