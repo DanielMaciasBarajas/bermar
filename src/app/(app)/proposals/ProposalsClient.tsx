@@ -7,7 +7,7 @@ import { useTranslations } from 'next-intl'
 import type { Profile } from '@/lib/supabase/types'
 
 interface Comment {
-  id: string; proposal_id: string; profile_id: string; apt_number: string; body: string; created_at: string
+  id: string; proposal_id: string; profile_id: string; apt_number: string; body: string; created_at: string; photo_url?: string | null
 }
 interface ProposalData {
   id: string; title: string; body: string; body_translations: any; category: string; status: string
@@ -54,6 +54,24 @@ export default function ProposalsClient({ proposals: initialProposals, profile }
   const [openComments, setOpenComments] = useState<string | null>(null)
   const [commentTexts, setCommentTexts] = useState<Record<string, string>>({})
   const [postingComment, setPostingComment] = useState(false)
+  const [commentPhotos, setCommentPhotos] = useState<Record<string, File | null>>({})
+  const [commentPhotoPreviews, setCommentPhotoPreviews] = useState<Record<string, string | null>>({})
+
+  function pickCommentPhoto(proposalId: string, e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setCommentPhotos(prev => ({ ...prev, [proposalId]: file }))
+    setCommentPhotoPreviews(prev => ({ ...prev, [proposalId]: URL.createObjectURL(file) }))
+  }
+  const [commentPhotos, setCommentPhotos] = useState<Record<string, File | null>>({})
+  const [commentPhotoPreviews, setCommentPhotoPreviews] = useState<Record<string, string | null>>({})
+
+  function pickCommentPhoto(proposalId: string, e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setCommentPhotos(prev => ({ ...prev, [proposalId]: file }))
+    setCommentPhotoPreviews(prev => ({ ...prev, [proposalId]: URL.createObjectURL(file) }))
+  }
 
   const statusLabel = (status: string) => {
     const map: Record<string, string> = {
@@ -116,11 +134,11 @@ export default function ProposalsClient({ proposals: initialProposals, profile }
   }
 
   async function setFlag(proposalId: string, field: 'is_important' | 'is_following' | 'is_dismissed', value: boolean) {
-    // Optimistic update
     setProposals(prev => prev.map(p => {
       if (p.id !== proposalId) return p
       const existingFlag = p.flags?.find(f => f.profile_id === profile.id)
-      const newFlag = { ...existingFlag, profile_id: profile.id, [field]: value, is_important: false, is_following: false, is_dismissed: false }
+      const base = { is_important: false, is_following: false, is_dismissed: false, last_read_at: null }
+      const newFlag = { ...base, ...existingFlag, profile_id: profile.id, [field]: value }
       const newFlags = [...(p.flags?.filter(f => f.profile_id !== profile.id) || []), newFlag]
       return { ...p, flags: newFlags }
     }))
@@ -131,8 +149,19 @@ export default function ProposalsClient({ proposals: initialProposals, profile }
     const body = commentTexts[proposalId]?.trim()
     if (!body) return
     setPostingComment(true)
+    let photo_url: string | null = null
+    const photoFile = commentPhotos[proposalId]
+    if (photoFile) {
+      const ext = photoFile.name.split('.').pop()
+      const path = profile.community_id + '/' + proposalId + '/' + Date.now() + '.' + ext
+      const { error: uploadError } = await supabase.storage.from('proposals').upload(path, photoFile, { upsert: false, contentType: photoFile.type })
+      if (!uploadError) {
+        const { data: urlData } = supabase.storage.from('proposals').getPublicUrl(path)
+        photo_url = urlData.publicUrl
+      }
+    }
     const { data: newComment } = await supabase.from('proposal_comments').insert({
-      proposal_id: proposalId, profile_id: profile.id, apt_number: profile.apt_number, body,
+      proposal_id: proposalId, profile_id: profile.id, apt_number: profile.apt_number, body, photo_url,
     }).select().single()
     if (newComment) {
       setProposals(prev => prev.map(p => {
@@ -140,6 +169,8 @@ export default function ProposalsClient({ proposals: initialProposals, profile }
         return { ...p, comments: [...(p.comments || []), newComment] }
       }))
       setCommentTexts(prev => ({ ...prev, [proposalId]: '' }))
+      setCommentPhotos(prev => ({ ...prev, [proposalId]: null }))
+      setCommentPhotoPreviews(prev => ({ ...prev, [proposalId]: null }))
     }
     setPostingComment(false)
   }
@@ -297,26 +328,38 @@ export default function ProposalsClient({ proposals: initialProposals, profile }
                           )}
                         </div>
                         <p style={{ fontSize: '12px', color: 'var(--tx)', margin: 0, lineHeight: 1.4 }}>{c.body}</p>
+                        {c.photo_url && <img src={c.photo_url} alt="" style={{ marginTop: '6px', maxWidth: '100%', maxHeight: '200px', borderRadius: '8px', objectFit: 'cover' }} />}
                       </div>
                     </div>
                   ))}
-                  <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
-                    <input
-                      value={commentTexts[p.id] || ''}
-                      onChange={e => setCommentTexts(prev => ({ ...prev, [p.id]: e.target.value }))}
-                      onKeyDown={e => e.key === 'Enter' && !e.shiftKey && postComment(p.id)}
-                      placeholder={t('add_comment')}
-                      className="form-input"
-                      style={{ flex: 1, fontSize: '12px' }}
-                    />
-                    <button
-                      onClick={() => postComment(p.id)}
-                      disabled={postingComment || !commentTexts[p.id]?.trim()}
-                      className="btn btn-primary btn-sm"
-                      style={{ opacity: postingComment ? 0.6 : 1 }}
-                    >
-                      {t('post_comment')}
-                    </button>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '8px' }}>
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                      <input
+                        value={commentTexts[p.id] || ''}
+                        onChange={e => setCommentTexts(prev => ({ ...prev, [p.id]: e.target.value }))}
+                        onKeyDown={e => e.key === 'Enter' && !e.shiftKey && postComment(p.id)}
+                        placeholder={t('add_comment')}
+                        className="form-input"
+                        style={{ flex: 1, fontSize: '12px' }}
+                      />
+                      <button
+                        onClick={() => postComment(p.id)}
+                        disabled={postingComment || !commentTexts[p.id]?.trim()}
+                        className="btn btn-primary btn-sm"
+                        style={{ opacity: postingComment ? 0.6 : 1 }}
+                      >
+                        {t('post_comment')}
+                      </button>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <input type="file" accept="image/*" onChange={e => pickCommentPhoto(p.id, e)} style={{ fontSize: '11px', color: 'var(--txm)' }} />
+                      {commentPhotoPreviews[p.id] && (
+                        <div style={{ position: 'relative', display: 'inline-block' }}>
+                          <img src={commentPhotoPreviews[p.id]!} alt="" style={{ width: '60px', height: '40px', objectFit: 'cover', borderRadius: '6px', border: '1px solid var(--br)' }} />
+                          <button onClick={() => { setCommentPhotos(prev => ({ ...prev, [p.id]: null })); setCommentPhotoPreviews(prev => ({ ...prev, [p.id]: null })) }} style={{ position: 'absolute', top: '-4px', right: '-4px', background: 'var(--tx)', color: 'var(--bg)', border: 'none', borderRadius: '50%', width: '14px', height: '14px', fontSize: '8px', cursor: 'pointer', lineHeight: '14px', textAlign: 'center' }}>x</button>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               )}
