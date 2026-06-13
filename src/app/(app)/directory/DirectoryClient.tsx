@@ -59,7 +59,7 @@ export default function DirectoryClient({ apartments, profiles, occupants, emerg
   }
 
   return (
-    <div className="two-col" style={{ maxWidth: '900px', margin: '0 auto', gap: '24px' }}>
+    <div style={{ maxWidth: '960px', margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 200px', gap: '24px', alignItems: 'start' }}>
       <div>
         <h2 style={{ fontSize: '18px', fontWeight: 600, color: 'var(--tx)', marginBottom: '2px' }}>{tNav('directory')}</h2>
         <div style={{ fontSize: '11px', color: 'var(--txm)', marginBottom: '4px' }}>{t('building')}</div>
@@ -113,10 +113,11 @@ export default function DirectoryClient({ apartments, profiles, occupants, emerg
                         <div style={{ width: '20px', height: '20px', borderRadius: '50%', background: 'var(--br)' }} />
                       )}
 
-                      {/* Hover tooltip */}
+                      {/* Hover tooltip — flips upward for bottom floors */}
                       {hoveredApt === aptNumber && hasRegistration && !isOptedOut && (
                         <div style={{
-                          position: 'absolute', zIndex: 20, left: '100%', marginLeft: '4px', top: 0,
+                          position: 'absolute', zIndex: 20, left: '100%', marginLeft: '4px',
+                          ...(floor <= 3 ? { bottom: 0 } : { top: 0 }),
                           background: '#fff', borderRadius: '10px', border: '1px solid var(--br)',
                           boxShadow: '0 4px 12px rgba(0,0,0,0.1)', padding: '10px 12px',
                           minWidth: '128px', textAlign: 'left',
@@ -174,8 +175,19 @@ export default function DirectoryClient({ apartments, profiles, occupants, emerg
                 <div style={{ fontSize: '12px', fontWeight: 500, color: 'var(--tx)' }}>{contact.name}</div>
                 <div style={{ fontSize: '11px', color: 'var(--txm)' }}>{contact.available_hours}</div>
               </div>
-              {contact.phone && (
-                <a href={`tel:${contact.phone}`} style={{ fontSize: '11px', fontWeight: 500, color: 'var(--pine)', textDecoration: 'none', flexShrink: 0 }}>{contact.phone}</a>
+          {contact.phone && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', alignItems: 'flex-end', flexShrink: 0 }}>
+                  <a href={`tel:${contact.phone}`} style={{ fontSize: '11px', fontWeight: 500, color: 'var(--pine)', textDecoration: 'none' }}>{contact.phone}</a>
+                  {contact.name.includes('Moha') && (
+                    <a
+                      href={`https://wa.me/34${contact.phone.replace(/\s/g, '')}?text=${encodeURIComponent('Hola Moha! Soy un vecino de Bermar Park (Gavà Mar). Te escribo para comunicarte lo siguiente: ')}`}
+                      target="_blank" rel="noopener noreferrer"
+                      style={{ fontSize: '10px', fontWeight: 500, color: '#fff', background: '#25d366', borderRadius: '999px', padding: '2px 8px', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '3px' }}
+                    >
+                      <span>💬</span> WhatsApp
+                    </a>
+                  )}
+                </div>
               )}
             </div>
           ))}
