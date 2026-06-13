@@ -13,6 +13,8 @@ export default function SettingsClient({ profile, apartment, email }: Props) {
   const router = useRouter()
   const t = useTranslations('settings')
   const tc = useTranslations('common')
+  const tNav = useTranslations('nav')
+  const tI = useTranslations('interests')
 
   const [occupants] = useState<any[]>(profile?.occupants || [])
   const [selectedInterests, setSelectedInterests] = useState<string[]>((profile?.interests || []).map((i: any) => i.interest))
@@ -28,6 +30,8 @@ export default function SettingsClient({ profile, apartment, email }: Props) {
   const [deleteInput, setDeleteInput] = useState('')
   const [deleting, setDeleting] = useState(false)
   const [exporting, setExporting] = useState(false)
+  const [inviteEmail, setInviteEmail] = useState('')
+  const [showInvite, setShowInvite] = useState(false)
 
   async function exportData() {
     setExporting(true)
@@ -50,23 +54,15 @@ export default function SettingsClient({ profile, apartment, email }: Props) {
       supabase.from('occupants').select('*').eq('profile_id', profile.id),
       supabase.from('interests').select('*').eq('profile_id', profile.id),
     ])
-
-    // Strip sensitive internal fields before export
     const { community_id, ...safeProfile } = profileData as any
-
     const payload = {
       exported_at: new Date().toISOString(),
-      gdpr_note: 'This file contains all personal data held by Bermar Park for your apartment. You may request deletion at any time via Settings → Danger Zone.',
-      profile: safeProfile,
-      occupants: occupantsData || [],
+      gdpr_note: 'This file contains all personal data held by Bermar Park for your apartment.',
+      profile: safeProfile, occupants: occupantsData || [],
       interests: (interestsData || []).map((i: any) => i.interest),
-      bookings: bookings || [],
-      proposals: proposals || [],
-      votes: votes || [],
-      marketplace_listings: listings || [],
-      maintenance_tickets: tickets || [],
+      bookings: bookings || [], proposals: proposals || [], votes: votes || [],
+      marketplace_listings: listings || [], maintenance_tickets: tickets || [],
     }
-
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
@@ -83,13 +79,19 @@ export default function SettingsClient({ profile, apartment, email }: Props) {
     setSelectedInterests(prev => prev.includes(interest) ? prev.filter(i => i !== interest) : [...prev, interest])
   }
 
+  function getInterestLabel(interest: string): string {
+    try { return tI(interest as any) } catch { return interest }
+  }
+
   async function saveSettings() {
     setSaving(true)
     await supabase.from('profiles').update(privacy).eq('id', profile.id)
     await supabase.from('interests').delete().eq('profile_id', profile.id)
-    if (selectedInterests.length > 0) await supabase.from('interests').insert(selectedInterests.map(interest => ({ profile_id: profile.id, interest })))
+    if (selectedInterests.length > 0) {
+      await supabase.from('interests').insert(selectedInterests.map(interest => ({ profile_id: profile.id, interest })))
+    }
     setSaving(false)
-    setSaved('Settings saved ✓')
+    setSaved(t('saved'))
     setTimeout(() => setSaved(''), 3000)
     router.refresh()
   }
@@ -108,10 +110,25 @@ export default function SettingsClient({ profile, apartment, email }: Props) {
     router.push('/auth/login')
   }
 
+  const privacyItems = [
+    { key: 'show_names',         label: t('privacy_show_names') },
+    { key: 'show_ages',          label: t('privacy_show_ages') },
+    { key: 'show_interests',     label: t('privacy_show_interests') },
+    { key: 'show_phone',         label: t('privacy_show_phone') },
+    { key: 'show_in_directory',  label: t('privacy_show_directory') },
+    { key: 'birthday_wishes',    label: t('privacy_birthday') },
+    { key: 'email_notifications',label: t('privacy_email') },
+    { key: 'google_calendar_sync', label: t('privacy_calendar') },
+  ]
+
   return (
     <div style={{ maxWidth: '600px', margin: '0 auto' }}>
+
+      <h2 style={{ fontSize: '18px', fontWeight: 600, color: 'var(--tx)', marginBottom: '16px' }}>{tNav('settings')}</h2>
+
+      {/* Profile card */}
       <div className="card" style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '16px' }}>
-        <div style={{ width: '56px', height: '56px', borderRadius: '16px', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px', fontWeight: 700, color: '#fff', background: 'var(--pine)' }}>
+        <div style={{ width: '56px', height: '56px', borderRadius: '16px', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px', fontWeight: 700, color: '#fff', background: 'var(--pine)' }}>
           {profile.apt_number}
         </div>
         <div>
@@ -119,52 +136,111 @@ export default function SettingsClient({ profile, apartment, email }: Props) {
             Apt {profile.apt_number}{apartment?.is_duplex ? ` / ${apartment.duplex_upper_number} (duplex)` : ''}
           </div>
           <div style={{ fontSize: '11px', color: 'var(--txm)' }}>{email}</div>
-          <div style={{ fontSize: '11px', color: 'var(--txl)' }}>{profile.role} · {profile.approved ? 'Verified' : 'Pending verification'}</div>
+          <div style={{ fontSize: '11px', color: 'var(--txl)' }}>
+            {profile.role} · {profile.approved ? t('verified') : t('pending')}
+          </div>
         </div>
       </div>
 
+      {/* Who lives here */}
       <div className="section-title" style={{ marginBottom: '8px' }}>{t('who_lives_here')}</div>
       <div className="card" style={{ marginBottom: '16px' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '12px' }}>
           {occupants.map((occ, i) => (
             <div key={occ.id || i} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <div style={{ width: '28px', height: '28px', borderRadius: '50%', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', fontWeight: 600, color: '#fff', background: 'var(--pine)' }}>{occ.name?.slice(0,1) || '?'}</div>
+              <div style={{ width: '28px', height: '28px', borderRadius: '50%', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', fontWeight: 600, color: '#fff', background: 'var(--pine)' }}>
+                {occ.name?.slice(0,1) || '?'}
+              </div>
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize: '12px', fontWeight: 500, color: 'var(--tx)' }}>{occ.name}</div>
-                <div style={{ fontSize: '10px', color: 'var(--txl)' }}>{occ.gender}{occ.age ? ` · ${occ.age}y` : ''}{occ.birthday_day && occ.birthday_month ? ` · 🎂 ${occ.birthday_day}/${occ.birthday_month}` : ''}</div>
+                <div style={{ fontSize: '10px', color: 'var(--txl)' }}>
+                  {occ.gender}{occ.age ? ` · ${occ.age}y` : ''}{occ.birthday_day && occ.birthday_month ? ` · 🎂 ${occ.birthday_day}/${occ.birthday_month}` : ''}
+                </div>
               </div>
-              {i === 0 && <span style={{ fontSize: '9px', color: 'var(--txl)' }}>Primary</span>}
+              {i === 0 && <span style={{ fontSize: '9px', color: 'var(--txl)', background: 'var(--sand-d)', padding: '2px 6px', borderRadius: '999px' }}>{t('primary')}</span>}
             </div>
           ))}
         </div>
-        <div style={{ fontSize: '11px', color: 'var(--txl)' }}>To update occupants, contact your community admin.</div>
+        <div style={{ fontSize: '11px', color: 'var(--txl)' }}>{t('occupants_contact')}</div>
       </div>
 
+      {/* Sub-accounts */}
+      <div className="section-title" style={{ marginBottom: '8px' }}>{t('sub_users')}</div>
+      <div className="card" style={{ marginBottom: '16px' }}>
+        <div style={{ fontSize: '11px', color: 'var(--txm)', marginBottom: '12px', lineHeight: 1.5 }}>
+          {t('sub_users_desc', { apt: profile.apt_number })}
+        </div>
+
+        {/* Placeholder — existing sub-users would list here */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '12px' }}>
+          {/* Example of how a sub-user row will look when wired */}
+          {(profile.sub_profiles || []).map((sub: any) => (
+            <div key={sub.id} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '8px', borderRadius: '10px', background: 'var(--sand-d)' }}>
+              <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'var(--pine)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', fontWeight: 600, color: '#fff', flexShrink: 0 }}>
+                {sub.email?.slice(0,1).toUpperCase() || '?'}
+              </div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: '12px', fontWeight: 500, color: 'var(--tx)' }}>{sub.email}</div>
+                <div style={{ fontSize: '10px', color: 'var(--txl)' }}>Apt {profile.apt_number} · resident</div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Invite form */}
+        {showInvite ? (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <input
+              type="email"
+              value={inviteEmail}
+              onChange={e => setInviteEmail(e.target.value)}
+              placeholder="email@example.com"
+              className="form-input"
+              style={{ fontSize: '12px' }}
+            />
+            <div style={{ fontSize: '10px', color: 'var(--txl)' }}>{t('sub_user_invite_hint')}</div>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <button
+                className="btn btn-primary btn-sm"
+                style={{ flex: 1, opacity: 0.5, cursor: 'not-allowed' }}
+                title="Coming soon"
+              >
+                Send invite
+              </button>
+              <button onClick={() => { setShowInvite(false); setInviteEmail('') }} className="btn btn-sm">{tc('cancel')}</button>
+            </div>
+            <div style={{ fontSize: '10px', color: 'var(--txl)', fontStyle: 'italic' }}>Sub-account invites coming soon.</div>
+          </div>
+        ) : (
+          <button
+            onClick={() => setShowInvite(true)}
+            style={{ ...chipBase, borderColor: 'var(--pine)', color: 'var(--pine)', padding: '6px 14px', borderStyle: 'dashed' }}
+          >
+            {t('add_sub_user')}
+          </button>
+        )}
+      </div>
+
+      {/* Interests */}
       <div className="section-title" style={{ marginBottom: '8px' }}>{t('interests')}</div>
       <div className="card" style={{ marginBottom: '16px' }}>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
           {INTERESTS.map(interest => (
-            <button key={interest} onClick={() => toggleInterest(interest)} style={{ ...chipBase, background: selectedInterests.includes(interest) ? 'var(--pine)' : 'transparent', color: selectedInterests.includes(interest) ? '#fff' : 'var(--txm)', borderColor: selectedInterests.includes(interest) ? 'var(--pine)' : 'var(--br)' }}>
-              {interest}
+            <button key={interest} onClick={() => toggleInterest(interest)}
+              style={{ ...chipBase, background: selectedInterests.includes(interest) ? 'var(--pine)' : 'transparent', color: selectedInterests.includes(interest) ? '#fff' : 'var(--txm)', borderColor: selectedInterests.includes(interest) ? 'var(--pine)' : 'var(--br)' }}>
+              {getInterestLabel(interest)}
             </button>
           ))}
         </div>
       </div>
 
+      {/* Privacy */}
       <div className="section-title" style={{ marginBottom: '8px' }}>{t('privacy')}</div>
       <div className="card" style={{ marginBottom: '16px' }}>
-        {[
-          { key: 'show_names', label: 'Show occupant names in directory' },
-          { key: 'show_ages', label: 'Show ages' },
-          { key: 'show_interests', label: 'Show interests' },
-          { key: 'show_phone', label: 'Show phone to neighbours' },
-          { key: 'show_in_directory', label: 'Appear in building directory' },
-          { key: 'birthday_wishes', label: 'Birthday community wishes' },
-          { key: 'email_notifications', label: 'Email notifications' },
-          { key: 'google_calendar_sync', label: 'Sync bookings to Google Calendar' },
-        ].map(({ key, label }, i) => (
+        {privacyItems.map(({ key, label }, i) => (
           <label key={key} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 0', cursor: 'pointer', borderTop: i === 0 ? 'none' : '1px solid var(--br)' }}>
-            <input type="checkbox" checked={privacy[key as keyof typeof privacy]} onChange={e => setPrivacy(p => ({ ...p, [key]: e.target.checked }))} style={{ width: '14px', height: '14px', accentColor: 'var(--pine)', flexShrink: 0 }} />
+            <input type="checkbox" checked={privacy[key as keyof typeof privacy]} onChange={e => setPrivacy(p => ({ ...p, [key]: e.target.checked }))}
+              style={{ width: '14px', height: '14px', accentColor: 'var(--pine)', flexShrink: 0 }} />
             <span style={{ fontSize: '12px', color: 'var(--tx)' }}>{label}</span>
           </label>
         ))}
@@ -177,42 +253,45 @@ export default function SettingsClient({ profile, apartment, email }: Props) {
         {saving ? tc('saving') : t('save')}
       </button>
 
+      {/* Danger zone */}
       <div className="section-title" style={{ marginBottom: '8px', color: '#dc2626' }}>{t('danger_zone')}</div>
       <div className="card" style={{ border: '1px solid #fecaca', display: 'flex', flexDirection: 'column', gap: '16px' }}>
 
-        {/* GDPR data export */}
+        {/* GDPR export */}
         <div>
           <div style={{ fontSize: '13px', fontWeight: 500, color: 'var(--tx)', marginBottom: '4px' }}>{t('download_data')}</div>
-          <div style={{ fontSize: '11px', color: 'var(--txm)', marginBottom: '10px', lineHeight: 1.5 }}>
-            {t('download_data_desc')}
-          </div>
-          <button onClick={exportData} disabled={exporting} style={{ padding: '8px 16px', borderRadius: '10px', fontSize: '12px', fontWeight: 500, background: 'transparent', border: '1px solid var(--br)', color: 'var(--tx)', cursor: 'pointer', opacity: exporting ? 0.6 : 1 }}>
+          <div style={{ fontSize: '11px', color: 'var(--txm)', marginBottom: '10px', lineHeight: 1.5 }}>{t('download_data_desc')}</div>
+          <button onClick={exportData} disabled={exporting}
+            style={{ padding: '8px 16px', borderRadius: '10px', fontSize: '12px', fontWeight: 500, background: 'transparent', border: '1px solid var(--br)', color: 'var(--tx)', cursor: 'pointer', opacity: exporting ? 0.6 : 1 }}>
             {exporting ? t('download_data_preparing') : t('download_data_btn')}
           </button>
         </div>
 
         <div style={{ borderTop: '1px solid #fecaca' }} />
+
+        {/* Delete account */}
         <div style={{ fontSize: '13px', fontWeight: 500, color: '#dc2626', marginBottom: '4px' }}>{t('delete_account')}</div>
         <div style={{ fontSize: '11px', color: 'var(--txm)', marginBottom: '12px', lineHeight: 1.5 }}>
-          This permanently deletes all data associated with Apt {profile.apt_number} — bookings, votes, proposals, and your profile. The apartment remains in the building directory but will show as unregistered. This cannot be undone.
+          {t('delete_account_desc', { apt: profile.apt_number })}
         </div>
         {!deleteConfirm ? (
-          <button onClick={() => setDeleteConfirm(true)} style={{ padding: '8px 16px', borderRadius: '10px', fontSize: '12px', fontWeight: 500, background: 'transparent', border: '1px solid #fecaca', color: '#dc2626', cursor: 'pointer' }}>
+          <button onClick={() => setDeleteConfirm(true)}
+            style={{ padding: '8px 16px', borderRadius: '10px', fontSize: '12px', fontWeight: 500, background: 'transparent', border: '1px solid #fecaca', color: '#dc2626', cursor: 'pointer' }}>
             {t('delete_account')}
           </button>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            <div style={{ fontSize: '12px', color: 'var(--tx)' }}>Type your apartment number <strong>{profile.apt_number}</strong> to confirm:</div>
+            <div style={{ fontSize: '12px', color: 'var(--tx)' }}>{t('delete_confirm_label', { apt: profile.apt_number })}</div>
             <input value={deleteInput} onChange={e => setDeleteInput(e.target.value.toUpperCase())} placeholder={profile.apt_number} className="form-input" style={{ borderColor: '#fecaca' }} />
             <div style={{ display: 'flex', gap: '8px' }}>
-              <button onClick={deleteAccount} disabled={deleteInput !== profile.apt_number || deleting} style={{ flex: 1, padding: '8px', borderRadius: '10px', fontSize: '12px', fontWeight: 500, background: deleteInput === profile.apt_number ? '#dc2626' : '#fecaca', color: '#fff', border: 'none', cursor: deleteInput === profile.apt_number ? 'pointer' : 'default', transition: 'background 0.15s' }}>
-                {deleting ? 'Deleting...' : 'Permanently delete'}
+              <button onClick={deleteAccount} disabled={deleteInput !== profile.apt_number || deleting}
+                style={{ flex: 1, padding: '8px', borderRadius: '10px', fontSize: '12px', fontWeight: 500, background: deleteInput === profile.apt_number ? '#dc2626' : '#fecaca', color: '#fff', border: 'none', cursor: deleteInput === profile.apt_number ? 'pointer' : 'default', transition: 'background 0.15s' }}>
+                {deleting ? t('deleting') : t('delete_permanent')}
               </button>
               <button onClick={() => { setDeleteConfirm(false); setDeleteInput('') }} className="btn btn-sm">{tc('cancel')}</button>
             </div>
           </div>
         )}
-
       </div>
     </div>
   )
