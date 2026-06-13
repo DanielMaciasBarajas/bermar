@@ -187,6 +187,13 @@ export default function ProposalsClient({ proposals: initialProposals, profile }
     setProposals(prev => prev.map(p => p.id !== proposalId ? p : { ...p, comments: p.comments?.filter(c => c.id !== commentId) || [] }))
   }
 
+  const isAdmin = profile.role === 'admin'
+
+  async function changeStatus(proposalId: string, newStatus: string) {
+    await supabase.from('proposals').update({ status: newStatus }).eq('id', proposalId)
+    setProposals(prev => prev.map(p => p.id !== proposalId ? p : { ...p, status: newStatus }))
+  }
+
   async function deleteProposal(proposalId: string) {
     if (!confirm(t('delete_proposal_confirm'))) return
     await supabase.from('proposals').delete().eq('id', proposalId)
@@ -335,6 +342,20 @@ export default function ProposalsClient({ proposals: initialProposals, profile }
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: '6px', marginBottom: '8px', flexWrap: 'wrap' }}>
                 <span className={CATEGORY_TAG[p.category] || 'tag tag-gray'}>{getCategoryLabel(p.category)}</span>
                 <span className={STATUS_TAG[p.status] || 'tag tag-gray'}>{statusLabel(p.status)}</span>
+                {isAdmin && (
+                  <select
+                    value={p.status}
+                    onChange={e => changeStatus(p.id, e.target.value)}
+                    className="form-select"
+                    style={{ fontSize: '11px', padding: '2px 6px', height: 'auto', width: 'auto' }}
+                  >
+                    <option value="open">{t('status_open')}</option>
+                    <option value="voting">{t('status_voting')}</option>
+                    <option value="resolved">{t('status_resolved')}</option>
+                    <option value="promoted">{t('status_promoted')}</option>
+                    <option value="archived">{t('status_archived')}</option>
+                  </select>
+                )}
                 <div style={{ marginLeft: 'auto', display: 'flex', gap: '4px' }}>
                   <button
                     title={t('important')}
