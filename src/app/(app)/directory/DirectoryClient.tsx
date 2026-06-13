@@ -11,25 +11,14 @@ interface Props { apartments: Apartment[]; profiles: ProfileData[]; occupants: O
 const DOORS = ['A','B','C','D','E','F','G','H','I','J']
 const FLOORS = [9,8,7,6,5,4,3,2,1]
 
-// Avatar component — shows photo if available, otherwise initials circle
-function AptAvatar({ aptNumber, size = 28, profile }: { aptNumber: string; size?: number; profile?: ProfileData }) {
+function AptAvatar({ aptNumber, size = 36, profile }: { aptNumber: string; size?: number; profile?: ProfileData }) {
   if (profile?.avatar_url) {
-    return (
-      <img
-        src={profile.avatar_url}
-        alt={aptNumber}
-        style={{ width: size, height: size, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }}
-      />
-    )
+    return <img src={profile.avatar_url} alt={aptNumber} style={{ width: size, height: size, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
   }
-  const initials = aptNumber.slice(0, 2).toUpperCase()
-  const fontSize = size < 24 ? '6px' : size < 36 ? '10px' : '13px'
+  const initials = aptNumber.toUpperCase()
+  const fontSize = size <= 28 ? '7px' : size <= 36 ? '9px' : '13px'
   return (
-    <div style={{
-      width: size, height: size, borderRadius: '50%', flexShrink: 0,
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-      background: 'var(--pine)', color: '#fff', fontWeight: 600, fontSize,
-    }}>
+    <div style={{ width: size, height: size, borderRadius: '50%', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--pine)', color: '#fff', fontWeight: 700, fontSize }}>
       {initials}
     </div>
   )
@@ -59,93 +48,101 @@ export default function DirectoryClient({ apartments, profiles, occupants, emerg
   }
 
   return (
-    <div style={{ maxWidth: '960px', margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 200px', gap: '24px', alignItems: 'start' }}>
+    <div style={{ maxWidth: '100%', margin: '0 auto', display: 'grid', gridTemplateColumns: 'minmax(0,1fr) 210px', gap: '20px', alignItems: 'start' }}>
+
+      {/* LEFT — building grid */}
       <div>
         <h2 style={{ fontSize: '18px', fontWeight: 600, color: 'var(--tx)', marginBottom: '2px' }}>{tNav('directory')}</h2>
-        <div style={{ fontSize: '11px', color: 'var(--txm)', marginBottom: '4px' }}>{t('building')}</div>
-        <div style={{ fontSize: '11px', color: 'var(--txl)', marginBottom: '12px' }}>
+        <div style={{ fontSize: '11px', color: 'var(--txm)', marginBottom: '2px' }}>{t('building')}</div>
+        <div style={{ fontSize: '11px', color: 'var(--txl)', marginBottom: '10px' }}>
           {t('registered_count', { registered: registeredCount, total: totalApts })} · {t('hover_hint')}
         </div>
 
-        <div style={{ overflowX: 'auto' }}>
-          <div style={{ minWidth: '380px' }}>
-            {/* Door letters header */}
-            <div style={{ display: 'grid', gridTemplateColumns: '28px repeat(10, 1fr)', gap: '3px', marginBottom: '4px' }}>
-              <div />
-              {DOORS.map(d => <div key={d} style={{ textAlign: 'center', fontSize: '9px', fontWeight: 500, color: 'var(--txl)' }}>{d}</div>)}
-            </div>
-
-            {FLOORS.map(floor => (
-              <div key={floor} style={{ display: 'grid', gridTemplateColumns: '28px repeat(10, 1fr)', gap: '3px', marginBottom: '3px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', paddingRight: '6px', fontSize: '9px', fontWeight: 500, color: 'var(--txl)' }}>{floor}</div>
-                {DOORS.map(door => {
-                  const { aptNumber, profile, isDuplex } = getCellInfo(floor, door)
-                  const hasRegistration = !!profile
-                  const isOptedOut = hasRegistration && !profile.show_in_directory
-                  const isMe = currentProfile.apt_number === aptNumber
-
-                  return (
-                    <div key={door}
-                      style={{
-                        position: 'relative', borderRadius: '6px', padding: '3px 2px',
-                        textAlign: 'center', cursor: 'pointer', aspectRatio: '1',
-                        border: isMe ? '2px solid var(--pine)' : hasRegistration && !isOptedOut ? '1px solid rgba(26,61,43,0.2)' : '1px solid var(--br)',
-                        background: hasRegistration && !isOptedOut ? 'rgba(26,61,43,0.08)' : 'var(--sand-d)',
-                        transition: 'all 0.15s',
-                        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '1px',
-                      }}
-                      onMouseEnter={() => setHoveredApt(aptNumber)}
-                      onMouseLeave={() => setHoveredApt(null)}
-                    >
-                      {hasRegistration && !isOptedOut ? (
-                        <>
-                          <AptAvatar aptNumber={aptNumber} size={20} profile={profile} />
-                          <div style={{ fontSize: '7px', fontWeight: 500, color: 'var(--pine)', lineHeight: 1 }}>
-                            {aptNumber}{isDuplex ? '*' : ''}
-                          </div>
-                        </>
-                      ) : isOptedOut ? (
-                        <>
-                          <div style={{ width: '20px', height: '20px', borderRadius: '50%', background: 'var(--sand-d)', border: '1px solid var(--br)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '8px', color: 'var(--txl)' }}>—</div>
-                          <div style={{ fontSize: '7px', color: 'var(--txl)', lineHeight: 1 }}>{aptNumber}</div>
-                        </>
-                      ) : (
-                        <div style={{ width: '20px', height: '20px', borderRadius: '50%', background: 'var(--br)' }} />
-                      )}
-
-                      {/* Hover tooltip — flips upward for bottom floors */}
-                      {hoveredApt === aptNumber && hasRegistration && !isOptedOut && (
-                        <div style={{
-                          position: 'absolute', zIndex: 20, left: '100%', marginLeft: '4px',
-                          ...(floor <= 3 ? { bottom: 0 } : { top: 0 }),
-                          background: '#fff', borderRadius: '10px', border: '1px solid var(--br)',
-                          boxShadow: '0 4px 12px rgba(0,0,0,0.1)', padding: '10px 12px',
-                          minWidth: '128px', textAlign: 'left',
-                        }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-                            <AptAvatar aptNumber={aptNumber} size={32} profile={profile} />
-                            <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--tx)' }}>
-                              Apt {aptNumber}{isDuplex ? ` / 9${door}` : ''}
-                            </div>
-                          </div>
-                          {profile.show_names
-                            ? occupantsByProfile.get(profile.id)?.map(o => (
-                                <div key={o.profile_id + o.name} style={{ fontSize: '11px', color: 'var(--txm)', lineHeight: 1.6 }}>{o.name}</div>
-                              ))
-                            : <div style={{ fontSize: '11px', color: 'var(--txl)', fontStyle: 'italic' }}>{t('opted_out')}</div>
-                          }
-                        </div>
-                      )}
-                    </div>
-                  )
-                })}
-              </div>
-            ))}
+        {/* Grid — no overflowX, let it fill the column */}
+        <div>
+          {/* Door letters */}
+          <div style={{ display: 'grid', gridTemplateColumns: '22px repeat(10, 1fr)', gap: '3px', marginBottom: '4px' }}>
+            <div />
+            {DOORS.map(d => <div key={d} style={{ textAlign: 'center', fontSize: '9px', fontWeight: 500, color: 'var(--txl)' }}>{d}</div>)}
           </div>
+
+          {FLOORS.map(floor => (
+            <div key={floor} style={{ display: 'grid', gridTemplateColumns: '22px repeat(10, 1fr)', gap: '3px', marginBottom: '3px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', paddingRight: '4px', fontSize: '9px', fontWeight: 500, color: 'var(--txl)' }}>{floor}</div>
+              {DOORS.map(door => {
+                const { aptNumber, profile, isDuplex } = getCellInfo(floor, door)
+                const hasRegistration = !!profile
+                const isOptedOut = hasRegistration && !profile.show_in_directory
+                const isMe = currentProfile.apt_number === aptNumber
+
+                return (
+                  <div key={door}
+                    style={{
+                      position: 'relative', borderRadius: '8px',
+                      aspectRatio: '1', cursor: 'pointer',
+                      border: isMe ? '2px solid var(--pine)' : hasRegistration && !isOptedOut ? '1px solid rgba(26,61,43,0.25)' : '1px solid var(--br)',
+                      background: hasRegistration && !isOptedOut ? 'rgba(26,61,43,0.08)' : 'var(--sand-d)',
+                      transition: 'all 0.15s',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      overflow: 'visible',
+                    }}
+                    onMouseEnter={() => setHoveredApt(aptNumber)}
+                    onMouseLeave={() => setHoveredApt(null)}
+                  >
+                    {hasRegistration && !isOptedOut ? (
+                      <>
+                        {/* Big avatar fills the cell */}
+                        <AptAvatar aptNumber={aptNumber} size={28} profile={profile} />
+                        {/* Apt # in bottom-right corner */}
+                        <div style={{
+                          position: 'absolute', bottom: '2px', right: '3px',
+                          fontSize: '6px', fontWeight: 600, color: 'var(--pine)',
+                          lineHeight: 1, pointerEvents: 'none',
+                        }}>
+                          {aptNumber}{isDuplex ? '*' : ''}
+                        </div>
+                      </>
+                    ) : isOptedOut ? (
+                      <>
+                        <div style={{ fontSize: '10px', color: 'var(--txl)' }}>—</div>
+                        <div style={{ position: 'absolute', bottom: '2px', right: '3px', fontSize: '6px', color: 'var(--txl)', lineHeight: 1 }}>{aptNumber}</div>
+                      </>
+                    ) : (
+                      <div style={{ width: '16px', height: '16px', borderRadius: '50%', background: 'var(--br)' }} />
+                    )}
+
+                    {/* Tooltip — flips up for floors 1-3 */}
+                    {hoveredApt === aptNumber && hasRegistration && !isOptedOut && (
+                      <div style={{
+                        position: 'absolute', zIndex: 30, left: '105%',
+                        ...(floor <= 3 ? { bottom: 0 } : { top: 0 }),
+                        background: '#fff', borderRadius: '10px', border: '1px solid var(--br)',
+                        boxShadow: '0 4px 16px rgba(0,0,0,0.12)', padding: '10px 12px',
+                        minWidth: '130px', textAlign: 'left', pointerEvents: 'none',
+                      }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                          <AptAvatar aptNumber={aptNumber} size={32} profile={profile} />
+                          <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--tx)' }}>
+                            Apt {aptNumber}{isDuplex ? ` / 9${door}` : ''}
+                          </div>
+                        </div>
+                        {profile.show_names
+                          ? occupantsByProfile.get(profile.id)?.map(o => (
+                              <div key={o.profile_id + o.name} style={{ fontSize: '11px', color: 'var(--txm)', lineHeight: 1.6 }}>{o.name}</div>
+                            ))
+                          : <div style={{ fontSize: '11px', color: 'var(--txl)', fontStyle: 'italic' }}>{t('opted_out')}</div>
+                        }
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+          ))}
         </div>
 
         {/* Legend */}
-        <div style={{ display: 'flex', gap: '16px', marginTop: '12px', fontSize: '10px', color: 'var(--txl)', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: '16px', marginTop: '10px', fontSize: '10px', color: 'var(--txl)', flexWrap: 'wrap' }}>
           <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
             <span style={{ display: 'inline-block', width: '12px', height: '12px', borderRadius: '3px', background: 'rgba(26,61,43,0.12)', border: '1px solid rgba(26,61,43,0.2)' }} />
             {t('legend_registered')}
@@ -162,29 +159,31 @@ export default function DirectoryClient({ apartments, profiles, occupants, emerg
         </div>
       </div>
 
-      {/* Right column */}
-      <div>
+      {/* RIGHT — emergency contacts + profile, aligned to top of grid */}
+      <div style={{ paddingTop: '42px' }}>
         <div className="section-title" style={{ marginBottom: '8px' }}>{t('emergency_contacts')}</div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '24px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '20px' }}>
           {emergencyContacts.map(contact => (
-            <div key={contact.id} className="emerg-card">
-              <div style={{ width: '32px', height: '32px', borderRadius: '50%', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px', background: '#dbeafe' }}>
-                {contact.name.includes('Moha') ? '🔧' : contact.name.includes('Liaison') ? '👤' : contact.name.includes('Admin') ? '🏢' : '🆘'}
+            <div key={contact.id} style={{ background: '#fff', borderRadius: '12px', border: '1px solid var(--br)', padding: '10px 12px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <div style={{ width: '28px', height: '28px', borderRadius: '50%', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', background: '#dbeafe' }}>
+                  {contact.name.includes('Moha') ? '🔧' : contact.name.includes('Liaison') ? '👤' : contact.name.includes('Admin') ? '🏢' : '🆘'}
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: '11px', fontWeight: 500, color: 'var(--tx)', lineHeight: 1.3 }}>{contact.name}</div>
+                  <div style={{ fontSize: '10px', color: 'var(--txm)' }}>{contact.available_hours}</div>
+                </div>
               </div>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: '12px', fontWeight: 500, color: 'var(--tx)' }}>{contact.name}</div>
-                <div style={{ fontSize: '11px', color: 'var(--txm)' }}>{contact.available_hours}</div>
-              </div>
-          {contact.phone && (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', alignItems: 'flex-end', flexShrink: 0 }}>
+              {contact.phone && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '2px', flexWrap: 'wrap' }}>
                   <a href={`tel:${contact.phone}`} style={{ fontSize: '11px', fontWeight: 500, color: 'var(--pine)', textDecoration: 'none' }}>{contact.phone}</a>
                   {contact.name.includes('Moha') && (
                     <a
-                      href={`https://wa.me/34${contact.phone.replace(/\s/g, '')}?text=${encodeURIComponent('Hola Moha! Soy un vecino de Bermar Park (Gavà Mar). Te escribo para comunicarte lo siguiente: ')}`}
+                      href={`https://wa.me/34${contact.phone.replace(/\s/g, '')}?text=${encodeURIComponent('Hola Moha! Soy un vecino de Bermar Park (Gava Mar). Te escribo para comunicarte lo siguiente: ')}`}
                       target="_blank" rel="noopener noreferrer"
-                      style={{ fontSize: '10px', fontWeight: 500, color: '#fff', background: '#25d366', borderRadius: '999px', padding: '2px 8px', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '3px' }}
+                      style={{ fontSize: '10px', fontWeight: 500, color: '#fff', background: '#25d366', borderRadius: '999px', padding: '2px 8px', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '3px' }}
                     >
-                      <span>💬</span> WhatsApp
+                      💬 WhatsApp
                     </a>
                   )}
                 </div>
