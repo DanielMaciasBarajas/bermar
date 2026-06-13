@@ -7,7 +7,8 @@ import { useTranslations } from 'next-intl'
 import type { Profile } from '@/lib/supabase/types'
 
 interface Comment {
-  id: string; proposal_id: string; profile_id: string; apt_number: string; body: string; created_at: string; photo_url?: string | null
+  id: string; proposal_id: string; profile_id: string; apt_number: string
+  body: string; photo_url?: string | null; created_at: string
 }
 interface ProposalData {
   id: string; title: string; body: string; body_translations: any; category: string; status: string
@@ -41,6 +42,8 @@ export default function ProposalsClient({ proposals: initialProposals, profile }
   }
 
   const supabase = createClient()
+
+  // ── State ──────────────────────────────────────────────
   const [proposals, setProposals] = useState<ProposalData[]>(initialProposals)
   const [categoryFilter, setCategoryFilter] = useState('all')
   const [statusFilter, setStatusFilter] = useState('all')
@@ -53,26 +56,11 @@ export default function ProposalsClient({ proposals: initialProposals, profile }
   const [saving, setSaving] = useState(false)
   const [openComments, setOpenComments] = useState<string | null>(null)
   const [commentTexts, setCommentTexts] = useState<Record<string, string>>({})
+  const [commentPhotos, setCommentPhotos] = useState<Record<string, File | null>>({})
+  const [commentPhotoPreviews, setCommentPhotoPreviews] = useState<Record<string, string | null>>({})
   const [postingComment, setPostingComment] = useState(false)
-  const [commentPhotos, setCommentPhotos] = useState<Record<string, File | null>>({})
-  const [commentPhotoPreviews, setCommentPhotoPreviews] = useState<Record<string, string | null>>({})
 
-  function pickCommentPhoto(proposalId: string, e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0]
-    if (!file) return
-    setCommentPhotos(prev => ({ ...prev, [proposalId]: file }))
-    setCommentPhotoPreviews(prev => ({ ...prev, [proposalId]: URL.createObjectURL(file) }))
-  }
-  const [commentPhotos, setCommentPhotos] = useState<Record<string, File | null>>({})
-  const [commentPhotoPreviews, setCommentPhotoPreviews] = useState<Record<string, string | null>>({})
-
-  function pickCommentPhoto(proposalId: string, e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0]
-    if (!file) return
-    setCommentPhotos(prev => ({ ...prev, [proposalId]: file }))
-    setCommentPhotoPreviews(prev => ({ ...prev, [proposalId]: URL.createObjectURL(file) }))
-  }
-
+  // ── Helpers ──────────────────────────────────────────────
   const statusLabel = (status: string) => {
     const map: Record<string, string> = {
       open: t('status_open'), voting: t('status_voting'), resolved: t('status_resolved'),
@@ -81,6 +69,14 @@ export default function ProposalsClient({ proposals: initialProposals, profile }
     return map[status] || status
   }
 
+  function pickCommentPhoto(proposalId: string, e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setCommentPhotos(prev => ({ ...prev, [proposalId]: file }))
+    setCommentPhotoPreviews(prev => ({ ...prev, [proposalId]: URL.createObjectURL(file) }))
+  }
+
+  // ── Filtered + sorted list ──────────────────────────────
   const filtered = proposals.filter(p => {
     const myFlag = p.flags?.find(f => f.profile_id === profile.id)
     if (personalFilter === 'important' && !myFlag?.is_important) return false
@@ -99,12 +95,12 @@ export default function ProposalsClient({ proposals: initialProposals, profile }
     return 0
   })
 
+  // ── Actions ──────────────────────────────────────────────
   async function vote(proposalId: string, voteType: 'support' | 'against') {
     const proposal = proposals.find(p => p.id === proposalId)
     if (!proposal) return
     const existing = proposal.votes?.find(v => v.profile_id === profile.id)
 
-    // Optimistic update
     setProposals(prev => prev.map(p => {
       if (p.id !== proposalId) return p
       let newVotes = p.votes?.filter(v => v.profile_id !== profile.id) || []
@@ -136,9 +132,9 @@ export default function ProposalsClient({ proposals: initialProposals, profile }
   async function setFlag(proposalId: string, field: 'is_important' | 'is_following' | 'is_dismissed', value: boolean) {
     setProposals(prev => prev.map(p => {
       if (p.id !== proposalId) return p
-      const existingFlag = p.flags?.find(f => f.profile_id === profile.id)
+      const existing = p.flags?.find(f => f.profile_id === profile.id)
       const base = { is_important: false, is_following: false, is_dismissed: false, last_read_at: null }
-      const newFlag = { ...base, ...existingFlag, profile_id: profile.id, [field]: value }
+      const newFlag = { ...base, ...existing, profile_id: profile.id, [field]: value }
       const newFlags = [...(p.flags?.filter(f => f.profile_id !== profile.id) || []), newFlag]
       return { ...p, flags: newFlags }
     }))
@@ -164,10 +160,7 @@ export default function ProposalsClient({ proposals: initialProposals, profile }
       proposal_id: proposalId, profile_id: profile.id, apt_number: profile.apt_number, body, photo_url,
     }).select().single()
     if (newComment) {
-      setProposals(prev => prev.map(p => {
-        if (p.id !== proposalId) return p
-        return { ...p, comments: [...(p.comments || []), newComment] }
-      }))
+      setProposals(prev => prev.map(p => p.id !== proposalId ? p : { ...p, comments: [...(p.comments || []), newComment] }))
       setCommentTexts(prev => ({ ...prev, [proposalId]: '' }))
       setCommentPhotos(prev => ({ ...prev, [proposalId]: null }))
       setCommentPhotoPreviews(prev => ({ ...prev, [proposalId]: null }))
@@ -177,10 +170,7 @@ export default function ProposalsClient({ proposals: initialProposals, profile }
 
   async function deleteComment(proposalId: string, commentId: string) {
     await supabase.from('proposal_comments').delete().eq('id', commentId)
-    setProposals(prev => prev.map(p => {
-      if (p.id !== proposalId) return p
-      return { ...p, comments: p.comments?.filter(c => c.id !== commentId) || [] }
-    }))
+    setProposals(prev => prev.map(p => p.id !== proposalId ? p : { ...p, comments: p.comments?.filter(c => c.id !== commentId) || [] }))
   }
 
   async function submitProposal(e: React.FormEvent) {
@@ -189,12 +179,11 @@ export default function ProposalsClient({ proposals: initialProposals, profile }
       community_id: profile.community_id, profile_id: profile.id, apt_number: profile.apt_number,
       title: newTitle, body: newBody, category: newCategory as any, status: 'open', tagged_apts: [], tag_all: false,
     }).select().single()
-    if (newProposal) {
-      setProposals(prev => [{ ...newProposal, votes: [], flags: [], comments: [] }, ...prev])
-    }
+    if (newProposal) setProposals(prev => [{ ...newProposal, votes: [], flags: [], comments: [] }, ...prev])
     setShowNewForm(false); setNewTitle(''); setNewBody(''); setSaving(false)
   }
 
+  // ── Styles ──────────────────────────────────────────────
   const chipBase: React.CSSProperties = { padding: '4px 10px', borderRadius: '999px', fontSize: '11px', border: '1px solid', cursor: 'pointer', transition: 'all 0.15s' }
 
   const personalFilters = [
@@ -212,8 +201,11 @@ export default function ProposalsClient({ proposals: initialProposals, profile }
     { key: 'apt', label: t('sort_apt') },
   ]
 
+  // ── Render ──────────────────────────────────────────────
   return (
     <div style={{ maxWidth: '720px', margin: '0 auto' }}>
+
+      {/* Filters row */}
       <div style={{ display: 'flex', gap: '8px', marginBottom: '10px', flexWrap: 'wrap', alignItems: 'center' }}>
         <select value={categoryFilter} onChange={e => setCategoryFilter(e.target.value)} className="form-select" style={{ width: 'auto' }}>
           <option value="all">{t('all_categories')}</option>
@@ -231,6 +223,7 @@ export default function ProposalsClient({ proposals: initialProposals, profile }
         <button onClick={() => setShowNewForm(true)} className="btn btn-primary btn-sm" style={{ marginLeft: 'auto' }}>{t('new_proposal')}</button>
       </div>
 
+      {/* Personal filter chips */}
       <div style={{ display: 'flex', gap: '6px', marginBottom: '10px', flexWrap: 'wrap' }}>
         {personalFilters.map(f => (
           <button key={f.key} onClick={() => setPersonalFilter(f.key)} style={{ ...chipBase, background: personalFilter === f.key ? 'var(--pine)' : '#fff', color: personalFilter === f.key ? '#fff' : 'var(--txm)', borderColor: personalFilter === f.key ? 'var(--pine)' : 'var(--br)' }}>
@@ -241,6 +234,7 @@ export default function ProposalsClient({ proposals: initialProposals, profile }
 
       <div className="lang-nudge" style={{ marginBottom: '12px' }}>{t('lang_nudge')}</div>
 
+      {/* New proposal form */}
       {showNewForm && (
         <div className="card" style={{ marginBottom: '16px' }}>
           <h3 style={{ fontSize: '13px', fontWeight: 500, color: 'var(--tx)', marginBottom: '12px' }}>{t('new_proposal_title')}</h3>
@@ -260,28 +254,48 @@ export default function ProposalsClient({ proposals: initialProposals, profile }
         </div>
       )}
 
+      {/* Proposals list */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-        {filtered.length === 0 && <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--txl)', fontSize: '13px' }}>{t('no_proposals')}</div>}
+        {filtered.length === 0 && (
+          <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--txl)', fontSize: '13px' }}>{t('no_proposals')}</div>
+        )}
         {filtered.map(p => {
           const myVote = p.votes?.find(v => v.profile_id === profile.id)
           const myFlag = p.flags?.find(f => f.profile_id === profile.id)
           const comments = p.comments || []
-          const commentCount = comments.length
           const closesIn = p.voting_closes_at ? Math.ceil((new Date(p.voting_closes_at).getTime() - Date.now()) / (1000 * 60 * 60 * 24)) : null
           const isCommentsOpen = openComments === p.id
 
           return (
             <div key={p.id} className="card">
+
+              {/* Tags + flag buttons */}
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: '6px', marginBottom: '8px', flexWrap: 'wrap' }}>
                 <span className={CATEGORY_TAG[p.category] || 'tag tag-gray'}>{getCategoryLabel(p.category)}</span>
                 <span className={STATUS_TAG[p.status] || 'tag tag-gray'}>{statusLabel(p.status)}</span>
                 <div style={{ marginLeft: 'auto', display: 'flex', gap: '4px' }}>
-                  <button title="Important" onClick={() => setFlag(p.id, 'is_important', !myFlag?.is_important)} style={{ ...chipBase, padding: '2px 8px', background: myFlag?.is_important ? '#fee2e2' : 'transparent', color: myFlag?.is_important ? '#b91c1c' : 'var(--txl)', borderColor: myFlag?.is_important ? '#fca5a5' : 'var(--br)' }}>⭐</button>
-                  <button title="Follow" onClick={() => setFlag(p.id, 'is_following', !myFlag?.is_following)} style={{ ...chipBase, padding: '2px 8px', background: myFlag?.is_following ? '#dbeafe' : 'transparent', color: myFlag?.is_following ? '#1e40af' : 'var(--txl)', borderColor: myFlag?.is_following ? '#bfdbfe' : 'var(--br)' }}>🔖</button>
-                  <button title="Dismiss" onClick={() => setFlag(p.id, 'is_dismissed', !myFlag?.is_dismissed)} style={{ ...chipBase, padding: '2px 8px', background: myFlag?.is_dismissed ? '#f3f4f6' : 'transparent', color: myFlag?.is_dismissed ? '#374151' : 'var(--txl)', borderColor: myFlag?.is_dismissed ? '#d1d5db' : 'var(--br)' }}>🙈</button>
+                  <button
+                    title={t('important')}
+                    onClick={() => setFlag(p.id, 'is_important', !myFlag?.is_important)}
+                    style={{ ...chipBase, padding: '2px 8px', background: myFlag?.is_important ? '#fee2e2' : 'transparent', color: myFlag?.is_important ? '#b91c1c' : 'var(--txl)', borderColor: myFlag?.is_important ? '#fca5a5' : 'var(--br)' }}>
+                    ⭐
+                  </button>
+                  <button
+                    title={t('following')}
+                    onClick={() => setFlag(p.id, 'is_following', !myFlag?.is_following)}
+                    style={{ ...chipBase, padding: '2px 8px', background: myFlag?.is_following ? '#dbeafe' : 'transparent', color: myFlag?.is_following ? '#1e40af' : 'var(--txl)', borderColor: myFlag?.is_following ? '#bfdbfe' : 'var(--br)' }}>
+                    🔖
+                  </button>
+                  <button
+                    title={t('dismissed')}
+                    onClick={() => setFlag(p.id, 'is_dismissed', !myFlag?.is_dismissed)}
+                    style={{ ...chipBase, padding: '2px 8px', background: myFlag?.is_dismissed ? '#f3f4f6' : 'transparent', color: myFlag?.is_dismissed ? '#374151' : 'var(--txl)', borderColor: myFlag?.is_dismissed ? '#d1d5db' : 'var(--br)' }}>
+                    🙈
+                  </button>
                 </div>
               </div>
 
+              {/* Title + meta */}
               <h3 style={{ fontSize: '13px', fontWeight: 500, color: 'var(--tx)', marginBottom: '4px' }}>{p.title}</h3>
               <div style={{ fontSize: '11px', color: 'var(--txm)', marginBottom: '6px' }}>
                 {t('by_apt', { apt: p.apt_number })} · {formatDate(p.created_at, locale)}
@@ -290,6 +304,7 @@ export default function ProposalsClient({ proposals: initialProposals, profile }
               </div>
               <p style={{ fontSize: '11px', color: 'var(--txm)', lineHeight: 1.5, marginBottom: '12px', whiteSpace: 'pre-line' }}>{getBody(p)}</p>
 
+              {/* Vote + comment buttons */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                 <button onClick={() => vote(p.id, 'support')} style={{ ...chipBase, background: myVote?.vote === 'support' ? '#dcfce7' : 'transparent', color: myVote?.vote === 'support' ? '#166534' : 'var(--txm)', borderColor: myVote?.vote === 'support' ? '#86efac' : 'var(--br)', fontWeight: myVote?.vote === 'support' ? 500 : 400, display: 'flex', alignItems: 'center', gap: '4px' }}>
                   👍 {t('support')} ({p.supports})
@@ -298,12 +313,10 @@ export default function ProposalsClient({ proposals: initialProposals, profile }
                   👎 {t('against')} ({p.against})
                 </button>
                 <button onClick={() => setOpenComments(isCommentsOpen ? null : p.id)} style={{ ...chipBase, background: isCommentsOpen ? '#f0fdf4' : 'transparent', color: isCommentsOpen ? 'var(--pine)' : 'var(--txm)', borderColor: isCommentsOpen ? 'var(--pine)' : 'var(--br)', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  💬 {t('comments')} ({commentCount})
+                  💬 {t('comments')} ({comments.length})
                 </button>
                 {closesIn !== null && closesIn > 0 && (
-                  <span style={{ marginLeft: 'auto', fontSize: '11px', color: 'var(--txl)' }}>
-                    {t('closes_in', { days: closesIn })}
-                  </span>
+                  <span style={{ marginLeft: 'auto', fontSize: '11px', color: 'var(--txl)' }}>{t('closes_in', { days: closesIn })}</span>
                 )}
               </div>
 
@@ -328,10 +341,14 @@ export default function ProposalsClient({ proposals: initialProposals, profile }
                           )}
                         </div>
                         <p style={{ fontSize: '12px', color: 'var(--tx)', margin: 0, lineHeight: 1.4 }}>{c.body}</p>
-                        {c.photo_url && <img src={c.photo_url} alt="" style={{ marginTop: '6px', maxWidth: '100%', maxHeight: '200px', borderRadius: '8px', objectFit: 'cover' }} />}
+                        {c.photo_url && (
+                          <img src={c.photo_url} alt="" style={{ marginTop: '6px', maxWidth: '100%', maxHeight: '200px', borderRadius: '8px', objectFit: 'cover' }} />
+                        )}
                       </div>
                     </div>
                   ))}
+
+                  {/* Comment input */}
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '8px' }}>
                     <div style={{ display: 'flex', gap: '8px' }}>
                       <input
@@ -352,11 +369,18 @@ export default function ProposalsClient({ proposals: initialProposals, profile }
                       </button>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <input type="file" accept="image/*" onChange={e => pickCommentPhoto(p.id, e)} style={{ fontSize: '11px', color: 'var(--txm)' }} />
+                      <label style={{ fontSize: '11px', color: 'var(--txm)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        📷
+                        <input type="file" accept="image/*" onChange={e => pickCommentPhoto(p.id, e)} style={{ display: 'none' }} />
+                      </label>
                       {commentPhotoPreviews[p.id] && (
                         <div style={{ position: 'relative', display: 'inline-block' }}>
                           <img src={commentPhotoPreviews[p.id]!} alt="" style={{ width: '60px', height: '40px', objectFit: 'cover', borderRadius: '6px', border: '1px solid var(--br)' }} />
-                          <button onClick={() => { setCommentPhotos(prev => ({ ...prev, [p.id]: null })); setCommentPhotoPreviews(prev => ({ ...prev, [p.id]: null })) }} style={{ position: 'absolute', top: '-4px', right: '-4px', background: 'var(--tx)', color: 'var(--bg)', border: 'none', borderRadius: '50%', width: '14px', height: '14px', fontSize: '8px', cursor: 'pointer', lineHeight: '14px', textAlign: 'center' }}>x</button>
+                          <button
+                            onClick={() => { setCommentPhotos(prev => ({ ...prev, [p.id]: null })); setCommentPhotoPreviews(prev => ({ ...prev, [p.id]: null })) }}
+                            style={{ position: 'absolute', top: '-4px', right: '-4px', background: 'var(--tx)', color: 'var(--bg)', border: 'none', borderRadius: '50%', width: '14px', height: '14px', fontSize: '8px', cursor: 'pointer', lineHeight: '14px', textAlign: 'center' }}>
+                            x
+                          </button>
                         </div>
                       )}
                     </div>
