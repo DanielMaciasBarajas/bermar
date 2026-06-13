@@ -9,7 +9,7 @@ import type { Profile } from '@/lib/supabase/types'
 interface BookingData {
   id: string; apt_number: string; date: string; slot_start: string | null; slot_end: string | null
   halfday_period: string | null; invite_open: boolean; invite_scope: string; invite_max_slots: number | null
-  premise: { name: string; icon: string } | null
+  premise: { name: string; icon: string; name_translations?: any } | null
   participants: { apt_number: string; profile_id: string }[]
 }
 interface VoicePost { id: string; body: any; trigger_type: string; entity_id?: string | null; created_at: string }
@@ -18,9 +18,19 @@ type Tab = 'upcoming' | 'live' | 'past'
 
 export default function EventsClient({ upcoming, live, past, voicePosts, profile }: Props) {
   const supabase = createClient()
+  const t = useTranslations('events')
   const tc = useTranslations('common')
+  const lang = (profile as any).preferred_lang || 'CA'
+  const locale = lang.toLowerCase()
   const [activeTab, setActiveTab] = useState<Tab>('upcoming')
   const [joiningId, setJoiningId] = useState<string | null>(null)
+
+  function getPremiseName(premise: BookingData['premise']): string {
+    if (!premise) return ''
+    const nt = premise.name_translations
+    if (nt && typeof nt === 'object') return nt[lang] || nt['CA'] || nt['ES'] || premise.name
+    return premise.name
+  }
 
   async function joinBooking(bookingId: string) {
     setJoiningId(bookingId)
@@ -33,9 +43,9 @@ export default function EventsClient({ upcoming, live, past, voicePosts, profile
   }
 
   const tabs = [
-    { id: 'upcoming' as Tab, label: `Upcoming${upcoming.length > 0 ? ` (${upcoming.length})` : ''}` },
-    { id: 'live' as Tab, label: `Live now${live.length > 0 ? ` (${live.length})` : ''}` },
-    { id: 'past' as Tab, label: 'Past' },
+    { id: 'upcoming' as Tab, label: upcoming.length > 0 ? t('upcoming_count', { n: upcoming.length }) : t('upcoming') },
+    { id: 'live' as Tab, label: live.length > 0 ? t('live_now_count', { n: live.length }) : t('live_now') },
+    { id: 'past' as Tab, label: t('past') },
   ]
 
   const avatarBase: React.CSSProperties = { width: '24px', height: '24px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', fontWeight: 600, color: '#fff', flexShrink: 0 }
@@ -51,7 +61,7 @@ export default function EventsClient({ upcoming, live, past, voicePosts, profile
       {/* UPCOMING */}
       {activeTab === 'upcoming' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          {upcoming.length === 0 && <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--txl)', fontSize: '13px' }}>No upcoming open events. Book a premise and open it to neighbours!</div>}
+          {upcoming.length === 0 && <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--txl)', fontSize: '13px' }}>{t('no_upcoming')}</div>}
           {upcoming.map(booking => {
             const isParticipant = booking.participants.some(p => p.profile_id === profile.id)
             const isOwner = booking.apt_number === profile.apt_number
@@ -59,20 +69,20 @@ export default function EventsClient({ upcoming, live, past, voicePosts, profile
             return (
               <div key={booking.id} className="card">
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-                  <span className="tag tag-amber">Invite open</span>
-                  <span style={{ fontSize: '13px', fontWeight: 500, color: 'var(--tx)' }}>{booking.premise?.name} · @{booking.apt_number}</span>
+                  <span className="tag tag-amber">{t('invite_open')}</span>
+                  <span style={{ fontSize: '13px', fontWeight: 500, color: 'var(--tx)' }}>{getPremiseName(booking.premise)} · @{booking.apt_number}</span>
                 </div>
                 <div style={{ fontSize: '11px', color: 'var(--txm)', marginBottom: '12px' }}>
-                  {formatDate(booking.date)}
-                  {booking.slot_start && ` · ${formatTime(booking.slot_start)}–${formatTime(booking.slot_end || '')}`}
+                  {formatDate(booking.date, locale)}
+                  {booking.slot_start && ` · ${formatTime(booking.slot_start)}-${formatTime(booking.slot_end || '')}`}
                   {booking.halfday_period && ` · ${booking.halfday_period}`}
-                  {` · ${booking.participants.length}/${booking.invite_max_slots} spots filled`}
+                  {` · ${t('spots_filled', { filled: booking.participants.length, max: booking.invite_max_slots })}`}
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '12px' }}>
                   <div style={{ ...avatarBase, background: 'var(--pine)' }}>{booking.apt_number.slice(0,2)}</div>
                   {booking.participants.map(p => <div key={p.profile_id} style={{ ...avatarBase, background: '#4b5563' }}>{p.apt_number.slice(0,2)}</div>)}
                   {spotsLeft > 0 && Array.from({ length: spotsLeft }).map((_, i) => <div key={i} style={{ ...avatarBase, background: '#dbeafe', color: '#1e40af', fontWeight: 500 }}>+1</div>)}
-                  {spotsLeft > 0 && <span style={{ fontSize: '11px', color: '#2563eb', marginLeft: '4px' }}>{spotsLeft} spot{spotsLeft !== 1 ? 's' : ''} open</span>}
+                  {spotsLeft > 0 && <span style={{ fontSize: '11px', color: '#2563eb', marginLeft: '4px' }}>{t('spots_open', { n: spotsLeft, s: spotsLeft !== 1 ? 's' : '' })}</span>}
                 </div>
                 {!isOwner && (
                   <div style={{ display: 'flex', gap: '8px' }}>
@@ -82,7 +92,7 @@ export default function EventsClient({ upcoming, live, past, voicePosts, profile
                       </button>
                     )}
                     {isParticipant && <button onClick={() => leaveBooking(booking.id)} className="btn btn-sm">{tc('leave')}</button>}
-                    {spotsLeft === 0 && !isParticipant && <span style={{ fontSize: '11px', color: 'var(--txl)', padding: '6px 0' }}>Full</span>}
+                    {spotsLeft === 0 && !isParticipant && <span style={{ fontSize: '11px', color: 'var(--txl)', padding: '6px 0' }}>{t('full')}</span>}
                   </div>
                 )}
               </div>
@@ -94,7 +104,7 @@ export default function EventsClient({ upcoming, live, past, voicePosts, profile
       {/* LIVE */}
       {activeTab === 'live' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          {live.length === 0 && <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--txl)', fontSize: '13px' }}>No events happening right now.</div>}
+          {live.length === 0 && <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--txl)', fontSize: '13px' }}>{t('no_live')}</div>}
           {live.map(booking => {
             const spotsLeft = (booking.invite_max_slots || 0) - booking.participants.length
             const isParticipant = booking.participants.some(p => p.profile_id === profile.id)
@@ -102,13 +112,15 @@ export default function EventsClient({ upcoming, live, past, voicePosts, profile
             return (
               <div key={booking.id} className="card">
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-                  <span className="tag tag-green" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span className="pulse-dot" />Live</span>
-                  <span style={{ fontSize: '13px', fontWeight: 500, color: 'var(--tx)' }}>{booking.premise?.name} · @{booking.apt_number}</span>
+                  <span className="tag tag-green" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span className="pulse-dot" />{t('live_tag')}</span>
+                  <span style={{ fontSize: '13px', fontWeight: 500, color: 'var(--tx)' }}>{getPremiseName(booking.premise)} · @{booking.apt_number}</span>
                 </div>
                 <div style={{ fontSize: '11px', color: 'var(--txm)', marginBottom: '12px' }}>
-                  {booking.slot_start && `${formatTime(booking.slot_start)}–${formatTime(booking.slot_end || '')} · `}
-                  {booking.participants.length > 0 ? `${booking.participants.length} participant${booking.participants.length !== 1 ? 's' : ''}` : 'Just started'}
-                  {booking.invite_open && spotsLeft > 0 && ` · ${spotsLeft} spot${spotsLeft !== 1 ? 's' : ''} open`}
+                  {booking.slot_start && `${formatTime(booking.slot_start)}-${formatTime(booking.slot_end || '')} · `}
+                  {booking.participants.length > 0
+                    ? t('participants', { n: booking.participants.length, s: booking.participants.length !== 1 ? 's' : '' })
+                    : t('just_started')}
+                  {booking.invite_open && spotsLeft > 0 && ` · ${t('spots_open', { n: spotsLeft, s: spotsLeft !== 1 ? 's' : '' })}`}
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '12px' }}>
                   <div style={{ ...avatarBase, background: 'var(--pine)' }}>{booking.apt_number.slice(0,2)}</div>
@@ -116,7 +128,7 @@ export default function EventsClient({ upcoming, live, past, voicePosts, profile
                   {booking.invite_open && spotsLeft > 0 && Array.from({ length: Math.min(spotsLeft, 3) }).map((_, i) => <div key={i} style={{ ...avatarBase, background: '#dbeafe', color: '#1e40af' }}>+</div>)}
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', paddingTop: '10px', borderTop: '1px solid var(--br)' }}>
-                  <button style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', color: 'var(--txl)', background: 'none', border: 'none', cursor: 'pointer' }}>📷 Add photo (optional · visible to all)</button>
+                  <button style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', color: 'var(--txl)', background: 'none', border: 'none', cursor: 'pointer' }}>{t('add_photo')}</button>
                   {booking.invite_open && !isOwner && !isParticipant && spotsLeft > 0 && (
                     <button onClick={() => joinBooking(booking.id)} className="btn btn-primary btn-sm" style={{ marginLeft: 'auto' }}>{tc('join')}</button>
                   )}
@@ -130,18 +142,26 @@ export default function EventsClient({ upcoming, live, past, voicePosts, profile
       {/* PAST */}
       {activeTab === 'past' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          {past.length === 0 && <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--txl)', fontSize: '13px' }}>No past events in the last 30 days.</div>}
+          {past.length === 0 && <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--txl)', fontSize: '13px' }}>{t('no_past')}</div>}
           {past.map(booking => {
             const voicePost = voicePosts.find(v => v.entity_id === booking.id)
-            const voiceText = voicePost ? (typeof voicePost.body === 'object' ? voicePost.body.EN || voicePost.body.CA || Object.values(voicePost.body)[0] : voicePost.body) : null
+            const voiceText = voicePost ? (typeof voicePost.body === 'object' ? voicePost.body[lang] || voicePost.body.EN || voicePost.body.CA || Object.values(voicePost.body)[0] : voicePost.body) : null
             return (
               <div key={booking.id} className="cv-card" style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
                 <div style={{ width: '28px', height: '28px', borderRadius: '50%', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', background: 'var(--pine)' }}>🎾</div>
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: '8px', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--pine)', marginBottom: '4px' }}>{booking.premise?.name} · {formatDate(booking.date)}</div>
+                  <div style={{ fontSize: '8px', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--pine)', marginBottom: '4px' }}>
+                    {getPremiseName(booking.premise)} · {formatDate(booking.date, locale)}
+                  </div>
                   {voiceText
                     ? <p style={{ fontSize: '13px', fontStyle: 'italic', lineHeight: 1.4, marginBottom: '8px', fontFamily: 'DM Serif Display, serif' }}>{voiceText}</p>
-                    : <p style={{ fontSize: '11px', color: 'var(--txm)', marginBottom: '8px' }}>{booking.participants.length > 0 ? `${booking.participants.length + 1} participants` : `Booked by @${booking.apt_number}`}{booking.slot_start && ` · ${formatTime(booking.slot_start)}–${formatTime(booking.slot_end || '')}`}</p>
+                    : <p style={{ fontSize: '11px', color: 'var(--txm)', marginBottom: '8px' }}>
+                        {booking.participants.length > 0
+                          ? t('participants', { n: booking.participants.length + 1, s: booking.participants.length !== 0 ? 's' : '' })
+                          : t('booked_by', { apt: booking.apt_number })}
+                        {booking.slot_start && ` · ${formatTime(booking.slot_start)}-${formatTime(booking.slot_end || '')}`}
+                        {booking.halfday_period && ` · ${booking.halfday_period}`}
+                      </p>
                   }
                   <div style={{ display: 'flex', gap: '4px' }}>
                     <div style={{ ...avatarBase, width: '20px', height: '20px', fontSize: '7px', background: 'var(--pine)' }}>{booking.apt_number.slice(0,2)}</div>

@@ -17,7 +17,7 @@ export default async function EventsPage() {
   // Upcoming: future bookings with open invites
   const { data: upcoming } = await supabase
     .from('bookings')
-    .select('*, premise:premises(name, icon), participants:booking_participants(apt_number, profile_id)')
+    .select('*, premise:premises(name, icon, name_translations), participants:booking_participants(apt_number, profile_id)')
     .eq('community_id', profile.community_id)
     .eq('status', 'confirmed')
     .eq('invite_open', true)
@@ -29,7 +29,7 @@ export default async function EventsPage() {
   // Live: bookings happening right now
   const { data: live } = await supabase
     .from('bookings')
-    .select('*, premise:premises(name, icon), participants:booking_participants(apt_number, profile_id)')
+    .select('*, premise:premises(name, icon, name_translations), participants:booking_participants(apt_number, profile_id)')
     .eq('community_id', profile.community_id)
     .eq('status', 'confirmed')
     .eq('date', todayStr)
@@ -41,7 +41,7 @@ export default async function EventsPage() {
   const thirtyAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
   const { data: past } = await supabase
     .from('bookings')
-    .select('*, premise:premises(name, icon), participants:booking_participants(apt_number)')
+    .select('*, premise:premises(name, icon, name_translations), participants:booking_participants(apt_number)')
     .eq('community_id', profile.community_id)
     .eq('status', 'confirmed')
     .lt('date', todayStr)

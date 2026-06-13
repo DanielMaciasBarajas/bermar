@@ -170,5 +170,24 @@
     "Dogs": "Chiens",
     "Cooking": "Cuisine",
     "Language exchange": "Échange linguistique"
+  },
+  "events": {
+    "upcoming": "À venir",
+    "upcoming_count": "À venir ({n})",
+    "live_now": "En direct",
+    "live_now_count": "En direct ({n})",
+    "past": "Passés",
+    "invite_open": "Invitation ouverte",
+    "live_tag": "En direct",
+    "spots_filled": "{filled}/{max} places occupées",
+    "spots_open": "{n} place{s} disponible{s}",
+    "full": "Complet",
+    "just_started": "Vient de commencer",
+    "participants": "{n} participant{s}",
+    "booked_by": "Réservé par @{apt}",
+    "add_photo": "Ajouter une photo (optionnel · visible par tous)",
+    "no_upcoming": "Aucun événement ouvert. Réservez un espace et ouvrez-le aux voisins!",
+    "no_live": "Aucun événement en cours.",
+    "no_past": "Aucun événement dans les 30 derniers jours."
   }
 }

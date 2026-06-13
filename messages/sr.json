@@ -170,5 +170,24 @@
     "Dogs": "Пси",
     "Cooking": "Кување",
     "Language exchange": "Размена језика"
+  },
+  "events": {
+    "upcoming": "Predstojeći",
+    "upcoming_count": "Predstojeći ({n})",
+    "live_now": "Uživo",
+    "live_now_count": "Uživo ({n})",
+    "past": "Prošli",
+    "invite_open": "Otvoreni poziv",
+    "live_tag": "Uživo",
+    "spots_filled": "{filled}/{max} mesta zauzeto",
+    "spots_open": "{n} mesto dostupno",
+    "full": "Popunjeno",
+    "just_started": "Upravo počelo",
+    "participants": "{n} učesnik(a)",
+    "booked_by": "Rezervisao @{apt}",
+    "add_photo": "Dodaj foto (opciono · vidljivo svima)",
+    "no_upcoming": "Nema otvorenih događaja. Rezerviši prostor i otvori ga za komšije!",
+    "no_live": "Nema aktivnih događaja trenutno.",
+    "no_past": "Nema događaja u poslednjih 30 dana."
   }
 }

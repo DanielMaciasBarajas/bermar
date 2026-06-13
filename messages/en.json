@@ -170,5 +170,24 @@
     "Dogs": "Dogs",
     "Cooking": "Cooking",
     "Language exchange": "Language exchange"
+  },
+  "events": {
+    "upcoming": "Upcoming",
+    "upcoming_count": "Upcoming ({n})",
+    "live_now": "Live now",
+    "live_now_count": "Live now ({n})",
+    "past": "Past",
+    "invite_open": "Invite open",
+    "live_tag": "Live",
+    "spots_filled": "{filled}/{max} spots filled",
+    "spots_open": "{n} spot{s} open",
+    "full": "Full",
+    "just_started": "Just started",
+    "participants": "{n} participant{s}",
+    "booked_by": "Booked by @{apt}",
+    "add_photo": "Add photo (optional · visible to all)",
+    "no_upcoming": "No upcoming open events. Book a premise and open it to neighbours!",
+    "no_live": "No events happening right now.",
+    "no_past": "No past events in the last 30 days."
   }
 }
