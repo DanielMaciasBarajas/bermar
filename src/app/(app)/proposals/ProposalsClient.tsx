@@ -187,7 +187,7 @@ export default function ProposalsClient({ proposals: initialProposals, profile }
     setProposals(prev => prev.map(p => p.id !== proposalId ? p : { ...p, comments: p.comments?.filter(c => c.id !== commentId) || [] }))
   }
 
-  const isAdmin = profile.role === 'admin'
+  const isAdmin = profile.role === 'admin' || profile.role === 'sa'
 
   async function changeStatus(proposalId: string, newStatus: string) {
     await supabase.from('proposals').update({ status: newStatus }).eq('id', proposalId)
